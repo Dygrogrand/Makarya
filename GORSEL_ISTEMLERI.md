@@ -1,4 +1,6 @@
-# Makarya · ChatGPT görsel istemleri
+# Makarya · ChatGPT görsel istemleri (arşiv)
+
+> **Şu an kullanılacak dosya: `CHATGPT_PAKETLERI.md`.** Bu dosyadaki kız karakter bölümleri (1–3) erkek hikâyesi bitince kullanılacak: bitmiş erkek görseli yüklenip "çocuğu kızla değiştir" yöntemiyle.
 
 Bu dosya, oyunda eksik olan görselleri ChatGPT'ye ürettirmek için hazırlandı. İstemler İngilizce, çünkü görsel modelleri İngilizce talimatlara daha tutarlı cevap veriyor. Açıklamalar Türkçe.
 

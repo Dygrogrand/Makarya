@@ -50,6 +50,8 @@ button:disabled{cursor:default}
 .genderBtn{border:0;border-radius:14px;min-height:74px;color:#fff;font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 3px 0 rgba(0,0,0,.25)}
 .genderBtn.kiz{background:#a8433a}.genderBtn.erkek{background:#26405e}
 .genderBtn span{font-size:26px}
+.genderBtn.soon{opacity:.55;position:relative;cursor:default}
+.genderBtn em{position:absolute;top:6px;right:8px;font-style:normal;font-size:10.5px;letter-spacing:.6px;background:rgba(0,0,0,.35);border-radius:999px;padding:2px 7px;text-transform:uppercase}
 .saveCard{border:1px solid #d7c08b;background:#f7edd3;border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .saveCard b{font-size:14px}.saveCard small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
 .saveCard button{border:0;background:var(--ink);color:#fff;border-radius:10px;padding:10px 12px;font-weight:900;font-size:13px}
@@ -189,3 +191,35 @@ button:disabled{cursor:default}
   .art{flex-basis:30%}.artCaption h1{font-size:24px}.artCaption p{font-size:13.5px}
   .choice{min-height:56px;padding:8px 10px}.mgStage{min-height:210px}
 }
+
+/* İç sesler */
+.voice{border-left:4px solid var(--vc);background:#fbf6ea;border-radius:0 12px 12px 0;padding:8px 11px;font-size:14px;line-height:1.4;color:#2e2720;animation:vin .35s ease-out both}
+.voice b{display:block;font-size:11.5px;letter-spacing:1px;color:var(--vc);margin-bottom:2px}
+.voice b i{font-style:normal;font-weight:700;color:var(--muted);letter-spacing:.2px}
+.voice.off{opacity:.62;font-style:italic}
+.voice:nth-child(2){animation-delay:.15s}.voice:nth-child(3){animation-delay:.3s}
+@keyframes vin{from{opacity:0;transform:translateX(-8px)}to{transform:none}}
+.tag.voiceTag{background:#e3eef0;color:#23606a}
+
+/* Yeni mini oyunlar */
+.mgPulse{width:132px;height:132px;margin:0 auto;border-radius:50%;border:0;background:#2b2438;font-size:58px;display:grid;place-items:center;box-shadow:0 0 0 0 rgba(246,217,120,0);transition:transform .08s,box-shadow .12s;touch-action:manipulation}
+.mgPulse.on{transform:scale(1.1);box-shadow:0 0 0 14px rgba(246,217,120,.35),0 0 40px rgba(246,217,120,.8);background:#3d3352}
+.mgDots{display:flex;justify-content:center;gap:8px}
+.mgDots i{width:14px;height:14px;border-radius:50%;background:#e1d4bb;display:block}
+.mgDots i.hit{background:var(--green)}.mgDots i.miss{background:var(--red)}
+.mgLanes{position:relative;height:260px;border-radius:14px;overflow:hidden;border:1px solid #cdbb99;touch-action:none;
+  background:linear-gradient(90deg,transparent 33%,rgba(0,0,0,.08) 33.3%,transparent 33.6%,transparent 66.3%,rgba(0,0,0,.08) 66.6%,transparent 67%),#eadcc1}
+.mgMe,.mgObs{position:absolute;transform:translate(-50%,-50%);font-size:34px;transition:left .1s}
+.mgMe{top:82%}.mgMe.bump,.mgObs.bump{animation:shake .25s}
+@keyframes shake{25%{transform:translate(-58%,-50%)}75%{transform:translate(-42%,-50%)}}
+.mgSimon{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mgTile{min-height:84px;border-radius:16px;border:1px solid var(--line);background:#fffaf0;font-size:40px;transition:transform .1s,background .1s}
+.mgTile.lit{background:#f6d978;transform:scale(1.06)}
+.mgPoker{position:relative;height:280px;border-radius:14px;background:#f1e5cc;border:1px solid var(--line);overflow:hidden}
+.mgQ{position:absolute;top:10px;left:0;right:0;text-align:center;font-family:var(--serif);font-size:18px;font-weight:900;color:#5a4a36}
+.mgRing{position:absolute;border-radius:50%;border:4px solid var(--green);background:rgba(43,122,79,.12);display:grid;place-items:center;font-size:34px;pointer-events:none}
+.mgRing.bad{border-color:var(--red);background:rgba(165,47,38,.12)}
+.mgTrace{width:100%;height:auto;background:#fffaf0;border:1px solid var(--line);border-radius:14px}
+.mgTrace .guide{fill:none;stroke:#c9b48c;stroke-width:14;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2 14}
+.mgTrace .ink{fill:none;stroke:#26405e;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+.mgTrace .startDot{fill:var(--green)}

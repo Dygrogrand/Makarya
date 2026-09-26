@@ -13,7 +13,9 @@ Seçimlerinle ve 20 yüzlü zarla şekillenen, doğumdan 9 yaşına uzanan bir �
 | `rules.js` | Zar, hedef hesabı, sonuçlar, final kartı |
 | `game.js` | Ekranlar, mini oyunlar, kayıt, paylaşım kartı |
 | `img/` | Görseller (`sahne/`, `aile/`, `kiz/sahne/`, `kiz/aile/`) |
-| `GORSEL_ISTEMLERI.md` | Eksik görseller için ChatGPT istemleri |
+| `TASARIM.md` | Oyun tasarım belgesi: 10 perdelik hayat, iç sesler, ton rehberi, mini oyun kataloğu, mağaza yolu |
+| `CHATGPT_PAKETLERI.md` | Şu anki görsel turu için ChatGPT'ye yapıştırılacak mesajlar |
+| `GORSEL_ISTEMLERI.md` | Arşiv: kız karakter görselleri için sonraki aşama istemleri |
 
 ## Denge
 Zorluk tablosu `data.js` içindeki `DIFF`, bölüm beklentileri `CHAPTERS` altında. 20.000 oyunluk simülasyonla ayarlandı:

@@ -16,10 +16,30 @@ function applyFamily(S, name) {
   S.famStats = Object.assign({}, S.stats);
 }
 
-function hasReq(S, c) {
+function hasReq(S, c, e) {
   if (c.req && S.traits.indexOf(c.req) < 0) return false;
   if (c.reqFlag && S.flags.indexOf(c.reqFlag) < 0) return false;
+  if (c.reqVoice) {
+    var ok = e && eventVoices(S, e).some(function (v) { return v.stat === c.reqVoice && v.pass; });
+    if (!ok) return false;
+  }
   return true;
+}
+
+/* İç sesler: zar atılmadan, stat yeterliyse araya giren pasif kontroller */
+var PASSIVE = { easy: -3, medium: 1, hard: 5, veryHard: 9 };
+var VOICE_NAMES = { "Akıl": "AKIL", "Çene": "ÇENE", "Kurnazlık": "KURNAZLIK", "Cesaret": "CESARET", "Pişkinlik": "PİŞKİNLİK", "Vicdan": "VİCDAN", "Dayanıklılık": "DAYANIKLILIK", "Sosyal Radar": "SOSYAL RADAR" };
+function voicePower(S, stat) {
+  var p = S.stats[stat];
+  S.traits.forEach(function (t) { p += 2 * (((TRAITS[t] || {}).bonus || {})[stat] || 0); });
+  if (S.family) FAMILIES[S.family].traits.forEach(function (t) { p += 2 * ((t.stats || {})[stat] || 0); });
+  return p;
+}
+function eventVoices(S, e) {
+  return (e.voices || []).map(function (v) {
+    var need = CHAPTERS[e.ch].expected + PASSIVE[v.diff];
+    return { stat: v.stat, diff: v.diff, text: v.text, fail: v.fail, opens: v.opens, pass: voicePower(S, v.stat) >= need };
+  });
 }
 
 /* Ailenin bu olay türünde bu stat için verdiği avantaj (hedef puanından düşülür) */

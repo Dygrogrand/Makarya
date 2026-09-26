@@ -3,6 +3,8 @@ var S = newState();
 var CUR = null;          // o anki seçim: {e, c, idx, b, res, roll, mini}
 var MG = { timers: [], raf: null, done: false };
 var SAVE_KEY = "makarya-kayit-v3";
+var VOICE_COLORS = { "Akıl": "#3b6ea5", "Çene": "#b0572b", "Kurnazlık": "#8a6d1c", "Cesaret": "#b3322a", "Pişkinlik": "#8e3f86", "Vicdan": "#5f7d6a", "Dayanıklılık": "#6b5a48", "Sosyal Radar": "#2f7f86" };
+var GIRL_OPEN = false;  // kız karakter görselleri tamamlanınca true yap
 var ROMAN = { 1: "I", 2: "II", 3: "III" };
 var app = document.getElementById("app");
 
@@ -58,13 +60,13 @@ function renderStart() {
   shell("Makarya", art(["img/baslangic.webp"], "🌇", "HAYAT ZARI", "Makarya", "Aynı şehir, birbirinden çok farklı hayatlar.", true),
     '<div class="sectionTitle">Bir hayat başlıyor.</div>' +
     '<div class="sectionSub">Hayatındaki pek çok şeyi seçemeyeceksin. Ama bu kez bazı cevapları sen vereceksin.</div>' + saveHtml +
-    '<div class="genderRow"><button class="genderBtn kiz" onclick="startGame(\'kiz\')"><span>👧</span> Kız</button>' +
+    '<div class="genderRow"><button class="genderBtn kiz soon" disabled><span>👧</span> Kız<em>Yakında</em></button>' +
     '<button class="genderBtn erkek" onclick="startGame(\'erkek\')"><span>👦</span> Erkek</button></div>' +
     '<button class="secondary" onclick="showRules()">Nasıl oynanır?</button>' +
-    '<div class="muted">Yeni sahnelerin görselleri hazırlanıyor; görseli olmayan sahnelerde simgeli kapak görünür.</div>');
+    '<div class="muted">Kız karakterin hikâyesi hazırlanıyor.</div>');
 }
 function resume() { var sv = loadSave(); if (!sv) return; S = sv; render(); }
-function startGame(g) { clearSave(); S = newState(); S.gender = g; S.screen = "family"; render(); }
+function startGame(g) { if (g === "kiz" && !GIRL_OPEN) return; clearSave(); S = newState(); S.gender = g; S.screen = "family"; render(); }
 
 /* ── aile kurası ── */
 function renderFamily() {
@@ -112,16 +114,21 @@ function renderEvent() {
   var e = EVENTS[S.i];
   var recall = (e.recall || []).filter(function (r) { return S.flags.indexOf(r.flag) >= 0; })
     .map(function (r) { return '<div class="recall"><b>GEÇMİŞTEN</b>' + esc(r.text) + "</div>"; }).join("");
+  var voices = eventVoices(S, e).filter(function (v) { return v.pass || v.fail; }).map(function (v) {
+    return '<div class="voice' + (v.pass ? "" : " off") + '" style="--vc:' + VOICE_COLORS[v.stat] + '"><b>' + VOICE_NAMES[v.stat] +
+      ' <i>[' + DIFF[v.diff].label + " · " + (v.pass ? "Başarılı" : "Başarısız") + "]</i></b>" + esc(v.pass ? v.text : v.fail) + "</div>";
+  }).join("");
   var famLine = e.fam && S.family ? '<div class="famLine"><span>🏠</span><span>' + esc(FAMILIES[S.family].lines[e.fam]) + "</span></div>" : "";
   var choices = e.choices.map(function (c, idx) {
-    if (!hasReq(S, c)) {
-      if (c.reqFlag) return "";
+    if (!hasReq(S, c, e)) {
+      if (c.reqFlag || c.reqVoice) return "";
       return '<div class="choice locked"><div class="choiceIcon">🔒</div><div class="choiceMain"><b>' + esc(c.t) +
         "</b><small>Bu seçenek için özellik gerekir: " + esc(c.req) + "</small></div></div>";
     }
     var tags = [], sub, chance;
     if (c.req) tags.push('<span class="tag trait">⭐ ' + esc(c.req) + "</span>");
     if (c.reqFlag) tags.push('<span class="tag trait">📜 Geçmişten gelen seçenek</span>');
+    if (c.reqVoice) tags.push('<span class="tag voiceTag">💭 ' + esc(VOICE_NAMES[c.reqVoice]) + ' açtı</span>');
     if (c.trait && S.traits.indexOf(c.trait) < 0) tags.push('<span class="tag trait">🏅 Kazandırır: ' + esc(c.trait) + "</span>");
     if (c.direct) {
       sub = "Kesin sonuç · " + directSummary(c);
@@ -140,11 +147,11 @@ function renderEvent() {
       '</div><div class="choiceMain"><b>' + esc(c.t) + "</b><small>" + esc(sub) + "</small>" + (tags.length ? '<div class="tags">' + tags.join("") + "</div>" : "") +
       "</div>" + chance + "</button>";
   }).join("");
-  shell(chTitle(e.ch), art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + e.age, e.title, e.text), recall + famLine + choices);
+  shell(chTitle(e.ch), art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + e.age, e.title, e.text), recall + voices + famLine + choices);
 }
 function choose(idx) {
   var e = EVENTS[S.i], c = e.choices[idx];
-  if (!hasReq(S, c)) return;
+  if (!hasReq(S, c, e)) return;
   CUR = { e: e, c: c, idx: idx };
   if (c.direct) { CUR.res = applyOutcome(S, e, c, "direct"); S.screen = "result"; }
   else if (c.mini) S.screen = "minigame";
@@ -378,7 +385,8 @@ function renderMini() {
 function startMini() {
   var m = CUR.c.mini, st = document.getElementById("mg");
   var back = st.parentNode.querySelector(".secondary"); if (back) back.remove();
-  ({ timing: mgTiming, hold: mgHold, collect: mgCollect, race: mgRace, memory: mgMemory, cups: mgCups, doors: mgDoors })[m.type](st, MG.assist, m);
+  ({ timing: mgTiming, hold: mgHold, collect: mgCollect, race: mgRace, memory: mgMemory, cups: mgCups, doors: mgDoors,
+     rhythm: mgRhythm, lanes: mgLanes, simon: mgSimon, poker: mgPoker, trace: mgTrace })[m.type](st, MG.assist, m);
 }
 function mgTiming(st, a, m) {
   var width = 18 + a * 44, left = 50 - width / 2;
@@ -543,6 +551,159 @@ function mgDoors(st, a, m) {
       };
     });
   }, 1800 + a * 3000);
+}
+
+/* Ninni ritmi: ışık parladığı anda dokun */
+function mgRhythm(st, a, m) {
+  var beats = 8, gap = 780, win = 150 + a * 220, t0 = performance.now() + 1200, hits = [], used = [];
+  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><button class="mgPulse" id="pulse">🌙</button><div class="mgStatus" id="rs">Hazırlan…</div><div class="mgDots" id="dots">' +
+    Array(beats + 1).join('<i></i>') + '</div>';
+  var pulse = document.getElementById("pulse"), dots = document.querySelectorAll("#dots i");
+  for (var k = 0; k < beats; k++) (function (k) {
+    later(function () { pulse.classList.add("on"); document.getElementById("rs").textContent = "Dokun!"; later(function () { pulse.classList.remove("on"); }, 180); }, t0 + k * gap - performance.now());
+  })(k);
+  pulse.onpointerdown = function (ev) {
+    ev.preventDefault();
+    var t = performance.now(), k = Math.round((t - t0) / gap);
+    if (k < 0 || k >= beats || used[k]) return;
+    var err = Math.abs(t - (t0 + k * gap));
+    used[k] = true;
+    if (err <= win) { hits[k] = 1 - 0.5 * err / win; dots[k].className = "hit"; }
+    else { hits[k] = 0; dots[k].className = "miss"; }
+  };
+  later(function () {
+    var sum = 0; for (var k = 0; k < beats; k++) sum += hits[k] || 0;
+    finishMini(sum / beats * 1.05);
+  }, t0 + beats * gap + 400 - performance.now());
+}
+
+/* Kalabalıkta ilerle: şerit değiştirerek engellerden kaç */
+function mgLanes(st, a, m) {
+  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgLanes" id="lf"><div class="mgMe" id="me">' + (S.gender === "kiz" ? "👧" : "👦") +
+    '</div></div><div class="mgStatus" id="ls">Çarpma: 0</div><div class="row"><button class="mgBig" id="lb">◀</button><button class="mgBig" id="rb">▶</button></div>';
+  var field = document.getElementById("lf"), me = document.getElementById("me");
+  var lane = 1, obs = [], hits = 0, dur = 8000, t0 = performance.now(), last = t0, nextSpawn = t0 + 300;
+  var speed = 0.055 - a * 0.04, spawnGap = 640 + a * 500, faces = ["🧒", "👧", "👦", "🧒🏽", "👶"];
+  function place() { me.style.left = (lane * 33.33 + 16.66) + "%"; }
+  function move(d) { lane = clamp(lane + d, 0, 2); place(); }
+  place();
+  document.getElementById("lb").onpointerdown = function (ev) { ev.preventDefault(); move(-1); };
+  document.getElementById("rb").onpointerdown = function (ev) { ev.preventDefault(); move(1); };
+  var sx = null;
+  field.onpointerdown = function (ev) { sx = ev.clientX; };
+  field.onpointerup = function (ev) { if (sx == null) return; var dx = ev.clientX - sx; if (Math.abs(dx) > 25) move(dx > 0 ? 1 : -1); sx = null; };
+  function tick(now) {
+    var dt = Math.min(40, now - last); last = now;
+    if (now >= nextSpawn && now - t0 < dur - 900) {
+      var ln = Math.floor(Math.random() * 3), el = document.createElement("div");
+      el.className = "mgObs"; el.textContent = faces[Math.floor(Math.random() * faces.length)];
+      el.style.left = (ln * 33.33 + 16.66) + "%"; field.appendChild(el);
+      obs.push({ lane: ln, y: -8, el: el, hit: false });
+      nextSpawn = now + spawnGap * (0.75 + Math.random() * 0.5);
+    }
+    obs.forEach(function (o) {
+      o.y += dt * speed; o.el.style.top = o.y + "%";
+      if (!o.hit && o.y > 72 && o.y < 90 && o.lane === lane) { o.hit = true; hits++; o.el.classList.add("bump"); me.classList.add("bump"); setTimeout(function () { me.classList.remove("bump"); }, 250); }
+    });
+    obs = obs.filter(function (o) { if (o.y > 110) { o.el.remove(); return false; } return true; });
+    var ls = document.getElementById("ls"); if (ls) ls.textContent = "Çarpma: " + hits + " · " + (Math.max(0, dur - (now - t0)) / 1000).toFixed(1) + " sn";
+    if (now - t0 >= dur) { finishMini(1 - hits * 0.24); return; }
+    MG.raf = requestAnimationFrame(tick);
+  }
+  MG.raf = requestAnimationFrame(tick);
+}
+
+/* Sırayı tekrarla */
+function mgSimon(st, a, m) {
+  var items = ["🥪", "🧃", "🍫", "🥯"], len = clamp(5 - Math.round(a * 3), 3, 6), show = 620 + a * 400;
+  var seq = []; for (var i = 0; i < len; i++) seq.push(Math.floor(Math.random() * 4));
+  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgSimon" id="sg">' +
+    items.map(function (x, i) { return '<button class="mgTile" data-i="' + i + '" disabled>' + x + "</button>"; }).join("") +
+    '</div><div class="mgStatus" id="ss">Dinle: ' + len + ' ürün</div>';
+  var tiles = document.querySelectorAll("#sg .mgTile");
+  seq.forEach(function (x, k) {
+    later(function () { tiles[x].classList.add("lit"); later(function () { tiles[x].classList.remove("lit"); }, show * 0.7); }, 700 + k * show);
+  });
+  later(function () {
+    document.getElementById("ss").textContent = "Şimdi sen söyle!";
+    var pos = 0, t0 = performance.now();
+    Array.prototype.forEach.call(tiles, function (b) {
+      b.disabled = false;
+      b.onclick = function () {
+        var i = +b.getAttribute("data-i");
+        b.classList.add("lit"); setTimeout(function () { b.classList.remove("lit"); }, 150);
+        if (i !== seq[pos]) { finishMini(pos / len * 0.66); return; }
+        pos++;
+        document.getElementById("ss").textContent = pos + " / " + len;
+        if (pos === len) finishMini(performance.now() - t0 < len * 900 ? 0.95 : 0.85);
+      };
+    });
+  }, 700 + len * show + 200);
+}
+
+/* Poker yüzü: parmağı gezinen dairenin içinde tut */
+function mgPoker(st, a, m) {
+  var R = 44 + a * 44, dur = 5000, qs = ["Emin misin?", "Bana bak.", "Gözlerimin içine bak.", "Kulakların neden kızardı?", "Son kez soruyorum.", "Hımm…"];
+  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgPoker" id="pf"><div class="mgQ" id="pq">Parmağını daireye koy</div><div class="mgRing" id="ring" style="width:' + 2 * R + "px;height:" + 2 * R +
+    'px">😐</div></div><div class="mgStatus" id="ps">Başlamak için daireye dokun</div>';
+  var f = document.getElementById("pf"), ring = document.getElementById("ring"), W = f.clientWidth, H = f.clientHeight;
+  var cx = W / 2, cy = H / 2 + 10, tx = cx, ty = cy, px = -999, py = -999, down = false, started = 0, inside = 0, last = 0, qT = 0, qi = 0;
+  function pos(ev) { var r = f.getBoundingClientRect(); px = ev.clientX - r.left; py = ev.clientY - r.top; }
+  f.style.touchAction = "none";
+  f.onpointerdown = function (ev) { ev.preventDefault(); pos(ev); down = true; try { f.setPointerCapture(ev.pointerId); } catch (e) {} if (!started && Math.hypot(px - cx, py - cy) < R) { started = performance.now(); last = started; } };
+  f.onpointermove = function (ev) { if (down) pos(ev); };
+  f.onpointerup = f.onpointercancel = function () { down = false; };
+  function tick(now) {
+    if (started) {
+      var dt = now - last; last = now;
+      var el = now - started, hard = 0.6 + el / dur;
+      if (Math.hypot(tx - cx, ty - cy) < 6) { tx = R + Math.random() * (W - 2 * R); ty = R + 30 + Math.random() * (H - 2 * R - 30); }
+      cx += (tx - cx) * 0.035 * hard; cy += (ty - cy) * 0.035 * hard;
+      var ok = down && Math.hypot(px - cx, py - cy) < R;
+      if (ok) inside += dt;
+      ring.classList.toggle("bad", !ok);
+      ring.textContent = ok ? "😐" : "😳";
+      if (now > qT) { document.getElementById("pq").textContent = qs[qi++ % qs.length]; qT = now + 900; }
+      var ps = document.getElementById("ps"); if (ps) ps.textContent = "Soğukkanlılık %" + Math.round(100 * inside / Math.max(1, el)) + " · " + (Math.max(0, dur - el) / 1000).toFixed(1) + " sn";
+      if (el >= dur) { finishMini(inside / dur * 1.04); return; }
+    }
+    ring.style.left = (cx - R) + "px"; ring.style.top = (cy - R) + "px";
+    MG.raf = requestAnimationFrame(tick);
+  }
+  MG.raf = requestAnimationFrame(tick);
+}
+
+/* Harfi çiz: kesikli çizgiyi tek hamlede takip et */
+function mgTrace(st, a, m) {
+  var P = [[40, 175], [40, 30], [150, 125], [260, 30], [260, 175]], tol = 20 + a * 26, N = 48, cps = [];
+  for (var s = 0; s < P.length - 1; s++) for (var k = 0; k < N / 4; k++) {
+    var u = k / (N / 4); cps.push([P[s][0] + (P[s + 1][0] - P[s][0]) * u, P[s][1] + (P[s + 1][1] - P[s][1]) * u]);
+  }
+  cps.push(P[P.length - 1]);
+  var pts = P.map(function (p) { return p.join(","); }).join(" ");
+  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><svg class="mgTrace" id="tsvg" viewBox="0 0 300 200"><polyline points="' + pts +
+    '" class="guide"/><circle cx="40" cy="175" r="9" class="startDot"/><polyline id="ink" points="" class="ink"/></svg><div class="mgStatus" id="ts">Yeşil noktadan başla</div>';
+  var svg = document.getElementById("tsvg"), ink = document.getElementById("ink"), drawing = false, done = false, line = [], hit = [], off = 0, t0 = 0;
+  svg.style.touchAction = "none";
+  function toV(ev) { var r = svg.getBoundingClientRect(); return [(ev.clientX - r.left) * 300 / r.width, (ev.clientY - r.top) * 200 / r.height]; }
+  function add(p) {
+    line.push(p); ink.setAttribute("points", line.map(function (q) { return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" "));
+    var best = 1e9;
+    cps.forEach(function (c, i) { var d = Math.hypot(c[0] - p[0], c[1] - p[1]); if (d < tol) hit[i] = true; if (d < best) best = d; });
+    if (best > tol * 1.6) off++;
+    var cov = hit.filter(Boolean).length / cps.length;
+    document.getElementById("ts").textContent = "Tamamlanan %" + Math.round(cov * 100);
+  }
+  function end() {
+    if (done || !drawing) return; done = true; drawing = false;
+    var cov = hit.filter(Boolean).length / cps.length, prec = line.length ? 1 - off / line.length : 0;
+    var fast = performance.now() - t0 < 4000 ? 0.04 : 0;
+    finishMini(cov * 0.8 + prec * 0.2 + fast - 0.02);
+  }
+  svg.onpointerdown = function (ev) { if (done) return; ev.preventDefault(); drawing = true; t0 = t0 || performance.now(); try { svg.setPointerCapture(ev.pointerId); } catch (e) {} add(toV(ev)); };
+  svg.onpointermove = function (ev) { if (drawing) add(toV(ev)); };
+  svg.onpointerup = svg.onpointercancel = end;
+  later(function () { if (!done) { drawing = true; end(); } }, 9000);
 }
 
 render();

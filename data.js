@@ -144,14 +144,15 @@ function D(t, direct, r, x) { var o = { t: t, direct: direct, r: r }; for (var k
 
 var EVENTS = [
 /* ───────────── BÖLÜM I · EV ───────────── */
-{ id: "dogum", ch: 1, age: "0 yaş", icon: "👶", title: "Ortam Fazla Aydınlık", text: "Makarya'ya geldin. Işıklar fazla parlak, herkes senden bir tepki bekliyor.", choices: [
+{ id: "dogum", ch: 1, age: "0 yaş", icon: "👶", title: "Ortam Fazla Aydınlık", text: "Makarya'ya geldin. Işıklar fazla parlak, herkes senden bir tepki bekliyor.", voices: [{ stat: "Sosyal Radar", diff: "easy", text: "Odada altı kişi var. Beşi sana bakıyor. Altıncısı faturaya." }, { stat: "Pişkinlik", diff: "medium", text: "Sahne senin. Işıklar hazır. Ağlamak, açılış için yeterince güçlü bir performans." }],
+  choices: [
   D("Ağla", { Çene: 2 }, "İlk basın açıklamanı yaptın."),
   D("Daha çok ağla", { Çene: 2, Pişkinlik: 1 }, "Ses seviyesinin bir müzakere aracı olabileceğini keşfettin.", { trait: "Ses Yükseltince Oluyor" }),
   D("Etrafı izle", { Akıl: 2, "Sosyal Radar": 2 }, "Konuşmadan önce ortamı okumayı seçtin.", { trait: "Sessiz Gözlemci" }),
   D("Sessiz kal", { "Sosyal Radar": 2 }, "Herkes endişelendi. Sen sadece veri topluyordun.")
 ]},
 { id: "gece-vardiyasi", ch: 1, age: "3 ay", icon: "🌙", fam: "home", title: "Gece Vardiyası", text: "Saat 03:00. Ev halkı uyumaya çalışıyor. Senin vardiyan yeni başladı.", choices: [
-  C("Kendi kendine uyu", "Dayanıklılık", "veryEasy", ["Kısa süreliğine ev ekonomisine katkıda bulundun.", "Sabaha kadar deliksiz uyudun. Ailen seni 'Ayın Çalışanı' ilan etmeyi düşündü.", "Uyumaya çalıştın. Uyku seni reddetti.", "Kendi kendine uyumaya çalışırken kendi kendini uyandırdın. Vardiya uzadı."]),
+  C("Kendi kendine uyu", "Dayanıklılık", "veryEasy", ["Kısa süreliğine ev ekonomisine katkıda bulundun.", "Sabaha kadar deliksiz uyudun. Ailen seni 'Ayın Çalışanı' ilan etmeyi düşündü.", "Uyumaya çalıştın. Uyku seni reddetti.", "Kendi kendine uyumaya çalışırken kendi kendini uyandırdın. Vardiya uzadı.", "Yarım saat uyudun. Ev halkı bunu tam bir gece gibi kutladı."], { mini: { type: "rhythm", title: "Ninni Ritmi", hint: "Ay ışığı her parladığında dokun. Ritmi tut, uyku gelsin." } }),
   C("Ağlayarak yardım çağır", "Çene", "veryEasy", ["Gece ekibini başarıyla göreve çağırdın.", "Tek bir 'ıngaa' ile tüm ev halkı toplandı. Yönetim becerilerin not edildi.", "Ağladın ama ses kapıya ulaşmadı. Talebin sıraya alındı.", "Ağladın, yanlış kişi uyandı. Sonra komşu uyandı. Toplantı sabaha sarktı."]),
   D("Sessizce bekle", { "Sosyal Radar": 1 }, "Bir süre bekledin. Dünya dönmeye devam etti.")
 ]},
@@ -162,7 +163,8 @@ var EVENTS = [
   D("Kabullen", { "Sosyal Radar": 1 }, "Krizi düşük profille atlattın."),
   D("Ağla", { Çene: 1 }, "Toplantı erken sona erdi.")
 ]},
-{ id: "yasak-nesne", ch: 1, age: "10 ay", icon: "💎", fam: "home", title: "Yasak Nesne", text: "Masada dokunmaman gereken parlak bir şey var. Bu bilgi nesneyi daha çekici yaptı.", choices: [
+{ id: "yasak-nesne", ch: 1, age: "10 ay", icon: "💎", fam: "home", title: "Yasak Nesne", text: "Masada dokunmaman gereken parlak bir şey var. Bu bilgi nesneyi daha çekici yaptı.", voices: [{ stat: "Kurnazlık", diff: "easy", text: "Parlak şeyler pahalıdır. Pahalı şeyler yüksekte durur. Bu masada bir planlama hatası var." }, { stat: "Vicdan", diff: "medium", text: "Bu nesneye dokunursan birileri üzülecek. Muhtemelen sen, biraz sonra." }],
+  choices: [
   D("Dokunma", { Vicdan: 1 }, "İlk kez bir yasağı uyguladın."),
   C("Anne çıkana kadar bekle", "Kurnazlık", "easy", ["Zamanlama kavramını keşfettin.", "Anne çıktı, sen aldın, anne döndü, nesne yerindeydi. Kimse hiçbir şey anlamadı.", "Beklerken uyuyakaldın. Fırsat penceresi kapandı.", "Anne çıkmadı. Sadece çıkıyormuş gibi yaptı. Seni izliyordu."]),
   C("Direkt al", "Pişkinlik", "easy", ["Mülkiyet hukukuna farklı bir yorum getirdin.", "Aldın ve kimse itiraz edemedi. Yüz ifaden tüm soruları cevapladı.", "Uzandın. Masa senden uzunmuş.", "Aldın, düşürdün, kırıldı. Hukuk sisteminde yeni dosya açıldı."])
@@ -189,15 +191,18 @@ var EVENTS = [
   C("Pastaya erken saldır", "Pişkinlik", "medium", ["Protokolü kremayla yeniden yazdın.", "Pastanın en güzel köşesi artık senin. Herkes alkışladı, çünkü başka seçenek yoktu.", "Uzandın, biri tabağı kaydırdı. Elin havayı kremaladı.", "Pastaya daldın. Pasta da sana daldı. Aile albümüne kalıcı kayıt."]),
   C("Mumları önce üfle", "Pişkinlik", "hard", ["Doğum günü sahibinin kim olduğu geçici olarak belirsizleşti.", "Mumları söndürdün, dilek tuttun, alkışları topladın. Hediyeler de yön değiştirmek üzere.", "Üfledin ama mumlar senden daha kararlıydı.", "Üfledin; mum yerine pastanın süsü uçtu. Doğum günü çocuğu ağlamaya başladı."], { trait: "Sahne Sever" })
 ]},
-{ id: "vazo-kirildi", ch: 1, age: "2 yaş", icon: "🏺", fam: "home", title: "Vazo Kırıldı", text: "Vazo yerde. Sessizlik ağır. Kedi sana bakıyor.", choices: [
+{ id: "vazo-kirildi", ch: 1, age: "2 yaş", icon: "🏺", fam: "home", title: "Vazo Kırıldı", text: "Vazo yerde. Sessizlik ağır. Kedi sana bakıyor.", voices: [{ stat: "Sosyal Radar", diff: "medium", text: "Kedi seni izlemiyor. Annenin ayak seslerini izliyor. Dört saniyen var.", opens: true }, { stat: "Pişkinlik", diff: "hard", text: "Kedinin avukatı yok. Sadece söylüyorum." }, { stat: "Vicdan", diff: "easy", text: "Bu vazo babaanneden kalmaydı. Babaanne hâlâ hayatta. Bu durumu daha da kötüleştiriyor.", fail: "…Vicdan bu sırada başka bir şeyle meşguldü." }],
+  choices: [
   D("Bekle", { Vicdan: 2 }, "Olay yeri incelemesine gönüllü oldun."),
   C("Kaç", "Kurnazlık", "medium", ["Şüpheli olay yerinden uzaklaştı.", "Kaçtın ve üç dakika sonra 'Ne oldu?' diye içeri girdin. Ödüllük performans.", "Kaçarken terlikler ses yaptı. Şüpheli tespit edildi.", "Kaçarken ikinci vazoyu da devirdin. Dosya kabardı."]),
   C("Kediyi suçla", "Pişkinlik", "veryHard", ["Savunma yaratıcıydı. Kedinin odada olmaması küçük bir ayrıntıydı.", "Kedi mahkûm edildi. Mama tayınları kısıldı. Sen o gece iki tatlı yedin.", "Kediye baktın. Kedi sana baktı. Ailen ikinize de baktı. Kimse ikna olmadı.", "Kediyi suçladın. Kedi o sırada annenin kucağındaydı."], { flag: "kediSuclu" }),
+  C("Ayak seslerini say, tam zamanında ağla", "Çene", "easy", ["Ağladın. Anne seni teselli etti. Vazo gündemin ikinci maddesine düştü.", "Ağladın; anne vazoyu değil seni sordu. Vazo resmî kayıtlara 'kaza' olarak geçti.", "Ağladın; anne önce vazoya baktı. Sonra sana. Sonra yine vazoya.", "Ağladın ama kediyle aynı anda. Anne ikinizi de şüpheli ilan etti."], { reqVoice: "Sosyal Radar" }),
   C("Parçaları sakla", "Kurnazlık", "medium", ["Deliller toparlandı. Delil yönetimi departmanı kuruldu.", "Parçalar göz açıp kapayıncaya kadar kayboldu. Vazo hiç var olmamış gibi.", "Parçalar senden hızlı yayıldı.", "Parçaları toplarken daha fazla ses çıkardın. Ev halkı toplandı.", "Çoğunu sakladın ama bir parça hâlâ şüpheli biçimde ortada."],
     { mini: { type: "collect", title: "Delilleri Topla", hint: "Parçalar fark edilmeden önce hepsine dokun.", piece: "🧩" } })
 ]},
 { id: "ilk-harclik", ch: 1, age: "2 yaş 2 ay", icon: "🪙", fam: "money", title: "İlk Harçlık", text: "Avucuna birkaç bozuk para bırakıldı. Finansal sistemle ilk temas.",
-  recall: [{ flag: "ilkKelimePara", text: "İlk kelimen 'Para' olduğundan beri bu konuda seni ciddiye alıyorlar." }], choices: [
+  recall: [{ flag: "ilkKelimePara", text: "İlk kelimen 'Para' olduğundan beri bu konuda seni ciddiye alıyorlar." }], voices: [{ stat: "Kurnazlık", diff: "medium", text: "Bu bozuk paralar tek başına bir şey değil. Biriktirirsen de bir şey değil. Ama biriktirirsen." }, { stat: "Çene", diff: "easy", text: "Karşıdaki çocuğun elinde kraker var. Kraker de bir para birimidir." }],
+  choices: [
   D("Annene ver", { Vicdan: 2 }, "Varlık yönetimini dışarıya devrettin."),
   D("Oyuncak iste", { Çene: 1 }, "Likidite anında tüketime döndü."),
   C("Parayı sakla", "Kurnazlık", "easy", ["Makarya Merkez Bankası seni henüz izlemiyor.", "Parayı sakladın, bir hafta sonra unuttuğun bir sürpriz olarak buldun. Faiz kavramına ilk adım.", "Sakladığın yeri unuttun. Para artık evin ortak mirası.", "Parayı ağzına sakladın. Acil müdahale ekibi ve babaanne devreye girdi."], { trait: "Yastık Altı Ekonomisti" }),
@@ -216,14 +221,16 @@ var EVENTS = [
 ]},
 { id: "parkta-sira", ch: 1, age: "2 yaş 10 ay", icon: "🛝", title: "Parkta Sıra", text: "Kaydırakta sıra var. Sistem basit görünüyor. İnsanlar yüzünden değil.", choices: [
   D("Sıraya gir", { Vicdan: 1 }, "Kurallı toplum deneyine katıldın."),
-  C("Öne geç", "Pişkinlik", "medium", ["Öne geçtin. Toplumsal tepki geldiğinde sen zaten aşağı kayıyordun.", "Öne geçtin ve kimse fark etmedi. Hatta biri sana yer verdi.", "Öne geçmeye çalıştın; sıradaki anneler komitesi seni geri gönderdi.", "Öne geçtin, kaydıraktan ters indin. Sıradakiler alkışladı."]),
+  C("Öne geç", "Pişkinlik", "medium", ["Öne geçtin. Toplumsal tepki geldiğinde sen zaten aşağı kayıyordun.", "Öne geçtin ve kimse fark etmedi. Hatta biri sana yer verdi.", "Öne geçmeye çalıştın; sıradaki anneler komitesi seni geri gönderdi.", "Öne geçtin, kaydıraktan ters indin. Sıradakiler alkışladı.", "Yarıya kadar geldin. Sonra biri seni fark etti. Yarım zafer."], { mini: { type: "lanes", title: "Sıranın Arasından Geç", hint: "Sağa sola kaydırarak (ya da oklara basarak) çocuklara çarpmadan en öne ulaş." } }),
   C("Konuşarak çöz", "Çene", "easy", ["İki dakikalık diplomasi, üç dakikalık kaydırak.", "Konuştun ve sıradaki herkes sana geçiş hakkı verdi. Nedeni belirsiz.", "Konuştun; herkes dinledi, kimse kıpırdamadı.", "Konuşurken sıradaki yerini de kaybettin."]),
   C("Sistemi izle", "Sosyal Radar", "easy", ["Kimin gerçekten sırada olduğunu anlamaya başladın.", "Sıranın aslında iki ayrı sıra olduğunu fark ettin ve boş olanına geçtin.", "İzledin; sistem çok karışıktı. Kaydırak kapandı.", "Sistemi izlerken salıncak kafana çarptı."])
 ]},
 { id: "kim-yapti", ch: 1, age: "2 yaş 11 ay", icon: "🔍", fam: "home", title: "Kim Yaptı?", text: "Bir şey oldu. Bir yetişkin tek soru soruyor. Oda sessiz.",
-  recall: [{ flag: "kediSuclu", text: "Vazo olayından beri ev halkı ifadelerine daha dikkatli bakıyor." }], choices: [
+  recall: [{ flag: "kediSuclu", text: "Vazo olayından beri ev halkı ifadelerine daha dikkatli bakıyor." }], voices: [{ stat: "Vicdan", diff: "easy", text: "Doğruyu söylersen bugün kötü geçer. Yalan söylersen bu gece kötü geçer." }, { stat: "Akıl", diff: "medium", text: "Soruyu soran yetişkin cevabı zaten biliyor. Bu bir soruşturma değil, bir sadakat testi.", opens: true }],
+  choices: [
   D("Doğruyu söyle", { Vicdan: 2 }, "Kısa vadede kötü, uzun vadede kullanışlı bir alışkanlık."),
   C("Bilmiyorum de", "Çene", "medium", ["Bilgi eksikliği stratejik olarak kullanıldı.", "'Bilmiyorum' dedin. O kadar ikna ediciydin ki soruşturma kapandı ve sana dondurma verildi.", "'Bilmiyorum' dedin. Yüzün 'biliyorum' dedi.", "'Bilmiyorum' dedin ve hemen ardından 'ama ben yapmadım' ekledin. Kimse sormamıştı."]),
+  C("'Siz ne düşünüyorsunuz?' diye sor", "Akıl", "medium", ["Soruyu soruya çevirdin. Yetişkin kendi teorisini anlatırken sen sessizce aklandın.", "Yetişkin cevap verirken kendini suçlu hissetti ve sana kurabiye verdi.", "'Soruyu ben sordum' dedi yetişkin. Tartışma bitti.", "Soruyu sordun; yetişkin 'Sen yaptın' dedi. Kendi sorunla yakalandın."], { reqVoice: "Akıl" }),
   C("Başkasını suçla", "Pişkinlik", "veryHard", ["Dosya başka birinin masasına gönderildi.", "Dosya kuzenin masasına gönderildi. Kuzen hâlâ ne olduğunu anlamaya çalışıyor.", "Suçladığın kişi o gün evde değildi.", "Suçladığın kişi olayın videosunu çekmişti."], { flag: "yalanci" })
 ]},
 { id: "kres-kapisi", ch: 1, age: "3 yaş", icon: "🏫", fam: "education", title: "Kreş Kapısı", text: "Kapının arkasında başka çocuklar, kurallar ve oyuncaklar var. Ailen ilk kez birkaç saatliğine dışarıda kalacak.", choices: [
@@ -271,12 +278,14 @@ var EVENTS = [
   D("Kendi oyuncağınla devam et", { Dayanıklılık: 1 }, "Bir şeyi kaçırma korkusu henüz tam gelişmedi.")
 ]},
 { id: "ilk-gercek-yalan", ch: 2, age: "4 yaş 2 ay", icon: "🤥", fam: "home", title: "İlk Gerçek Yalan", text: "Bu kez ne olduğunu biliyorsun. Karşındaki yetişkin de bildiğini düşünüyor.",
-  recall: [{ flag: "kediSuclu", text: "Ev halkı hâlâ o vazo meselesinde kediye inanmadı." }, { flag: "yalanci", text: "'Kim yaptı?' dosyası hâlâ açık." }], choices: [
+  recall: [{ flag: "kediSuclu", text: "Ev halkı hâlâ o vazo meselesinde kediye inanmadı." }, { flag: "yalanci", text: "'Kim yaptı?' dosyası hâlâ açık." }], voices: [{ stat: "Pişkinlik", diff: "medium", text: "Göz teması kur. Gözünü kırpma. Kırpma dedik." }, { stat: "Vicdan", diff: "easy", text: "Bu yetişkin sana güveniyor. Bu, işi hem kolaylaştırıyor hem zorlaştırıyor." }],
+  choices: [
   D("İtiraf et", { Vicdan: 2 }, "Dosya hızlı kapandı."),
-  C("'Hayır' de", "Çene", "hard", ["Ses tonun gerçeğin yerine geçti.", "'Hayır' dedin; o kadar samimiydin ki karşındaki yetişkin kendisinden şüphelenmeye başladı.", "'Hayır' dedin, kulakların kızardı. Kulaklar yalan söylemiyor.", "'Hayır' dedin, sonra 'evet' dedin, sonra ağladın. Dosya kapanmadı, genişledi."], { flag: "yalanci" }),
+  C("'Hayır' de", "Çene", "hard", ["Ses tonun gerçeğin yerine geçti.", "'Hayır' dedin; o kadar samimiydin ki karşındaki yetişkin kendisinden şüphelenmeye başladı.", "'Hayır' dedin, kulakların kızardı. Kulaklar yalan söylemiyor.", "'Hayır' dedin, sonra 'evet' dedin, sonra ağladın. Dosya kapanmadı, genişledi.", "Yüzün yarı yarıya ikna ediciydi. Yetişkin konuyu şimdilik kapattı ama dosyayı değil."], { mini: { type: "poker", title: "Poker Yüzü", hint: "Parmağını daireye koy ve 5 saniye boyunca dairenin içinde tut. Kıpırdama. Göz kırpma." }, flag: "yalanci" }),
   C("'O kendi oldu' de", "Pişkinlik", "veryHard", ["Nedensellik bilimine meydan okudun ve kazandın.", "Fizik kurallarını yeniden yazdın. Yetişkin bir an kendi kendine olabileceğine inandı.", "'Kendi oldu' dedin. Kimse gülmedi. Bir kişi gülmek üzereydi.", "'Kendi oldu' dedin; tam o sırada yine 'kendi oldu'. Elin hâlâ üstündeydi."], { flag: "yalanci" })
 ]},
-{ id: "mahalle-bakkali", ch: 2, age: "4 yaş 4 ay", icon: "🏪", fam: "money", title: "Mahalle Bakkalı", text: "Liste elinde. Para cebinde. Bakkal her şeyi biliyor gibi bakıyor.", choices: [
+{ id: "mahalle-bakkali", ch: 2, age: "4 yaş 4 ay", icon: "🏪", fam: "money", title: "Mahalle Bakkalı", text: "Liste elinde. Para cebinde. Bakkal her şeyi biliyor gibi bakıyor.", voices: [{ stat: "Sosyal Radar", diff: "medium", text: "Bakkal mahalledeki herkesin borcunu ezbere biliyor. Seninkini de. Henüz yok ama biliyor." }, { stat: "Kurnazlık", diff: "hard", text: "Terazinin kefesinin altında bir sakız yapışık. Yıllardır orada. Terazi yıllardır bir sakız ağırlığında yanılıyor." }],
+  choices: [
   D("Listeyi ver", { Dayanıklılık: 1 }, "Operasyon standart prosedürle tamamlandı."),
   C("Fiyat sor", "Çene", "veryEasy", ["Piyasa araştırması başladı.", "Fiyat sordun, bakkal indirim yaptı. Nedenini kendisi de bilmiyor.", "Sordun, bakkal duymadı. Radyo açıktı.", "Fiyat sordun, bakkal 'Paran yetmez' dedi. Haklıydı."]),
   C("Para üstünü kontrol et", "Kurnazlık", "medium", ["İlk finansal denetimin başarıyla tamamlandı.", "Eksik para üstünü buldun. Bakkal seni gelecekteki muhasebecisi ilan etti.", "Saydın, bir daha saydın. Sonuç her seferinde farklı.", "Kontrol ederken paraları yere düşürdün. Bir tanesi rafın altına gitti."], { trait: "Para Üstü Radarı" }),
@@ -294,7 +303,8 @@ var EVENTS = [
   C("İyi oynayan çocuğa git", "Sosyal Radar", "medium", ["Doğru kişiyi hatırladın. Network etkisini erken keşfettin.", "Bir bakışta en güçlü oyuncuyu seçtin.", "Yanlış oyuncuyu seçtin.", "En zayıf seçeneği takım yıldızı ilan ettin.", "Fena değildi ama en iyisi değildi."],
     { mini: { type: "memory", title: "Takımı Oku", hint: "Çocukları kısa süre göreceksin. En iyi top kontrolü olanı hatırla." } })
 ]},
-{ id: "sana-guluyorlar", ch: 2, age: "4 yaş 9 ay", icon: "😅", fam: "social", title: "Sana Gülüyorlar", text: "Bir şey söyledin. Birkaç çocuk güldü. Neye güldükleri tam belli değil.", choices: [
+{ id: "sana-guluyorlar", ch: 2, age: "4 yaş 9 ay", icon: "😅", fam: "social", title: "Sana Gülüyorlar", text: "Bir şey söyledin. Birkaç çocuk güldü. Neye güldükleri tam belli değil.", voices: [{ stat: "Dayanıklılık", diff: "easy", text: "Bu an geçecek. Otuz yıl sonra bir düğünde biri hatırlatacak. O an da geçecek." }, { stat: "Cesaret", diff: "medium", text: "Gülen üç kişi. İkisi neye güldüğünü bilmiyor. Üçüncüsü de emin değil." }],
+  choices: [
   D("Sus", { Dayanıklılık: 1 }, "Olayın ömrünü kısalttın."),
   C("Kendine de gül", "Pişkinlik", "easy", ["Silahı ellerinden aldın.", "Kendine güldün, herkes seninle güldü; bir saat sonra aynı espriyi onlar tekrar ediyordu.", "Güldün ama biraz geç. Kahkahalar çoktan bitmişti.", "Güldün, burnundan süt geldi. İkinci bir gülme dalgası başladı."], { trait: "Kendine Gülebilir" }),
   C("Laf yetiştir", "Çene", "hard", ["Karşı ateş etkili oldu.", "Tek cümlelik cevabın okul bahçesinde efsaneye dönüştü.", "Cevabı buldun; eve gidince.", "Laf yetiştirdin, sonra kelimeleri karıştırdın. Gülme ikiye katlandı."]),
@@ -305,7 +315,8 @@ var EVENTS = [
   C("Başkasına anlat", "Çene", "medium", ["Bilgi hızla dolaşıma girdi. Sen de bir anda popüler oldun.", "Sırrı öyle anlattın ki kimse kaynağın sen olduğunu bilmiyor. Profesyonel.", "Anlattın; dinleyen zaten biliyormuş.", "Anlattığın kişi, sırrın sahibinin en yakın arkadaşıydı."], { flag: "sirVerdi" }),
   C("Önemini değerlendir", "Sosyal Radar", "easy", ["Her sırrın aynı ağırlıkta olmadığını fark ettin.", "Sırrın aslında sır bile olmadığını fark ettin. Herkes biliyordu.", "Değerlendirmeye çalıştın; sır çok karışıktı.", "Değerlendirirken yüksek sesle düşündün."])
 ]},
-{ id: "aileler-kiyasliyor", ch: 2, age: "5 yaş 2 ay", icon: "📏", fam: "education", title: "Aileler Kıyaslıyor", text: "Yetişkinler çocuklardan konuşuyor ama aslında birbirleriyle yarışıyorlar.", choices: [
+{ id: "aileler-kiyasliyor", ch: 2, age: "5 yaş 2 ay", icon: "📏", fam: "education", title: "Aileler Kıyaslıyor", text: "Yetişkinler çocuklardan konuşuyor ama aslında birbirleriyle yarışıyorlar.", voices: [{ stat: "Sosyal Radar", diff: "medium", text: "Karşıdaki annenin gülümsemesi 'Bizimki de okuyor' diyor. Gözleri 'Ama sizinki kadar değil' diyor." }],
+  choices: [
   C("Görmezden gel", "Dayanıklılık", "easy", ["Yetişkin olimpiyatlarından çekildin.", "Görmezden geldin; yetişkinler senin olgunluğunu kıyaslamaya başladı. Kazandın.", "Görmezden gelmeye çalıştın; adın on kez geçti.", "Görmezden gelirken 'Bizimki okumayı söktü' cümlesini duydun. Sen sökmemiştin."]),
   C("Bildiğini göster", "Pişkinlik", "medium", ["Rekabetin ortasına gönüllü girdin ve puan aldın.", "Alfabeyi tersten okudun. Karşı aile çocuğunu hemen kursa yazdırdı.", "Göstermeye çalıştın; heyecandan unuttun.", "Bildiğini gösterdin. Yanlış biliyormuşsun."]),
   C("Yetişkinleri gözlemle", "Sosyal Radar", "medium", ["Bunun aslında çocuklarla ilgili olmadığını fark ettin.", "Kimin kiminle neden yarıştığını çözdün. Aile sosyolojisinde ilk makale.", "Gözlemledin. Sonuç: yetişkinler garip.", "Gözlemlerini yüksek sesle paylaştın. Misafirler erken kalktı."])
@@ -330,12 +341,13 @@ var EVENTS = [
   C("Enflasyon farkı talep et", "Akıl", "medium", ["Enflasyon farkı talep ettin. Ailen şaşkınlıkla kabul etti.", "Farkı hesapladın, geriye dönük talep ettin, tahsil ettin.", "'Enflasyon' kelimesini doğru söyleyemedin. Dava düştü.", "Enflasyon farkı istedin; babanın maaş konuşması başladı. Kimse mutlu değil."], { req: "Erken Ekonomi Bilinci" })
 ]},
 { id: "okul-hazirligi", ch: 2, age: "5 yaş 9 ay", icon: "🎒", fam: "education", title: "Okul Hazırlığı", text: "Çanta, harfler, defterler. Sistem seni bekliyor.", choices: [
-  C("Harflerle ilgilen", "Akıl", "easy", ["Sistemle ilk dostane temas.", "Harfleri öğrendin ve markette etiketleri okumaya başladın. Fiyatlar seni endişelendirdi.", "Harflerle ilgilendin; harfler seninle ilgilenmedi.", "B ile D'yi karıştırdın. Hâlâ karıştırıyorsun."]),
+  C("Harflerle ilgilen", "Akıl", "easy", ["Sistemle ilk dostane temas.", "Harfleri öğrendin ve markette etiketleri okumaya başladın. Fiyatlar seni endişelendirdi.", "Harflerle ilgilendin; harfler seninle ilgilenmedi.", "B ile D'yi karıştırdın. Hâlâ karıştırıyorsun.", "Harf oldu ama biraz yamuk. Öğretmen yine de yıldız verdi."], { mini: { type: "trace", title: "İlk Harf", hint: "Parmağını kaldırmadan kesikli çizginin üstünden M harfini çiz." } }),
   C("Çantayı kendin hazırla", "Dayanıklılık", "easy", ["Operasyonel bağımsızlık arttı.", "Beslenme, kalem, yedek çorap. Ailen sana kendi çantasını da verdi.", "Çantayı hazırladın; içinde sadece oyuncak var.", "Çantayı öyle doldurdun ki kaldıramadın."]),
   D("Aileye bırak", { "Sosyal Radar": 1 }, "Görev dağılımı da bir yetkinliktir.")
 ]},
 { id: "ilkokul-kapisi", ch: 2, age: "6 yaş", icon: "🏫", fam: "education", title: "İlkokul Kapısı", text: "Büyük bina, küçük sıra, çok sayıda kural. Bölüm III kapıda.",
-  recall: [{ flag: "yapiskan", text: "Kreş kapısındaki bacak olayı ailede hâlâ anlatılıyor." }], choices: [
+  recall: [{ flag: "yapiskan", text: "Kreş kapısındaki bacak olayı ailede hâlâ anlatılıyor." }], voices: [{ stat: "Cesaret", diff: "easy", text: "Bina büyük ama kapı normal boyutta. Başlangıç için yeterli." }, { stat: "Akıl", diff: "medium", text: "Koridorda on iki kapı var. Resimli olanlar küçük sınıflar. Sen artık küçük sınıfsın. Bunu kabullen." }],
+  choices: [
   C("Cesurca gir", "Cesaret", "medium", ["Yeni sistem açıldı.", "İçeri girdin, öğretmene 'Günaydın' dedin, en öndeki sırayı aldın.", "Kapıda bir an durdun. Arkadaki kalabalık seni içeri itti.", "Cesurca girdin; tuvalete."]),
   C("Önce ortamı oku", "Sosyal Radar", "medium", ["Sınıfın görünmeyen haritasını çıkarmaya başladın.", "Kimin lider, kimin sessiz dahi, kimin kantincinin yeğeni olduğunu ilk gün öğrendin.", "Ortamı okudun; ortam seni okumadı.", "Ortamı okurken zil çaldı ve kapı kapandı."]),
   C("Sınıfı kendin bul", "Akıl", "easy", ["Kapıyı buldun ve içeri girdin.", "İpucunu tek bakışta çözdün. Doğru sınıf, ilk sıra.", "Yanlış sınıfa girdin, sonra doğrusunu buldun.", "Yanlış sınıfa girdin. Herkes sana baktı. Dördüncü sınıftı.", "Doğru koridor, yanlış kapı; ama öğretmen seni yönlendirdi."],
@@ -358,7 +370,7 @@ var EVENTS = [
 ]},
 { id: "teneffus-kantini", ch: 3, age: "6 yaş 4 ay", icon: "🥪", fam: "money", title: "Kantin Kuyruğu", text: "Teneffüs 10 dakika. Kuyruk 12 dakika. Matematik kantinde başlıyor.", choices: [
   D("Sırada bekle", { Dayanıklılık: 1, Vicdan: 1 }, "Tost soğuktu ama vicdanın sıcak."),
-  C("Öndeki arkadaşına sipariş verdir", "Çene", "medium", ["Sipariş zincirini kurdun, tost sana ulaştı.", "Üç arkadaşının siparişini birleştirip toplu indirim aldın.", "Arkadaşın siparişi unuttu. Kendi tostunu yedi.", "Sipariş verdirdin; kantinci ikinizi de sıranın sonuna gönderdi."]),
+  C("Öndeki arkadaşına sipariş verdir", "Çene", "medium", ["Sipariş zincirini kurdun, tost sana ulaştı.", "Üç arkadaşının siparişini birleştirip toplu indirim aldın.", "Arkadaşın siparişi unuttu. Kendi tostunu yedi.", "Sipariş verdirdin; kantinci ikinizi de sıranın sonuna gönderdi.", "Siparişin yarısı doğru geldi. Tost geldi, ayran yerine su geldi."], { mini: { type: "simon", title: "Siparişi Ezberle", hint: "Arkadaşın siparişi bir kez söyleyecek. Aynı sırayla tekrar et." } }),
   C("Kantinciye yardım et", "Dayanıklılık", "medium", ["Dökülen bozuklukları topladın. Kantinci seni sıranın önüne aldı.", "Kantinci sana ömür boyu 'ekstra kaşar' hakkı tanıdı.", "Topladın ama zil çaldı. Yardım ettin, aç kaldın.", "Yardım ederken peynir kasesini devirdin. Kantin geçici olarak kapandı.", "Çoğunu topladın; kantinci teşekkür etti ama sıra aynı."],
     { mini: { type: "collect", title: "Bozuklukları Topla", hint: "Yere saçılan paraları zil çalmadan topla.", piece: "🪙" } }),
   C("Kantincinin hesap hatasını düzelt", "Kurnazlık", "easy", ["Kantincinin hesabındaki hatayı buldun. Sana 'Muhasebeci' lakabı takıldı.", "Hatayı buldun, kantinci ödül olarak sana çikolata verdi. Hata aslında senin lehineydi.", "Hatayı söyledin; kantinci 'Sen önce toplama öğren' dedi.", "Hatayı söyledin; hata yokmuş. Kuyruk seni izledi."], { req: "Para Üstü Radarı" })
@@ -369,7 +381,8 @@ var EVENTS = [
   C("Teneffüste yetiştir", "Akıl", "medium", ["On dakikada iki sayfa. Kalite tartışılır, teslim kesin.", "Teneffüste bitirdin; öğretmen 'En temiz ödev bu' dedi. Kimse sormadı.", "Yetiştiremedin; yarım ödev teslim edildi.", "Yazarken kalemin bitti. Sonra zil çaldı. Sonra silgin kayboldu."]),
   C("'Köpek yedi' de", "Pişkinlik", "hard", ["Öğretmen güldü ve bir gün ek süre verdi.", "Öyle anlattın ki öğretmen köpeğin sağlığını sordu. Ek süre ve geçmiş olsun dileği.", "'Sizin köpeğiniz yok ki' dedi öğretmen.", "Veli toplantısında köpek konusu açıldı. Köpeğiniz yoktu."], { flag: "yalanci" })
 ]},
-{ id: "sinif-baskani", ch: 3, age: "7 yaş", icon: "🗳️", fam: "social", title: "Sınıf Başkanlığı Seçimi", text: "Seçim var. Vaatler belli: daha uzun teneffüs, daha az ödev, sınıfa bir akvaryum.", choices: [
+{ id: "sinif-baskani", ch: 3, age: "7 yaş", icon: "🗳️", fam: "social", title: "Sınıf Başkanlığı Seçimi", text: "Seçim var. Vaatler belli: daha uzun teneffüs, daha az ödev, sınıfa bir akvaryum.", voices: [{ stat: "Çene", diff: "medium", text: "Vaat ne kadar büyükse oy o kadar çok. Uygulama kısmı seçimden sonraki bir sorun." }, { stat: "Vicdan", diff: "medium", text: "Akvaryum vaat eden aday, balıklara kimin bakacağını söylemedi. Siyasete hoş geldin." }],
+  choices: [
   C("Aday ol", "Cesaret", "hard", ["Seçildin. İlk icraatın: akvaryum için bağış kampanyası.", "Oyların çoğunu aldın. Rakibin tebrik etti, sonra yardımcın oldu.", "Aday oldun; iki oy aldın. Biri senin, biri sıra arkadaşının.", "Seçim konuşmasında 'Herkese dondurma' dedin. Öğretmen adaylığını iptal etti."], { flagWin: "baskan", trait: "Seçim Makinesi" }),
   C("Arkadaşının kampanyasını yönet", "Sosyal Radar", "medium", ["Adayın kazandı. Sen gölge başkansın.", "Adayın açık farkla kazandı. Tüm kararlar önce sana danışılıyor.", "Adayın kaybetti. Kampanya analizi yapılacak.", "Adayın kaybetti ve suçu sana attı."]),
   D("Oy ver, geç", { Vicdan: 1 }, "Demokrasiye katkıda bulundun. Akvaryum gelmedi."),
@@ -411,13 +424,15 @@ var EVENTS = [
   C("Ebeveyn kilidini çöz", "Akıl", "medium", ["Kilidi çözdün. Sınırsız ekran, sınırsız sorumluluk.", "Kilidi çözdün ve ailenin telefonuna ekran süresi koydun.", "Kilit çözülmedi; tablet 10 dakika kilitlendi.", "Kilidi çözmeye çalışırken tableti fabrika ayarlarına döndürdün."], { req: "Teknoloji Merakı", trait: "Kilit Kırıcı" })
 ]},
 { id: "veli-toplantisi", ch: 3, age: "8 yaş 8 ay", icon: "🚪", fam: "education", title: "Veli Toplantısı", text: "Ailen okulda. Sen kapının önündesin. İçeriden arada bir adın duyuluyor.",
-  recall: [{ flag: "yalanci", text: "Öğretmenin elinde 'yaratıcı açıklamalar' başlıklı bir dosya var." }, { flag: "camKirildi", text: "Komşunun camı konusu da gündemde." }, { flag: "baskan", text: "Sınıf başkanlığın hanene artı olarak yazıldı." }], choices: [
+  recall: [{ flag: "yalanci", text: "Öğretmenin elinde 'yaratıcı açıklamalar' başlıklı bir dosya var." }, { flag: "camKirildi", text: "Komşunun camı konusu da gündemde." }, { flag: "baskan", text: "Sınıf başkanlığın hanene artı olarak yazıldı." }], voices: [{ stat: "Sosyal Radar", diff: "hard", text: "Öğretmenin elindeki dosya kalın. İnce dosyalar iyi haberdir. Kalın dosyalar tarihtir." }, { stat: "Dayanıklılık", diff: "easy", text: "Kapının bu tarafında olmak, ömrünün en uzun yirmi dakikası olacak. Şimdilik." }],
+  choices: [
   C("Kapıyı dinle", "Sosyal Radar", "medium", ["Kilit cümleleri duydun: 'zeki' ve 'biraz konuşkan'. Hazırlıklısın.", "Her şeyi duydun ve ailen çıkmadan savunmanı hazırladın.", "Hiçbir şey duyamadın. Kapı çok kalınmış.", "Kapıya yaslandın, kapı açıldı. İçeri düştün."]),
   C("Öğretmene önceden çiçek götür", "Pişkinlik", "medium", ["Çiçek kabul edildi. Toplantının tonu yumuşadı.", "Öğretmen çiçeği vazoya koydu ve toplantıyı 'Ne kadar kibar bir çocuk' diye açtı.", "Çiçeği verdin; öğretmen alerjikmiş.", "Çiçeği okul bahçesinden kopardığın anlaşıldı."]),
   D("Sonucu bekle", { Dayanıklılık: 1 }, "Kontrol edemediğin şeyleri beklemeyi öğrendin."),
   C("Ailenin yüzünden sonucu oku", "Sosyal Radar", "easy", ["Kapıdan çıkarken yüzlerine baktın. Sonuç iyi. Rahatladın.", "Yüz ifadesinden sadece sonucu değil, akşam yemeğini de tahmin ettin.", "Yüzleri hiçbir şey söylemiyordu.", "'İyi geçti' diye sevinçle koştun. İyi geçmemişti."], { req: "Odayı Okur" })
 ]},
-{ id: "karne-gunu", ch: 3, age: "9 yaş", icon: "📜", fam: "education", title: "Karne Günü", text: "Yılın son günü. Karne elinde. Eve kadar 800 metre, düşünmek için bolca zaman.", choices: [
+{ id: "karne-gunu", ch: 3, age: "9 yaş", icon: "📜", fam: "education", title: "Karne Günü", text: "Yılın son günü. Karne elinde. Eve kadar 800 metre, düşünmek için bolca zaman.", voices: [{ stat: "Dayanıklılık", diff: "medium", text: "Eve 800 metre var. Her adım bir savunma cümlesi. Yeterince yürüdün, yeterince yazdın." }, { stat: "Akıl", diff: "easy", text: "Karnedeki notlar değişmeyecek. Değişecek tek şey, onları nasıl sunduğun. Bu da bir tür matematik." }],
+  choices: [
   C("Karneyi gururla göster", "Pişkinlik", "easy", ["Karneyi kapıda açtın. Alkış geldi.", "Karneyi gösterdin; ailen fotoğrafını çekip aile grubuna gönderdi.", "Karneyi gösterdin; tek zayıf not da görüldü.", "Karneyi gösterirken yere düşürdün. Kedi üstüne oturdu."]),
   C("Önce iyi haberleri anlat", "Çene", "medium", ["İyi haberlerle başladın; kötü haber gölgede kaldı.", "Sunumun o kadar iyiydi ki karneyi açmalarına gerek kalmadı.", "İyi haberleri anlattın; karne yine de açıldı.", "İyi haber bulamadın. Sessizlik uzadı."]),
   C("İmzayı yarına ertele", "Kurnazlık", "hard", ["İmza bir gün ertelendi. Bu bir günü iyi kullandın.", "Karne tatil boyunca 'kayıp' kaldı ve ilk gün imzalı bulundu. Kimse nasıl olduğunu sormadı.", "Ertelemeye çalıştın; öğretmen aradı.", "Ertelemeye çalıştın; karne çantadan çıktı ve herkesin önünde açıldı."]),
