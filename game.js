@@ -19,7 +19,10 @@ function saveMeta(m) { try { localStorage.setItem(META_KEY, JSON.stringify(m)); 
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
 
 function withExt(base) { return [base + ".webp", base + ".png", base + ".jpg"]; }
-function sceneSrcs(id) { return withExt((S.gender === "kiz" ? "img/kiz/sahne/" : "img/sahne/") + id); }
+function sceneSrcs(id) {
+  var e = EV_BY_ID[id], out = withExt((S.gender === "kiz" ? "img/kiz/sahne/" : "img/sahne/") + id);
+  return e && e.place ? out.concat(withExt("img/mekan/" + e.place)) : out;
+}
 function famSrcs(name) { return withExt((S.gender === "kiz" ? "img/kiz/aile/" : "img/aile/") + FAMILIES[name].slug); }
 function imgTag(srcs, cls) {
   return '<img class="' + (cls || "artImg") + '" alt="" src="' + esc(srcs[0]) + '" data-alt="' + esc(srcs.slice(1).join("|")) + '" onerror="imgFail(this)">';
@@ -169,7 +172,7 @@ function renderEvent() {
       '</div><div class="choiceMain"><b>' + esc(c.t) + "</b><small>" + esc(sub) + "</small>" + (tags.length ? '<div class="tags">' + tags.join("") + "</div>" : "") +
       "</div>" + chance + "</button>";
   }).join("");
-  shell(chTitle(e.ch), art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + e.age, e.title, e.text), recall + voices + famLine + choices);
+  shell(chTitle(e.ch), art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + eventAge(S, e), e.title, e.text), recall + voices + famLine + choices);
 }
 function choose(idx) {
   var e = curEvent(S), c = e.choices[idx];
@@ -239,6 +242,7 @@ function renderResult() {
 function advance() {
   CUR = null; S.last = null;
   if (S.dead) { S.screen = "final"; render(); return; }
+  replanRest(S);
   S.pi++;
   if (S.pi >= S.plan.length) S.screen = hasChapter(S.ch + 1) ? "chapterEnd" : "final";
   else S.screen = "event";
@@ -294,7 +298,7 @@ function renderFinal() {
   var C = CHAPTERS[S.ch], before = S.chTraits[S.ch] || [];
   var gained = S.traits.filter(function (t) { return before.indexOf(t) < 0; });
   var head = dead ? art(sceneSrcs(curEvent(S).id), "🪦", "HAYAT SONA ERDİ · " + dead.age, dead.title, dead.cause)
-    : art(sceneSrcs(C.endImg), "📜", "BÖLÜM " + ROMAN[S.ch] + " TAMAMLANDI", C.endAge, C.endText + " Hikâyenin devamı yazılıyor.");
+    : art(sceneSrcs(C.endImg), "📜", "BÖLÜM " + ROMAN[S.ch] + " TAMAMLANDI", C.endAge, C.endText);
   shell(dead ? "Mezar Taşı" : "Hayat Kartı", head,
     '<div class="finalCard' + (dead ? " grave" : "") + '"><div class="k">' + (dead ? "MAKARYA · MEZAR TAŞI" : "MAKARYA · HAYAT KARTI") + "</div><h2>" + esc(a.title) + "</h2><p><b>" + esc(S.family) + " ailesi · " + gender + " · " + esc(lifeAge()) + "</b></p><p>" + esc(dead ? dead.cause : a.prophecy) + "</p></div>" +
     '<button class="primary" onclick="shareCard()">📤 KARTI PAYLAŞ</button>' +
@@ -402,7 +406,8 @@ function showRules() {
     "<p><b>Özellikler.</b> Kazandığın özellikler hedefleri düşürür ve ileride yeni seçeneklerin kilidini açar (🔒).</p>" +
     "<p><b>Hafıza.</b> Bazı seçimler unutulmaz; yıllar sonra karşına çıkar.</p>" +
     "<p><b>Her hayat farklı.</b> Her bölümde olaylar geniş bir havuzdan seçilir; iki hayat birbirinin aynısı olmaz.</p>" +
-    "<p><b>Ölüm.</b> ☠️ işaretli seçenekler ölüm riski taşır. Risk yüzdesi her zaman görünür. Ölen hayatlar koleksiyona girer.</p>" +
+    "<p><b>Ölüm.</b> 18 yaşından sonra hayat biraz daha kırılgan: ☠️ işaretli seçenekler ölüm riski taşır ve yüzdesi her zaman görünür; yaş ilerledikçe arka planda küçük bir risk de vardır. Sağlıklı alışkanlıklar ve Dayanıklılık bu riski düşürür. Her hayat bir mezar taşıyla biter ve koleksiyona girer.</p>" +
+    "<p><b>Hatlar.</b> Meslek, evlilik, çocuk ve geçmiş seçimlerin, önüne çıkacak olayları değiştirir.</p>" +
     "<p><b>Kayıt.</b> Oyun otomatik kaydedilir. Seçimler geri alınamaz: zar atıldığı ya da mini oyun başladığı an karar verilmiş olur.</p>");
 }
 
@@ -436,7 +441,8 @@ function startMini() {
   var m = CUR.c.mini, st = document.getElementById("mg");
   var back = st.parentNode.querySelector(".secondary"); if (back) back.remove();
   ({ timing: mgTiming, hold: mgHold, collect: mgCollect, race: mgRace, memory: mgMemory, cups: mgCups, doors: mgDoors,
-     rhythm: mgRhythm, lanes: mgLanes, simon: mgSimon, poker: mgPoker, trace: mgTrace })[m.type](st, MG.assist, m);
+     rhythm: mgRhythm, lanes: mgLanes, simon: mgSimon, poker: mgPoker, trace: mgTrace,
+     bargain: mgBargain, swipe: mgSwipe, breath: mgBreath, balance: mgBalance })[m.type](st, MG.assist, m);
 }
 function mgTiming(st, a, m) {
   var width = 18 + a * 44, left = 50 - width / 2;
@@ -519,7 +525,8 @@ function mgRace(st, a, m) {
   }, 60));
 }
 function mgMemory(st, a, m) {
-  var pool = [{ f: "🧒🏻", r: 5 }, { f: "👧🏽", r: 4 }, { f: "🧒🏿", r: 3 }, { f: "👦🏼", r: 2 }, { f: "👧🏻", r: 1 }, { f: "🧒🏽", r: 2 }]
+  var src = (m.items && m.items.length >= 5) ? m.items : ["🧒🏻", "👧🏽", "🧒🏿", "👦🏼", "👧🏻", "🧒🏽"], ranks = [5, 4, 3, 2, 1, 2];
+  var pool = src.slice(0, 6).map(function (f, i) { return { f: f, r: ranks[i] }; })
     .sort(function () { return Math.random() - 0.5; });
   st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgKids" id="kids">' + pool.map(function (k) {
     return '<div class="mgKid"><div class="face">' + k.f + '</div><div class="stars">' + "★".repeat(k.r) + "</div></div>";
@@ -633,7 +640,7 @@ function mgLanes(st, a, m) {
     '</div></div><div class="mgStatus" id="ls">Çarpma: 0</div><div class="row"><button class="mgBig" id="lb">◀</button><button class="mgBig" id="rb">▶</button></div>';
   var field = document.getElementById("lf"), me = document.getElementById("me");
   var lane = 1, obs = [], hits = 0, dur = 8000, t0 = performance.now(), last = t0, nextSpawn = t0 + 300;
-  var speed = 0.055 - a * 0.04, spawnGap = 640 + a * 500, faces = ["🧒", "👧", "👦", "🧒🏽", "👶"];
+  var speed = 0.055 - a * 0.04, spawnGap = 640 + a * 500, faces = (m.obstacles && m.obstacles.length) ? m.obstacles : ["🧒", "👧", "👦", "🧒🏽", "👶"];
   function place() { me.style.left = (lane * 33.33 + 16.66) + "%"; }
   function move(d) { lane = clamp(lane + d, 0, 2); place(); }
   place();
@@ -665,7 +672,7 @@ function mgLanes(st, a, m) {
 
 /* Sırayı tekrarla */
 function mgSimon(st, a, m) {
-  var items = ["🥪", "🧃", "🍫", "🥯"], len = clamp(5 - Math.round(a * 3), 3, 6), show = 620 + a * 400;
+  var items = (m.items && m.items.length === 4) ? m.items : ["🥪", "🧃", "🍫", "🥯"], len = clamp(5 - Math.round(a * 3), 3, 6), show = 620 + a * 400;
   var seq = []; for (var i = 0; i < len; i++) seq.push(Math.floor(Math.random() * 4));
   st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgSimon" id="sg">' +
     items.map(function (x, i) { return '<button class="mgTile" data-i="' + i + '" disabled>' + x + "</button>"; }).join("") +
@@ -693,7 +700,7 @@ function mgSimon(st, a, m) {
 
 /* Poker yüzü: parmağı gezinen dairenin içinde tut */
 function mgPoker(st, a, m) {
-  var R = 44 + a * 44, dur = 5000, qs = ["Emin misin?", "Bana bak.", "Gözlerimin içine bak.", "Kulakların neden kızardı?", "Son kez soruyorum.", "Hımm…"];
+  var R = 44 + a * 44, dur = 5000, qs = (m.questions && m.questions.length) ? m.questions : ["Emin misin?", "Bana bak.", "Gözlerimin içine bak.", "Kulakların neden kızardı?", "Son kez soruyorum.", "Hımm…"];
   st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgPoker" id="pf"><div class="mgQ" id="pq">Parmağını daireye koy</div><div class="mgRing" id="ring" style="width:' + 2 * R + "px;height:" + 2 * R +
     'px">😐</div></div><div class="mgStatus" id="ps">Başlamak için daireye dokun</div>';
   var f = document.getElementById("pf"), ring = document.getElementById("ring"), W = f.clientWidth, H = f.clientHeight;
@@ -725,14 +732,14 @@ function mgPoker(st, a, m) {
 
 /* Harfi çiz: kesikli çizgiyi tek hamlede takip et */
 function mgTrace(st, a, m) {
-  var P = [[40, 175], [40, 30], [150, 125], [260, 30], [260, 175]], tol = 20 + a * 26, N = 48, cps = [];
+  var P = m.shape === "imza" ? [[30, 150], [60, 60], [90, 150], [125, 70], [160, 145], [200, 75], [235, 140], [270, 95]] : [[40, 175], [40, 30], [150, 125], [260, 30], [260, 175]], tol = 20 + a * 26, N = 48, cps = [];
   for (var s = 0; s < P.length - 1; s++) for (var k = 0; k < N / 4; k++) {
     var u = k / (N / 4); cps.push([P[s][0] + (P[s + 1][0] - P[s][0]) * u, P[s][1] + (P[s + 1][1] - P[s][1]) * u]);
   }
   cps.push(P[P.length - 1]);
   var pts = P.map(function (p) { return p.join(","); }).join(" ");
   st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><svg class="mgTrace" id="tsvg" viewBox="0 0 300 200"><polyline points="' + pts +
-    '" class="guide"/><circle cx="40" cy="175" r="9" class="startDot"/><polyline id="ink" points="" class="ink"/></svg><div class="mgStatus" id="ts">Yeşil noktadan başla</div>';
+    '" class="guide"/><circle cx="' + P[0][0] + '" cy="' + P[0][1] + '" r="9" class="startDot"/><polyline id="ink" points="" class="ink"/></svg><div class="mgStatus" id="ts">Yeşil noktadan başla</div>';
   var svg = document.getElementById("tsvg"), ink = document.getElementById("ink"), drawing = false, done = false, line = [], hit = [], off = 0, t0 = 0;
   svg.style.touchAction = "none";
   function toV(ev) { var r = svg.getBoundingClientRect(); return [(ev.clientX - r.left) * 300 / r.width, (ev.clientY - r.top) * 200 / r.height]; }
@@ -754,6 +761,108 @@ function mgTrace(st, a, m) {
   svg.onpointermove = function (ev) { if (drawing) add(toV(ev)); };
   svg.onpointerup = svg.onpointercancel = end;
   later(function () { if (!done) { drawing = true; end(); } }, 9000);
+}
+
+/* Pazarlık: karşı tarafın sabrı biterken doğru fiyatı bul */
+function mgBargain(st, a, m) {
+  var buy = m.mode !== "sell", T = 35 + Math.floor(Math.random() * 40), patience = 100, cost = 26 - a * 20, offers = 0;
+  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgPatience"><i id="pat" style="width:100%"></i></div><div class="muted">Karşı tarafın sabrı</div>' +
+    '<div class="bgOffer" id="bo">50</div><input type="range" min="0" max="100" value="50" id="bs" class="bgSlider">' +
+    '<div class="row muted"><span>' + (buy ? "ucuz" : "ucuz") + '</span><span style="text-align:right">pahalı</span></div>' +
+    '<div class="mgStatus" id="bm">' + esc(buy ? "Ne kadar ödemeyi teklif ediyorsun? (" + (m.item || "") + ")" : "Kaça satmak istiyorsun? (" + (m.item || "") + ")") + '</div><button class="mgBig" id="bb">TEKLİF VER</button>';
+  var sl = document.getElementById("bs"), bo = document.getElementById("bo");
+  sl.oninput = function () { bo.textContent = sl.value; };
+  document.getElementById("bb").onclick = function () {
+    var v = +sl.value, ok = buy ? v >= T : v <= T, d = Math.abs(v - T); offers++;
+    if (ok) { finishMini(Math.max(0.55, 1 - d / 35) + (offers === 1 ? 0.03 : 0)); return; }
+    patience -= cost; document.getElementById("pat").style.width = Math.max(0, patience) + "%";
+    var msg = buy ? (d > 20 ? "Güldü. Çok düşük." : d > 8 ? "Kaşlarını kaldırdı. Biraz daha çık." : "Tereddüt etti. Çok yakınsın.")
+                  : (d > 20 ? "Güldü. Çok yüksek." : d > 8 ? "Yüzünü buruşturdu. Biraz in." : "Tereddüt etti. Çok yakınsın.");
+    document.getElementById("bm").textContent = msg;
+    if (patience <= 0) finishMini(0.28);
+  };
+}
+
+/* Kartları hızla ayır */
+function mgSwipe(st, a, m) {
+  var items = (m.items || []).slice().sort(function () { return Math.random() - 0.5; }), i = 0, ok = 0, per = 2600 + a * 2200, t0 = 0;
+  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="swCard" id="sc"></div><div class="mgTimerBar"><i id="stb"></i></div>' +
+    '<div class="mgStatus" id="ss"></div><div class="row"><button class="mgBig sw" id="sl">◀ ' + esc(m.left || "Hayır") + '</button><button class="mgBig sw right" id="sr">' + esc(m.right || "Evet") + " ▶</button></div>";
+  var card = document.getElementById("sc");
+  function show() {
+    if (i >= items.length) { finishMini(ok / items.length * 1.02); return; }
+    card.className = "swCard in"; card.textContent = items[i].t; t0 = performance.now();
+    document.getElementById("ss").textContent = (i + 1) + " / " + items.length + " · doğru " + ok;
+  }
+  function answer(right) {
+    if (i >= items.length || MG.done) return;
+    if (right === !!items[i].right) ok++;
+    card.className = "swCard out " + (right ? "r" : "l"); i++;
+    setTimeout(show, 160);
+  }
+  document.getElementById("sl").onclick = function () { answer(false); };
+  document.getElementById("sr").onclick = function () { answer(true); };
+  var sx = null;
+  card.onpointerdown = function (ev) { sx = ev.clientX; };
+  card.onpointerup = function (ev) { if (sx == null) return; var dx = ev.clientX - sx; sx = null; if (Math.abs(dx) > 30) answer(dx > 0); };
+  function tick(now) {
+    if (i < items.length) {
+      var f = Math.min(1, (now - t0) / per), b = document.getElementById("stb"); if (b) b.style.width = (100 - f * 100) + "%";
+      if (f >= 1) { card.className = "swCard out"; i++; setTimeout(show, 160); t0 = now + 1e9; }
+    }
+    MG.raf = requestAnimationFrame(tick);
+  }
+  show(); MG.raf = requestAnimationFrame(tick);
+}
+
+/* Nefes: daire büyürken basılı tut, küçülürken bırak */
+function mgBreath(st, a, m) {
+  var cyc = 2800 + a * 1400, cycles = 3, dur = cyc * cycles, good = 0, total = 0, holding = false, t0 = 0;
+  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="brWrap"><div class="brCircle" id="bc"></div></div><div class="mgStatus" id="bs">Daire büyürken bas, küçülürken bırak</div>' +
+    '<button class="mgBig" id="bb" style="touch-action:none">BASILI TUT</button>';
+  var btn = document.getElementById("bb"), c = document.getElementById("bc");
+  btn.oncontextmenu = function (ev) { ev.preventDefault(); };
+  btn.onpointerdown = function (ev) { ev.preventDefault(); holding = true; if (!t0) t0 = performance.now(); try { btn.setPointerCapture(ev.pointerId); } catch (e) {} };
+  btn.onpointerup = btn.onpointercancel = function () { holding = false; };
+  var last = 0;
+  function tick(now) {
+    if (t0) {
+      var el = now - t0, ph = (el % cyc) / cyc, grow = ph < 0.5, s = grow ? 0.55 + ph * 1.3 : 1.2 - (ph - 0.5) * 1.3;
+      c.style.transform = "scale(" + s.toFixed(3) + ")"; c.classList.toggle("in", grow);
+      if (now - last > 50) { last = now; total++; if (holding === grow) good++; }
+      document.getElementById("bs").textContent = (grow ? "Nefes al…" : "Nefes ver…") + " %" + Math.round(100 * good / Math.max(1, total));
+      if (el >= dur) { finishMini((good / total - 0.35) / 0.6); return; }
+    }
+    MG.raf = requestAnimationFrame(tick);
+  }
+  MG.raf = requestAnimationFrame(tick);
+}
+
+/* Denge: kayan şeyin altında tepsiyi tut */
+function mgBalance(st, a, m) {
+  var dur = 6000, tol = 0.1 + a * 0.12, x = 0.5, tx = 0.5, tray = 0.5, inside = 0, last = 0, t0 = 0;
+  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="blField" id="bf"><div class="blItem" id="bi">' + esc(m.item || "🍵") + '</div><div class="blTray" id="bt"></div></div>' +
+    '<div class="mgStatus" id="bs">Parmağını sürükleyerek tepsiyi altında tut</div>';
+  var f = document.getElementById("bf"), it = document.getElementById("bi"), tr = document.getElementById("bt");
+  f.style.touchAction = "none";
+  function pos(ev) { var r = f.getBoundingClientRect(); tray = clamp((ev.clientX - r.left) / r.width, 0, 1); if (!t0) { t0 = performance.now(); last = t0; } }
+  f.onpointerdown = function (ev) { ev.preventDefault(); try { f.setPointerCapture(ev.pointerId); } catch (e) {} pos(ev); };
+  f.onpointermove = function (ev) { if (ev.buttons || ev.pointerType === "touch") pos(ev); };
+  function tick(now) {
+    if (t0) {
+      var dt = now - last; last = now;
+      if (Math.abs(tx - x) < 0.02) tx = 0.1 + Math.random() * 0.8;
+      x += (tx - x) * (0.018 + (now - t0) / dur * 0.02);
+      var ok = Math.abs(tray - x) < tol; if (ok) inside += dt;
+      it.classList.toggle("bad", !ok);
+      var el = now - t0;
+      document.getElementById("bs").textContent = "Denge %" + Math.round(100 * inside / Math.max(1, el)) + " · " + (Math.max(0, dur - el) / 1000).toFixed(1) + " sn";
+      if (el >= dur) { finishMini(inside / dur * 1.05); return; }
+    }
+    it.style.left = (x * 100) + "%"; tr.style.left = (tray * 100) + "%"; tr.style.width = (tol * 200) + "%";
+    MG.raf = requestAnimationFrame(tick);
+  }
+  MG.raf = requestAnimationFrame(tick);
 }
 
 render();

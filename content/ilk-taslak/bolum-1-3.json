@@ -1,0 +1,2669 @@
+{
+ "events": [
+  {
+   "id": "dogum",
+   "ch": 1,
+   "age": "0 yaş",
+   "icon": "👶",
+   "title": "Ortam Fazla Aydınlık",
+   "text": "Makarya'ya geldin. Işıklar fazla parlak, herkes senden bir tepki bekliyor.",
+   "fixed": true,
+   "voices": [
+    {
+     "stat": "Sosyal Radar",
+     "diff": "easy",
+     "text": "Odada altı kişi var. Beşi sana bakıyor. Altıncısı faturaya."
+    },
+    {
+     "stat": "Pişkinlik",
+     "diff": "medium",
+     "text": "Sahne senin. Işıklar hazır. Ağlamak, açılış için yeterince güçlü bir performans."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Ağla",
+     "direct": {
+      "Çene": 2
+     },
+     "r": "İlk basın açıklamanı yaptın."
+    },
+    {
+     "t": "Daha çok ağla",
+     "direct": {
+      "Çene": 2,
+      "Pişkinlik": 1
+     },
+     "r": "Ses seviyesinin bir müzakere aracı olabileceğini keşfettin.",
+     "trait": "Ses Yükseltince Oluyor"
+    },
+    {
+     "t": "Etrafı izle",
+     "direct": {
+      "Akıl": 2,
+      "Sosyal Radar": 2
+     },
+     "r": "Konuşmadan önce ortamı okumayı seçtin.",
+     "trait": "Sessiz Gözlemci"
+    },
+    {
+     "t": "Sessiz kal",
+     "direct": {
+      "Sosyal Radar": 2
+     },
+     "r": "Herkes endişelendi. Sen sadece veri topluyordun."
+    }
+   ]
+  },
+  {
+   "id": "gece-vardiyasi",
+   "ch": 1,
+   "age": "3 ay",
+   "icon": "🌙",
+   "title": "Gece Vardiyası",
+   "text": "Saat 03:00. Ev halkı uyumaya çalışıyor. Senin vardiyan yeni başladı.",
+   "fam": "home",
+   "choices": [
+    {
+     "t": "Kendi kendine uyu",
+     "stat": "Dayanıklılık",
+     "diff": "veryEasy",
+     "r": {
+      "win": "Kısa süreliğine ev ekonomisine katkıda bulundun.",
+      "crit": "Sabaha kadar deliksiz uyudun. Ailen seni 'Ayın Çalışanı' ilan etmeyi düşündü.",
+      "fail": "Uyumaya çalıştın. Uyku seni reddetti.",
+      "bad": "Kendi kendine uyumaya çalışırken kendi kendini uyandırdın. Vardiya uzadı.",
+      "mid": "Yarım saat uyudun. Ev halkı bunu tam bir gece gibi kutladı."
+     },
+     "mini": {
+      "type": "rhythm",
+      "title": "Ninni Ritmi",
+      "hint": "Ay ışığı her parladığında dokun. Ritmi tut, uyku gelsin."
+     }
+    },
+    {
+     "t": "Ağlayarak yardım çağır",
+     "stat": "Çene",
+     "diff": "veryEasy",
+     "r": {
+      "win": "Gece ekibini başarıyla göreve çağırdın.",
+      "crit": "Tek bir 'ıngaa' ile tüm ev halkı toplandı. Yönetim becerilerin not edildi.",
+      "fail": "Ağladın ama ses kapıya ulaşmadı. Talebin sıraya alındı.",
+      "bad": "Ağladın, yanlış kişi uyandı. Sonra komşu uyandı. Toplantı sabaha sarktı."
+     }
+    },
+    {
+     "t": "Sessizce bekle",
+     "direct": {
+      "Sosyal Radar": 1
+     },
+     "r": "Bir süre bekledin. Dünya dönmeye devam etti."
+    }
+   ]
+  },
+  {
+   "id": "yabanci-krizi",
+   "ch": 1,
+   "age": "8 ay",
+   "icon": "🤓",
+   "title": "Yabancı Krizi",
+   "text": "Tanımadığın biri sana fazla hızlı yaklaştı. Sosyal protokol henüz yayımlanmadı.",
+   "choices": [
+    {
+     "t": "Anneni ara",
+     "stat": "Sosyal Radar",
+     "diff": "easy",
+     "r": {
+      "win": "Güvenli limanı doğru tespit ettin.",
+      "crit": "Anneni tek bakışta buldun; yabancı, hiç yaklaşmamış gibi geri çekildi.",
+      "fail": "Anneni aradın. Bulduğun kişi halanmış.",
+      "bad": "Anne diye kucağına atladığın kişi yabancının ta kendisiydi."
+     }
+    },
+    {
+     "t": "Gözlüğüne saldır",
+     "stat": "Cesaret",
+     "diff": "medium",
+     "r": {
+      "win": "Bir hamlede gözlüğü kaptın. Diplomatik ilişkiler kısa süreliğine askıya alındı.",
+      "crit": "Gözlük elinde. Kadın ne olduğunu anlayana kadar sen çoktan zaferini ilan ettin.",
+      "fail": "Kadın senden hızlı çıktı.",
+      "bad": "Gözlüğe uzandın; onun yerine kendi burnunu yakaladın.",
+      "mid": "Parmakların çerçeveye değdi ama gözlük sende kalmadı."
+     },
+     "mini": {
+      "type": "timing",
+      "title": "Gözlüğü Kap!",
+      "hint": "Kırmızı işareti yeşil alanda durdur."
+     }
+    },
+    {
+     "t": "Kabullen",
+     "direct": {
+      "Sosyal Radar": 1
+     },
+     "r": "Krizi düşük profille atlattın."
+    },
+    {
+     "t": "Ağla",
+     "direct": {
+      "Çene": 1
+     },
+     "r": "Toplantı erken sona erdi."
+    }
+   ]
+  },
+  {
+   "id": "yasak-nesne",
+   "ch": 1,
+   "age": "10 ay",
+   "icon": "💎",
+   "title": "Yasak Nesne",
+   "text": "Masada dokunmaman gereken parlak bir şey var. Bu bilgi nesneyi daha çekici yaptı.",
+   "fam": "home",
+   "voices": [
+    {
+     "stat": "Kurnazlık",
+     "diff": "easy",
+     "text": "Parlak şeyler pahalıdır. Pahalı şeyler yüksekte durur. Bu masada bir planlama hatası var."
+    },
+    {
+     "stat": "Vicdan",
+     "diff": "medium",
+     "text": "Bu nesneye dokunursan birileri üzülecek. Muhtemelen sen, biraz sonra."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Dokunma",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "İlk kez bir yasağı uyguladın."
+    },
+    {
+     "t": "Anne çıkana kadar bekle",
+     "stat": "Kurnazlık",
+     "diff": "easy",
+     "r": {
+      "win": "Zamanlama kavramını keşfettin.",
+      "crit": "Anne çıktı, sen aldın, anne döndü, nesne yerindeydi. Kimse hiçbir şey anlamadı.",
+      "fail": "Beklerken uyuyakaldın. Fırsat penceresi kapandı.",
+      "bad": "Anne çıkmadı. Sadece çıkıyormuş gibi yaptı. Seni izliyordu."
+     }
+    },
+    {
+     "t": "Direkt al",
+     "stat": "Pişkinlik",
+     "diff": "easy",
+     "r": {
+      "win": "Mülkiyet hukukuna farklı bir yorum getirdin.",
+      "crit": "Aldın ve kimse itiraz edemedi. Yüz ifaden tüm soruları cevapladı.",
+      "fail": "Uzandın. Masa senden uzunmuş.",
+      "bad": "Aldın, düşürdün, kırıldı. Hukuk sisteminde yeni dosya açıldı."
+     }
+    }
+   ]
+  },
+  {
+   "id": "ilk-kelime",
+   "ch": 1,
+   "age": "1 yaş",
+   "icon": "💬",
+   "title": "İlk Kelime",
+   "text": "Salon sessizleşti. Herkes ağzından çıkacak ilk anlamlı kelimeyi bekliyor.",
+   "fam": "home",
+   "choices": [
+    {
+     "t": "Anne",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "Diplomatik olarak güvenli bir başlangıç."
+    },
+    {
+     "t": "Baba",
+     "direct": {
+      "Çene": 1
+     },
+     "r": "Salonda kısa süreli bir zafer havası oluştu."
+    },
+    {
+     "t": "Mama",
+     "direct": {
+      "Dayanıklılık": 1
+     },
+     "r": "Önceliklerini açıkça belirttin."
+    },
+    {
+     "t": "Para",
+     "direct": {
+      "Kurnazlık": 2
+     },
+     "r": "Aile bir an sessiz kaldı. Gelecek hakkında bazı sorular oluştu.",
+     "trait": "Erken Ekonomi Bilinci",
+     "flag": "ilkKelimePara"
+    }
+   ]
+  },
+  {
+   "id": "ilk-adimlar",
+   "ch": 1,
+   "age": "15 ay",
+   "icon": "👣",
+   "title": "İlk Adımlar",
+   "text": "Ayaktasın. Bu, teoride ilerleme sayılıyor.",
+   "choices": [
+    {
+     "t": "Koşmayı dene",
+     "stat": "Cesaret",
+     "diff": "easy",
+     "r": {
+      "win": "Yürümeden önce hızlanmayı tercih ettin. Adımlar sallantılı ama gerçek.",
+      "crit": "İki ayağın da yerde, rüzgâr arkanda. Bir anlığına evren dengede.",
+      "fail": "Denge seni henüz ikna etmedi.",
+      "bad": "Bir adım attın. Yer senden daha hızlı davrandı.",
+      "mid": "Bir adım, sonra güvenli bir oturuş."
+     },
+     "mini": {
+      "type": "hold",
+      "title": "İlk Adımlar",
+      "hint": "Basılı tut, gücü topla. Çubuk yeşil alana geldiğinde bırak."
+     }
+    },
+    {
+     "t": "Mobilyaya tutun",
+     "stat": "Dayanıklılık",
+     "diff": "veryEasy",
+     "r": {
+      "win": "Risk yönetimi bölümünü erken açtın.",
+      "crit": "Koltuktan sehpaya, sehpadan kapıya: ilk lojistik hattını kurdun.",
+      "fail": "Tuttuğun mobilya tekerlekliymiş.",
+      "bad": "Tuttuğun şey masa örtüsüydü. Üstündekilerle birlikte indin."
+     }
+    },
+    {
+     "t": "Önce diğerlerini izle",
+     "stat": "Akıl",
+     "diff": "easy",
+     "r": {
+      "win": "Rakip analizi yaptın. Yöntem not edildi.",
+      "crit": "Kediyi izledin: dört ayak daha dengeli, iki ayak daha prestijli. Prestij kazandı.",
+      "fail": "İzledin, izledin. O sırada herkes oturuyordu.",
+      "bad": "Örnek aldığın kişi dedendi. Bastonsuz model henüz piyasada yok."
+     }
+    }
+   ]
+  },
+  {
+   "id": "masadaki-telefon",
+   "ch": 1,
+   "age": "17 ay",
+   "icon": "📱",
+   "title": "Masadaki Telefon",
+   "text": "Ekran parlıyor. Yetişkinler bu nesneye günün önemli bölümünü ayırıyor.",
+   "choices": [
+    {
+     "t": "Dokunma",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "Nadir görülen bir özdenetim anı."
+    },
+    {
+     "t": "Ekranı kurcala",
+     "stat": "Kurnazlık",
+     "diff": "easy",
+     "r": {
+      "win": "Teknoloji departmanına izinsiz giriş yaptın.",
+      "crit": "Ekranı açtın ve babanın çalma listesini 'Ninniler' olarak güncelledin.",
+      "fail": "Ekran kilitliydi. Sen de bir süre kilitlendin.",
+      "bad": "Rastgele dokunuşlar babanın patronunu görüntülü aradı."
+     }
+    },
+    {
+     "t": "Gizlice al",
+     "stat": "Kurnazlık",
+     "diff": "medium",
+     "r": {
+      "win": "Cihaz güvenliği kısa süreliğine çöktü.",
+      "crit": "Telefonu aldın, bir oyun açtın, rekor kırdın. Kimse şifreyi nasıl bildiğini anlamadı.",
+      "fail": "Telefon titreşti, sen irkildin, operasyon iptal.",
+      "bad": "Telefonu aldın ve doğrudan su bardağına bıraktın. Pirinç torbası devreye girdi."
+     },
+     "trait": "Teknoloji Merakı"
+    }
+   ]
+  },
+  {
+   "id": "dogum-gunu-pastasi",
+   "ch": 1,
+   "age": "19 ay",
+   "icon": "🎂",
+   "title": "Doğum Günü Pastası",
+   "text": "Bir pasta, bir mum ve çok sayıda gereksiz sosyal kural.",
+   "fam": "social",
+   "choices": [
+    {
+     "t": "Bekle",
+     "stat": "Dayanıklılık",
+     "diff": "easy",
+     "r": {
+      "win": "Pasta hâlâ orada. Sen de hâlâ buradasın.",
+      "crit": "Sabrın ödüllendirildi: en büyük dilim, üstünde çilekle sana geldi.",
+      "fail": "Bekledin, bekledin; sıra sana geldiğinde kremalı kısım bitmişti.",
+      "bad": "Beklemekten sıkıldın ve pastanın yanında uyuyakaldın. Fotoğraflarda yüzün kremalı."
+     }
+    },
+    {
+     "t": "Pastaya erken saldır",
+     "stat": "Pişkinlik",
+     "diff": "medium",
+     "r": {
+      "win": "Protokolü kremayla yeniden yazdın.",
+      "crit": "Pastanın en güzel köşesi artık senin. Herkes alkışladı, çünkü başka seçenek yoktu.",
+      "fail": "Uzandın, biri tabağı kaydırdı. Elin havayı kremaladı.",
+      "bad": "Pastaya daldın. Pasta da sana daldı. Aile albümüne kalıcı kayıt."
+     }
+    },
+    {
+     "t": "Mumları önce üfle",
+     "stat": "Pişkinlik",
+     "diff": "hard",
+     "r": {
+      "win": "Doğum günü sahibinin kim olduğu geçici olarak belirsizleşti.",
+      "crit": "Mumları söndürdün, dilek tuttun, alkışları topladın. Hediyeler de yön değiştirmek üzere.",
+      "fail": "Üfledin ama mumlar senden daha kararlıydı.",
+      "bad": "Üfledin; mum yerine pastanın süsü uçtu. Doğum günü çocuğu ağlamaya başladı."
+     },
+     "trait": "Sahne Sever"
+    }
+   ]
+  },
+  {
+   "id": "vazo-kirildi",
+   "ch": 1,
+   "age": "2 yaş",
+   "icon": "🏺",
+   "title": "Vazo Kırıldı",
+   "text": "Vazo yerde. Sessizlik ağır. Kedi sana bakıyor.",
+   "fam": "home",
+   "voices": [
+    {
+     "stat": "Sosyal Radar",
+     "diff": "medium",
+     "text": "Kedi seni izlemiyor. Annenin ayak seslerini izliyor. Dört saniyen var.",
+     "opens": true
+    },
+    {
+     "stat": "Pişkinlik",
+     "diff": "hard",
+     "text": "Kedinin avukatı yok. Sadece söylüyorum."
+    },
+    {
+     "stat": "Vicdan",
+     "diff": "easy",
+     "text": "Bu vazo babaanneden kalmaydı. Babaanne hâlâ hayatta. Bu durumu daha da kötüleştiriyor.",
+     "fail": "…Vicdan bu sırada başka bir şeyle meşguldü."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Bekle",
+     "direct": {
+      "Vicdan": 2
+     },
+     "r": "Olay yeri incelemesine gönüllü oldun."
+    },
+    {
+     "t": "Kaç",
+     "stat": "Kurnazlık",
+     "diff": "medium",
+     "r": {
+      "win": "Şüpheli olay yerinden uzaklaştı.",
+      "crit": "Kaçtın ve üç dakika sonra 'Ne oldu?' diye içeri girdin. Ödüllük performans.",
+      "fail": "Kaçarken terlikler ses yaptı. Şüpheli tespit edildi.",
+      "bad": "Kaçarken ikinci vazoyu da devirdin. Dosya kabardı."
+     }
+    },
+    {
+     "t": "Kediyi suçla",
+     "stat": "Pişkinlik",
+     "diff": "veryHard",
+     "r": {
+      "win": "Savunma yaratıcıydı. Kedinin odada olmaması küçük bir ayrıntıydı.",
+      "crit": "Kedi mahkûm edildi. Mama tayınları kısıldı. Sen o gece iki tatlı yedin.",
+      "fail": "Kediye baktın. Kedi sana baktı. Ailen ikinize de baktı. Kimse ikna olmadı.",
+      "bad": "Kediyi suçladın. Kedi o sırada annenin kucağındaydı."
+     },
+     "flag": "kediSuclu"
+    },
+    {
+     "t": "Ayak seslerini say, tam zamanında ağla",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "Ağladın. Anne seni teselli etti. Vazo gündemin ikinci maddesine düştü.",
+      "crit": "Ağladın; anne vazoyu değil seni sordu. Vazo resmî kayıtlara 'kaza' olarak geçti.",
+      "fail": "Ağladın; anne önce vazoya baktı. Sonra sana. Sonra yine vazoya.",
+      "bad": "Ağladın ama kediyle aynı anda. Anne ikinizi de şüpheli ilan etti."
+     },
+     "reqVoice": "Sosyal Radar"
+    },
+    {
+     "t": "Parçaları sakla",
+     "stat": "Kurnazlık",
+     "diff": "medium",
+     "r": {
+      "win": "Deliller toparlandı. Delil yönetimi departmanı kuruldu.",
+      "crit": "Parçalar göz açıp kapayıncaya kadar kayboldu. Vazo hiç var olmamış gibi.",
+      "fail": "Parçalar senden hızlı yayıldı.",
+      "bad": "Parçaları toplarken daha fazla ses çıkardın. Ev halkı toplandı.",
+      "mid": "Çoğunu sakladın ama bir parça hâlâ şüpheli biçimde ortada."
+     },
+     "mini": {
+      "type": "collect",
+      "title": "Delilleri Topla",
+      "hint": "Parçalar fark edilmeden önce hepsine dokun.",
+      "piece": "🧩"
+     }
+    }
+   ]
+  },
+  {
+   "id": "ilk-harclik",
+   "ch": 1,
+   "age": "2 yaş 2 ay",
+   "icon": "🪙",
+   "title": "İlk Harçlık",
+   "text": "Avucuna birkaç bozuk para bırakıldı. Finansal sistemle ilk temas.",
+   "fam": "money",
+   "voices": [
+    {
+     "stat": "Kurnazlık",
+     "diff": "medium",
+     "text": "Bu bozuk paralar tek başına bir şey değil. Biriktirirsen de bir şey değil. Ama biriktirirsen."
+    },
+    {
+     "stat": "Çene",
+     "diff": "easy",
+     "text": "Karşıdaki çocuğun elinde kraker var. Kraker de bir para birimidir."
+    }
+   ],
+   "recall": [
+    {
+     "flag": "ilkKelimePara",
+     "text": "İlk kelimen 'Para' olduğundan beri bu konuda seni ciddiye alıyorlar."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Annene ver",
+     "direct": {
+      "Vicdan": 2
+     },
+     "r": "Varlık yönetimini dışarıya devrettin."
+    },
+    {
+     "t": "Oyuncak iste",
+     "direct": {
+      "Çene": 1
+     },
+     "r": "Likidite anında tüketime döndü."
+    },
+    {
+     "t": "Parayı sakla",
+     "stat": "Kurnazlık",
+     "diff": "easy",
+     "r": {
+      "win": "Makarya Merkez Bankası seni henüz izlemiyor.",
+      "crit": "Parayı sakladın, bir hafta sonra unuttuğun bir sürpriz olarak buldun. Faiz kavramına ilk adım.",
+      "fail": "Sakladığın yeri unuttun. Para artık evin ortak mirası.",
+      "bad": "Parayı ağzına sakladın. Acil müdahale ekibi ve babaanne devreye girdi."
+     },
+     "trait": "Yastık Altı Ekonomisti"
+    },
+    {
+     "t": "Bir çocukla takas yap",
+     "stat": "Çene",
+     "diff": "medium",
+     "r": {
+      "win": "İlk mikro ticaret operasyonun gerçekleşti.",
+      "crit": "İki bozuk parayı bir oyuncak arabaya çevirdin, sonra arabayı üç bozuk paraya. Kârdasın.",
+      "fail": "Karşı taraf teklifini değerlendirmeye aldı. Hiç dönmedi.",
+      "bad": "Takas ettin. Eline yarım bir kraker geçti. Kötü anlaşmaydı."
+     },
+     "trait": "Küçük Tüccar"
+    }
+   ]
+  },
+  {
+   "id": "oyuncak-krizi",
+   "ch": 1,
+   "age": "2 yaş 4 ay",
+   "icon": "🧸",
+   "title": "Oyuncak Krizi",
+   "text": "Başka bir çocuk senin oyuncağını aldı. Uluslararası kriz başladı.",
+   "fam": "social",
+   "choices": [
+    {
+     "t": "Paylaş",
+     "direct": {
+      "Vicdan": 2
+     },
+     "r": "Gerilim düşürüldü."
+    },
+    {
+     "t": "Başka oyuncak teklif et",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "Takas diplomasisi çalıştı.",
+      "crit": "Eski oyuncağını teklif ettin, yenisini geri aldın ve karşı taraf teşekkür etti.",
+      "fail": "Teklifini beğenmedi. Müzakere masası devrildi.",
+      "bad": "Teklif ettiğin oyuncağı da aldı. Artık iki oyuncak eksiğin var."
+     }
+    },
+    {
+     "t": "Elinden al",
+     "stat": "Cesaret",
+     "diff": "medium",
+     "r": {
+      "win": "Müzakere süreci fiziksel aşamaya geçti. Oyuncak sende.",
+      "crit": "Tek hamlede aldın. Karşı taraf itiraz edecek kelimeyi bulamadı.",
+      "fail": "Çektin, o da çekti. Oyuncak ikiye ayrılma eşiğinde bırakıldı.",
+      "bad": "Çektin, o bıraktı. Sen popo üstü oturdun, herkes güldü."
+     }
+    },
+    {
+     "t": "Sıkılmasını bekle",
+     "stat": "Dayanıklılık",
+     "diff": "easy",
+     "r": {
+      "win": "Zaman senin lehine çalıştı.",
+      "crit": "O sıkıldı, oyuncağı bıraktı ve sana bir tane daha verdi.",
+      "fail": "Sıkılmadı. Sen sıkıldın.",
+      "bad": "Bekledin; oyuncak onun evine götürüldü."
+     }
+    }
+   ]
+  },
+  {
+   "id": "aile-toplantisi",
+   "ch": 1,
+   "age": "2 yaş 7 ay",
+   "icon": "🛋️",
+   "title": "Aile Toplantısı",
+   "text": "Yetişkinler konuşuyor. Konu senden daha sıkıcı ama sonuçları daha büyük olabilir.",
+   "fam": "home",
+   "choices": [
+    {
+     "t": "Dinle",
+     "stat": "Sosyal Radar",
+     "diff": "easy",
+     "r": {
+      "win": "Yetişkinlerin söylediklerinden çok söylemediklerini duydun.",
+      "crit": "Toplantının gerçek gündemini senden başka kimse anlamadı: yaz tatili iptal değil, ertelenmiş.",
+      "fail": "Dinledin ama kelimeler çok uzundu.",
+      "bad": "Dinlerken duyduğun bir kelimeyi misafirlerin önünde tekrar ettin."
+     }
+    },
+    {
+     "t": "İlgi çek",
+     "stat": "Pişkinlik",
+     "diff": "medium",
+     "r": {
+      "win": "Gündem başarıyla değiştirildi.",
+      "crit": "Tüm toplantı senin şovuna dönüştü. Gündem maddeleri bir sonraki yıla ertelendi.",
+      "fail": "Dans ettin, kimse bakmadı. Bütçe konuşuluyordu.",
+      "bad": "İlgi çekmek için çaydanlığa uzandın. Toplantı acil durum toplantısına dönüştü."
+     }
+    },
+    {
+     "t": "Oyuncağınla ilgilen",
+     "direct": {
+      "Dayanıklılık": 1
+     },
+     "r": "Kriz yönetimini profesyonellere bıraktın."
+    }
+   ]
+  },
+  {
+   "id": "parkta-sira",
+   "ch": 1,
+   "age": "2 yaş 10 ay",
+   "icon": "🛝",
+   "title": "Parkta Sıra",
+   "text": "Kaydırakta sıra var. Sistem basit görünüyor. İnsanlar yüzünden değil.",
+   "choices": [
+    {
+     "t": "Sıraya gir",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "Kurallı toplum deneyine katıldın."
+    },
+    {
+     "t": "Öne geç",
+     "stat": "Pişkinlik",
+     "diff": "medium",
+     "r": {
+      "win": "Öne geçtin. Toplumsal tepki geldiğinde sen zaten aşağı kayıyordun.",
+      "crit": "Öne geçtin ve kimse fark etmedi. Hatta biri sana yer verdi.",
+      "fail": "Öne geçmeye çalıştın; sıradaki anneler komitesi seni geri gönderdi.",
+      "bad": "Öne geçtin, kaydıraktan ters indin. Sıradakiler alkışladı.",
+      "mid": "Yarıya kadar geldin. Sonra biri seni fark etti. Yarım zafer."
+     },
+     "mini": {
+      "type": "lanes",
+      "title": "Sıranın Arasından Geç",
+      "hint": "Sağa sola kaydırarak (ya da oklara basarak) çocuklara çarpmadan en öne ulaş."
+     }
+    },
+    {
+     "t": "Konuşarak çöz",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "İki dakikalık diplomasi, üç dakikalık kaydırak.",
+      "crit": "Konuştun ve sıradaki herkes sana geçiş hakkı verdi. Nedeni belirsiz.",
+      "fail": "Konuştun; herkes dinledi, kimse kıpırdamadı.",
+      "bad": "Konuşurken sıradaki yerini de kaybettin."
+     }
+    },
+    {
+     "t": "Sistemi izle",
+     "stat": "Sosyal Radar",
+     "diff": "easy",
+     "r": {
+      "win": "Kimin gerçekten sırada olduğunu anlamaya başladın.",
+      "crit": "Sıranın aslında iki ayrı sıra olduğunu fark ettin ve boş olanına geçtin.",
+      "fail": "İzledin; sistem çok karışıktı. Kaydırak kapandı.",
+      "bad": "Sistemi izlerken salıncak kafana çarptı."
+     }
+    }
+   ]
+  },
+  {
+   "id": "kim-yapti",
+   "ch": 1,
+   "age": "2 yaş 11 ay",
+   "icon": "🔍",
+   "title": "Kim Yaptı?",
+   "text": "Bir şey oldu. Bir yetişkin tek soru soruyor. Oda sessiz.",
+   "fam": "home",
+   "voices": [
+    {
+     "stat": "Vicdan",
+     "diff": "easy",
+     "text": "Doğruyu söylersen bugün kötü geçer. Yalan söylersen bu gece kötü geçer."
+    },
+    {
+     "stat": "Akıl",
+     "diff": "medium",
+     "text": "Soruyu soran yetişkin cevabı zaten biliyor. Bu bir soruşturma değil, bir sadakat testi.",
+     "opens": true
+    }
+   ],
+   "recall": [
+    {
+     "flag": "kediSuclu",
+     "text": "Vazo olayından beri ev halkı ifadelerine daha dikkatli bakıyor."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Doğruyu söyle",
+     "direct": {
+      "Vicdan": 2
+     },
+     "r": "Kısa vadede kötü, uzun vadede kullanışlı bir alışkanlık."
+    },
+    {
+     "t": "Bilmiyorum de",
+     "stat": "Çene",
+     "diff": "medium",
+     "r": {
+      "win": "Bilgi eksikliği stratejik olarak kullanıldı.",
+      "crit": "'Bilmiyorum' dedin. O kadar ikna ediciydin ki soruşturma kapandı ve sana dondurma verildi.",
+      "fail": "'Bilmiyorum' dedin. Yüzün 'biliyorum' dedi.",
+      "bad": "'Bilmiyorum' dedin ve hemen ardından 'ama ben yapmadım' ekledin. Kimse sormamıştı."
+     }
+    },
+    {
+     "t": "'Siz ne düşünüyorsunuz?' diye sor",
+     "stat": "Akıl",
+     "diff": "medium",
+     "r": {
+      "win": "Soruyu soruya çevirdin. Yetişkin kendi teorisini anlatırken sen sessizce aklandın.",
+      "crit": "Yetişkin cevap verirken kendini suçlu hissetti ve sana kurabiye verdi.",
+      "fail": "'Soruyu ben sordum' dedi yetişkin. Tartışma bitti.",
+      "bad": "Soruyu sordun; yetişkin 'Sen yaptın' dedi. Kendi sorunla yakalandın."
+     },
+     "reqVoice": "Akıl"
+    },
+    {
+     "t": "Başkasını suçla",
+     "stat": "Pişkinlik",
+     "diff": "veryHard",
+     "r": {
+      "win": "Dosya başka birinin masasına gönderildi.",
+      "crit": "Dosya kuzenin masasına gönderildi. Kuzen hâlâ ne olduğunu anlamaya çalışıyor.",
+      "fail": "Suçladığın kişi o gün evde değildi.",
+      "bad": "Suçladığın kişi olayın videosunu çekmişti."
+     },
+     "flag": "yalanci"
+    }
+   ]
+  },
+  {
+   "id": "kres-kapisi",
+   "ch": 1,
+   "age": "3 yaş",
+   "icon": "🏫",
+   "title": "Kreş Kapısı",
+   "text": "Kapının arkasında başka çocuklar, kurallar ve oyuncaklar var. Ailen ilk kez birkaç saatliğine dışarıda kalacak.",
+   "fam": "education",
+   "fixed": true,
+   "choices": [
+    {
+     "t": "Bacağına sarıl",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "Ayrılık müzakeresi uzadı.",
+     "flag": "yapiskan"
+    },
+    {
+     "t": "İçeri gir",
+     "stat": "Cesaret",
+     "diff": "medium",
+     "r": {
+      "win": "Yeni harita açıldı.",
+      "crit": "İçeri girdin, arkana bakmadın, öğle yemeğinde masa başkanıydın.",
+      "fail": "Kapıya kadar gittin, geri döndün. Plan B: yarın.",
+      "bad": "İçeri girdin; yanlış sınıfa. Bir saat bebek grubunda kaldın."
+     }
+    },
+    {
+     "t": "Önce ortamı izle",
+     "stat": "Sosyal Radar",
+     "diff": "easy",
+     "r": {
+      "win": "Kim kimdir, kim neye sahip, hızlıca kaydettin.",
+      "crit": "Beş dakikada sınıfın haritasını çıkardın: en iyi oyuncak, en iyi köşe, en tatlı öğretmen.",
+      "fail": "İzlerken kapı kapandı. Ortam içeride kaldı, sen dışarıda.",
+      "bad": "İzlerken biri seni yeni oyuncak sandı."
+     }
+    }
+   ]
+  },
+  {
+   "id": "ilk-arkadas",
+   "ch": 2,
+   "age": "3 yaş 1 ay",
+   "icon": "🤝",
+   "title": "İlk Arkadaş",
+   "text": "Yanında bir çocuk var. İkiniz de ne yapacağınızı tam bilmiyorsunuz.",
+   "choices": [
+    {
+     "t": "İsmini söyle",
+     "direct": {
+      "Çene": 1
+     },
+     "r": "Diplomatik ilişki kuruldu."
+    },
+    {
+     "t": "Oyuncağını sor",
+     "stat": "Çene",
+     "diff": "veryEasy",
+     "r": {
+      "win": "Ortak ilgi alanı bulundu.",
+      "crit": "Oyuncağını sordun; sana koleksiyonunun tam envanterini sundu. Dostluk tescillendi.",
+      "fail": "Sordun, cevap vermedi. Oyuncak daha ilginçti.",
+      "bad": "Sordun; oyuncağın kendisine ait olduğunu yüksek sesle ilan etti."
+     }
+    },
+    {
+     "t": "Konuşmadan yanında dur",
+     "stat": "Sosyal Radar",
+     "diff": "easy",
+     "r": {
+      "win": "Sessizlik garip değildi. Bu iyi işaret.",
+      "crit": "Hiç konuşmadınız. Ertesi gün aynı yerde buluştunuz. Gerçek dostluk.",
+      "fail": "Sessizlik biraz garipti.",
+      "bad": "Sessizce durdun; o da sessizce uzaklaştı."
+     }
+    }
+   ]
+  },
+  {
+   "id": "oyuncagimi-aldi",
+   "ch": 2,
+   "age": "3 yaş 2 ay",
+   "icon": "😤",
+   "title": "Oyuncağımı Aldı",
+   "text": "Bir çocuk oyuncağını aldı ve bunun tamamen normal olduğuna inanıyor.",
+   "fam": "social",
+   "choices": [
+    {
+     "t": "Geri iste",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "Mülkiyet hakkını sözlü savundun.",
+      "crit": "Öyle bir savunma yaptın ki oyuncağı özür dileyerek geri verdi.",
+      "fail": "İstedin. Duymamış gibi yaptı.",
+      "bad": "İstedin; o da senin diğer oyuncağını istedi. Dava büyüdü."
+     }
+    },
+    {
+     "t": "Elinden al",
+     "stat": "Cesaret",
+     "diff": "medium",
+     "r": {
+      "win": "Hızlı çözüm, uzun bakışmalar.",
+      "crit": "Aldın. Karşı taraf bir daha bu konuyu açmadı.",
+      "fail": "Aldın, geri aldı. Oyun berabere.",
+      "bad": "Almaya çalışırken öğretmen tam o an döndü. Sadece seni gördü."
+     }
+    },
+    {
+     "t": "Takas öner",
+     "stat": "Kurnazlık",
+     "diff": "easy",
+     "r": {
+      "win": "Piyasa mekanizması devreye girdi.",
+      "crit": "Takas ettin ve üstüne bir de kurabiye aldın. Arbitraj.",
+      "fail": "Teklifin reddedildi. Piyasa durgun.",
+      "bad": "Takas ettin; eline geçen oyuncağın sahibi başka bir çocuk çıktı."
+     }
+    },
+    {
+     "t": "Öğretmene söyle",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "Uyuşmazlık kurumsal kanala taşındı."
+    }
+   ]
+  },
+  {
+   "id": "ogretmen-yanlis-anladi",
+   "ch": 2,
+   "age": "3 yaş 4 ay",
+   "icon": "👩‍🏫",
+   "title": "Öğretmen Seni Yanlış Anladı",
+   "text": "Öğretmen başka bir şey olduğunu sanıyor. İlk kez otorite de hata yapabiliyor.",
+   "fam": "education",
+   "choices": [
+    {
+     "t": "Kendini anlat",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "Dosyaya kendi ifaden eklendi.",
+      "crit": "Öyle net anlattın ki öğretmen sana teşekkür edip seni sınıf sözcüsü yaptı.",
+      "fail": "Anlattın ama ağlamaklı ses tonu mesajın önüne geçti.",
+      "bad": "Anlatırken olayı daha da karıştırdın. Artık sen de ne olduğunu bilmiyorsun."
+     }
+    },
+    {
+     "t": "Sakin kal",
+     "stat": "Vicdan",
+     "diff": "easy",
+     "r": {
+      "win": "Gerilim büyümeden geçti.",
+      "crit": "Sakin kaldın; öğretmen gerçeği kendisi fark etti ve özür diledi. Bu nadir görülür.",
+      "fail": "Sakin kaldın ama içinden kaynıyordun. Yüzüne yansıdı.",
+      "bad": "Sakin kaldın; suskunluğun itiraf sayıldı."
+     }
+    },
+    {
+     "t": "Boş ver",
+     "direct": {
+      "Dayanıklılık": 1
+     },
+     "r": "Her yanlış anlaşılma toplantı gerektirmiyor."
+    },
+    {
+     "t": "Gerçek suçluyu gösteren ayrıntıyı hatırla",
+     "stat": "Sosyal Radar",
+     "diff": "easy",
+     "r": {
+      "win": "Suçlunun elindeki boyayı hatırladın. Dosya yeniden açıldı.",
+      "crit": "Ayrıntıları öyle sıraladın ki öğretmen seni sınıfın dedektifi ilan etti.",
+      "fail": "Ayrıntıyı hatırladın ama kimse inanmadı.",
+      "bad": "Yanlış ayrıntıyı hatırladın. Suçlu, masum bir boya kalemi oldu."
+     },
+     "req": "Sessiz Gözlemci"
+    }
+   ]
+  },
+  {
+   "id": "parkin-buyuk-cocugu",
+   "ch": 2,
+   "age": "3 yaş 6 ay",
+   "icon": "🧗",
+   "title": "Parkın Büyük Çocuğu",
+   "text": "Kaydırağın tepesinde senden büyük biri alanı sahiplenmiş görünüyor.",
+   "choices": [
+    {
+     "t": "Başka yere git",
+     "direct": {
+      "Dayanıklılık": 1
+     },
+     "r": "Kaynakları yeniden dağıttın."
+    },
+    {
+     "t": "'Herkesin burası' de",
+     "stat": "Cesaret",
+     "diff": "hard",
+     "r": {
+      "win": "Kamusal alan savunması yaptın. Büyük çocuk kenara çekildi.",
+      "crit": "Konuşmanı bitirdiğinde parktaki tüm küçük çocuklar arkandaydı. Kaydırak halka açıldı.",
+      "fail": "Söyledin. Büyük çocuk güldü. Biraz daha büyüyünce tekrar denersin.",
+      "bad": "Söyledin. Büyük çocuk kaydıraktan kaydı ve tam önüne indi. Sessizlik."
+     },
+     "flagWin": "cesurPark"
+    },
+    {
+     "t": "Diğer çocukları ölç",
+     "stat": "Sosyal Radar",
+     "diff": "medium",
+     "r": {
+      "win": "Koalisyon ihtimalini değerlendirdin ve kurdun.",
+      "crit": "Üç çocukla koalisyon kurdun. Büyük çocuk çoğunluğa boyun eğdi.",
+      "fail": "Çocukları ölçtün; hepsi senden de küçüktü.",
+      "bad": "Koalisyon kurdun; koalisyon büyük çocuğun tarafına geçti."
+     }
+    }
+   ]
+  },
+  {
+   "id": "market-kasasi",
+   "ch": 2,
+   "age": "3 yaş 8 ay",
+   "icon": "🍬",
+   "title": "Market Kasası",
+   "text": "Kasada göz hizanda şekerler var. Bu tesadüf olamayacak kadar iyi tasarlanmış.",
+   "fam": "money",
+   "choices": [
+    {
+     "t": "Şekeri iste",
+     "direct": {
+      "Çene": 1
+     },
+     "r": "Talep açıkça iletildi."
+    },
+    {
+     "t": "Sepete gizlice koy",
+     "stat": "Kurnazlık",
+     "diff": "medium",
+     "r": {
+      "win": "Satın alma sürecine gölge operasyon eklendi.",
+      "crit": "Şeker kasadan geçti, eve geldi, kimse fark etmedi. Kusursuz tedarik zinciri.",
+      "fail": "Kasiyer şekeri gördü ve sana göz kırptı. Şeker rafa döndü.",
+      "bad": "Sepete koyduğun şey şeker değil, pilmiş. Ailen çok şaşırdı."
+     }
+    },
+    {
+     "t": "Dokunma",
+     "stat": "Vicdan",
+     "diff": "veryEasy",
+     "r": {
+      "win": "Perakende psikolojisine karşı ilk zafer.",
+      "crit": "Dokunmadın; kasiyer ödül olarak sana bir şeker hediye etti. Sistem kendi silahıyla yenildi.",
+      "fail": "Dokunmadın ama gözün şekerde kaldı. Kasiyer gördü, ailen gördü.",
+      "bad": "Dokunmamaya çalışırken tüm şeker standını devirdin."
+     }
+    }
+   ]
+  },
+  {
+   "id": "baskasinin-dogum-gunu",
+   "ch": 2,
+   "age": "4 yaş",
+   "icon": "🎁",
+   "title": "Başkasının Doğum Günü",
+   "text": "Pasta onun. Hediyeler onun. İlgi de teoride onun.",
+   "fam": "social",
+   "choices": [
+    {
+     "t": "Alkışla",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "Sisteme uyum gösterdin."
+    },
+    {
+     "t": "İlgi çek",
+     "stat": "Pişkinlik",
+     "diff": "medium",
+     "r": {
+      "win": "Spot ışığı kısa süreliğine yön değiştirdi.",
+      "crit": "Sahneye çıktın, şarkıyı sen söyledin, fotoğraflarda ortadasın.",
+      "fail": "İlgi çekmeye çalıştın; palyaço daha iyiydi.",
+      "bad": "İlgi çekerken bir hediyeyi açtın. Senin değildi."
+     }
+    },
+    {
+     "t": "Pastaya odaklan",
+     "direct": {
+      "Dayanıklılık": 1
+     },
+     "r": "Stratejik öncelikler net."
+    }
+   ]
+  },
+  {
+   "id": "en-guzel-oyuncak",
+   "ch": 2,
+   "age": "4 yaş 1 ay",
+   "icon": "🤖",
+   "title": "En Güzel Oyuncak",
+   "text": "Odada herkesin baktığı tek oyuncak var.",
+   "choices": [
+    {
+     "t": "İste",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "Talebini medeni şekilde ilettin.",
+      "crit": "İstedin; sahibi 'sen oyna' dedi ve bir de nasıl çalıştığını anlattı.",
+      "fail": "İstedin; sıraya alındın. Sıra hiç gelmedi.",
+      "bad": "İstedin, sahibi ağladı. Oyuncak dolaba kilitlendi."
+     }
+    },
+    {
+     "t": "Takas öner",
+     "stat": "Kurnazlık",
+     "diff": "easy",
+     "r": {
+      "win": "Değer kavramı kişiden kişiye değişti.",
+      "crit": "Sıradan bir kalemi 'nadir koleksiyon parçası' olarak sundun. Takas gerçekleşti.",
+      "fail": "Teklifin kimseyi etkilemedi.",
+      "bad": "Takas ettin; oyuncağın pili yokmuş."
+     }
+    },
+    {
+     "t": "Kendi oyuncağınla devam et",
+     "direct": {
+      "Dayanıklılık": 1
+     },
+     "r": "Bir şeyi kaçırma korkusu henüz tam gelişmedi."
+    }
+   ]
+  },
+  {
+   "id": "ilk-gercek-yalan",
+   "ch": 2,
+   "age": "4 yaş 2 ay",
+   "icon": "🤥",
+   "title": "İlk Gerçek Yalan",
+   "text": "Bu kez ne olduğunu biliyorsun. Karşındaki yetişkin de bildiğini düşünüyor.",
+   "fam": "home",
+   "voices": [
+    {
+     "stat": "Pişkinlik",
+     "diff": "medium",
+     "text": "Göz teması kur. Gözünü kırpma. Kırpma dedik."
+    },
+    {
+     "stat": "Vicdan",
+     "diff": "easy",
+     "text": "Bu yetişkin sana güveniyor. Bu, işi hem kolaylaştırıyor hem zorlaştırıyor."
+    }
+   ],
+   "recall": [
+    {
+     "flag": "kediSuclu",
+     "text": "Ev halkı hâlâ o vazo meselesinde kediye inanmadı."
+    },
+    {
+     "flag": "yalanci",
+     "text": "'Kim yaptı?' dosyası hâlâ açık."
+    }
+   ],
+   "choices": [
+    {
+     "t": "İtiraf et",
+     "direct": {
+      "Vicdan": 2
+     },
+     "r": "Dosya hızlı kapandı."
+    },
+    {
+     "t": "'Hayır' de",
+     "stat": "Çene",
+     "diff": "hard",
+     "r": {
+      "win": "Ses tonun gerçeğin yerine geçti.",
+      "crit": "'Hayır' dedin; o kadar samimiydin ki karşındaki yetişkin kendisinden şüphelenmeye başladı.",
+      "fail": "'Hayır' dedin, kulakların kızardı. Kulaklar yalan söylemiyor.",
+      "bad": "'Hayır' dedin, sonra 'evet' dedin, sonra ağladın. Dosya kapanmadı, genişledi.",
+      "mid": "Yüzün yarı yarıya ikna ediciydi. Yetişkin konuyu şimdilik kapattı ama dosyayı değil."
+     },
+     "mini": {
+      "type": "poker",
+      "title": "Poker Yüzü",
+      "hint": "Parmağını daireye koy ve 5 saniye boyunca dairenin içinde tut. Kıpırdama. Göz kırpma."
+     },
+     "flag": "yalanci"
+    },
+    {
+     "t": "'O kendi oldu' de",
+     "stat": "Pişkinlik",
+     "diff": "veryHard",
+     "r": {
+      "win": "Nedensellik bilimine meydan okudun ve kazandın.",
+      "crit": "Fizik kurallarını yeniden yazdın. Yetişkin bir an kendi kendine olabileceğine inandı.",
+      "fail": "'Kendi oldu' dedin. Kimse gülmedi. Bir kişi gülmek üzereydi.",
+      "bad": "'Kendi oldu' dedin; tam o sırada yine 'kendi oldu'. Elin hâlâ üstündeydi."
+     },
+     "flag": "yalanci"
+    }
+   ]
+  },
+  {
+   "id": "mahalle-bakkali",
+   "ch": 2,
+   "age": "4 yaş 4 ay",
+   "icon": "🏪",
+   "title": "Mahalle Bakkalı",
+   "text": "Liste elinde. Para cebinde. Bakkal her şeyi biliyor gibi bakıyor.",
+   "fam": "money",
+   "voices": [
+    {
+     "stat": "Sosyal Radar",
+     "diff": "medium",
+     "text": "Bakkal mahalledeki herkesin borcunu ezbere biliyor. Seninkini de. Henüz yok ama biliyor."
+    },
+    {
+     "stat": "Kurnazlık",
+     "diff": "hard",
+     "text": "Terazinin kefesinin altında bir sakız yapışık. Yıllardır orada. Terazi yıllardır bir sakız ağırlığında yanılıyor."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Listeyi ver",
+     "direct": {
+      "Dayanıklılık": 1
+     },
+     "r": "Operasyon standart prosedürle tamamlandı."
+    },
+    {
+     "t": "Fiyat sor",
+     "stat": "Çene",
+     "diff": "veryEasy",
+     "r": {
+      "win": "Piyasa araştırması başladı.",
+      "crit": "Fiyat sordun, bakkal indirim yaptı. Nedenini kendisi de bilmiyor.",
+      "fail": "Sordun, bakkal duymadı. Radyo açıktı.",
+      "bad": "Fiyat sordun, bakkal 'Paran yetmez' dedi. Haklıydı."
+     }
+    },
+    {
+     "t": "Para üstünü kontrol et",
+     "stat": "Kurnazlık",
+     "diff": "medium",
+     "r": {
+      "win": "İlk finansal denetimin başarıyla tamamlandı.",
+      "crit": "Eksik para üstünü buldun. Bakkal seni gelecekteki muhasebecisi ilan etti.",
+      "fail": "Saydın, bir daha saydın. Sonuç her seferinde farklı.",
+      "bad": "Kontrol ederken paraları yere düşürdün. Bir tanesi rafın altına gitti."
+     },
+     "trait": "Para Üstü Radarı"
+    },
+    {
+     "t": "Veresiye defterine yazdır",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "Adın veresiye defterine girdi. Kredi notun oluştu.",
+      "crit": "Bakkal defterine yazdı ve sana bir de sakız ikram etti. Seçkin müşteri.",
+      "fail": "Bakkal defteri kapattı: 'Önce annen gelsin.'",
+      "bad": "Defter açıldı; ailenin önceki borçları da yüksek sesle okundu. Ortam gerildi."
+     },
+     "req": "Küçük Tüccar"
+    }
+   ]
+  },
+  {
+   "id": "kaybolan-bozuk-para",
+   "ch": 2,
+   "age": "4 yaş 5 ay",
+   "icon": "🔎",
+   "title": "Kaybolan Bozuk Para",
+   "text": "Yerde bir bozuk para var. Sahibi görünmüyor. Vicdan departmanı toplantıya çağrıldı.",
+   "fam": "money",
+   "choices": [
+    {
+     "t": "Yetişkine ver",
+     "direct": {
+      "Vicdan": 2
+     },
+     "r": "Kayıp eşya prosedürü uygulandı."
+    },
+    {
+     "t": "Cebe koy",
+     "stat": "Kurnazlık",
+     "diff": "easy",
+     "r": {
+      "win": "Bütçeye beklenmedik gelir yazıldı.",
+      "crit": "Tek bakışta doğru yeri buldun. Bozuk para sende ve kimse görmedi.",
+      "fail": "Yanlış yere uzandın. Para başkasının oldu.",
+      "bad": "Yanlış kutu. Bozuk para hâlâ kayıp; senin cebindeki de düştü.",
+      "mid": "Parayı buldun ama biri de gördü."
+     },
+     "mini": {
+      "type": "cups",
+      "title": "Bozuk Parayı Bul",
+      "hint": "Paranın hangi kutunun altına girdiğini izle. Kutular karışacak."
+     }
+    },
+    {
+     "t": "Olduğu yerde bırak",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "Meseleyi evrene devrettin."
+    }
+   ]
+  },
+  {
+   "id": "takim-seciliyor",
+   "ch": 2,
+   "age": "4 yaş 7 ay",
+   "icon": "⚽",
+   "title": "Takım Seçiliyor",
+   "text": "İki takım kuruluyor. Herkes hızlıca değer biçiyor.",
+   "choices": [
+    {
+     "t": "Bekle",
+     "stat": "Dayanıklılık",
+     "diff": "easy",
+     "r": {
+      "win": "Seçilme sırası karakter testi oldu; testi geçtin.",
+      "crit": "Beklerken kaptanlardan biri seni ilk seçti. Sabır ödüllendi.",
+      "fail": "Son seçilen oldun. Takıma kaleci olarak katıldın.",
+      "bad": "Hiç seçilmedin. Top senindi. Oyun top olmadan başladı."
+     }
+    },
+    {
+     "t": "'Beni al' de",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "Kendi pazarlamanı yaptın.",
+      "crit": "Öyle bir tanıtım yaptın ki iki kaptan seni almak için tartıştı.",
+      "fail": "'Beni al' dedin. Kaptan 'bakarız' dedi.",
+      "bad": "'Beni al' dedin, karşı takım kaptanı aldı. Kendi takımın bunu fark etmedi bile."
+     }
+    },
+    {
+     "t": "İyi oynayan çocuğa git",
+     "stat": "Sosyal Radar",
+     "diff": "medium",
+     "r": {
+      "win": "Doğru kişiyi hatırladın. Network etkisini erken keşfettin.",
+      "crit": "Bir bakışta en güçlü oyuncuyu seçtin.",
+      "fail": "Yanlış oyuncuyu seçtin.",
+      "bad": "En zayıf seçeneği takım yıldızı ilan ettin.",
+      "mid": "Fena değildi ama en iyisi değildi."
+     },
+     "mini": {
+      "type": "memory",
+      "title": "Takımı Oku",
+      "hint": "Çocukları kısa süre göreceksin. En iyi top kontrolü olanı hatırla."
+     }
+    }
+   ]
+  },
+  {
+   "id": "sana-guluyorlar",
+   "ch": 2,
+   "age": "4 yaş 9 ay",
+   "icon": "😅",
+   "title": "Sana Gülüyorlar",
+   "text": "Bir şey söyledin. Birkaç çocuk güldü. Neye güldükleri tam belli değil.",
+   "fam": "social",
+   "voices": [
+    {
+     "stat": "Dayanıklılık",
+     "diff": "easy",
+     "text": "Bu an geçecek. Otuz yıl sonra bir düğünde biri hatırlatacak. O an da geçecek."
+    },
+    {
+     "stat": "Cesaret",
+     "diff": "medium",
+     "text": "Gülen üç kişi. İkisi neye güldüğünü bilmiyor. Üçüncüsü de emin değil."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Sus",
+     "direct": {
+      "Dayanıklılık": 1
+     },
+     "r": "Olayın ömrünü kısalttın."
+    },
+    {
+     "t": "Kendine de gül",
+     "stat": "Pişkinlik",
+     "diff": "easy",
+     "r": {
+      "win": "Silahı ellerinden aldın.",
+      "crit": "Kendine güldün, herkes seninle güldü; bir saat sonra aynı espriyi onlar tekrar ediyordu.",
+      "fail": "Güldün ama biraz geç. Kahkahalar çoktan bitmişti.",
+      "bad": "Güldün, burnundan süt geldi. İkinci bir gülme dalgası başladı."
+     },
+     "trait": "Kendine Gülebilir"
+    },
+    {
+     "t": "Laf yetiştir",
+     "stat": "Çene",
+     "diff": "hard",
+     "r": {
+      "win": "Karşı ateş etkili oldu.",
+      "crit": "Tek cümlelik cevabın okul bahçesinde efsaneye dönüştü.",
+      "fail": "Cevabı buldun; eve gidince.",
+      "bad": "Laf yetiştirdin, sonra kelimeleri karıştırdın. Gülme ikiye katlandı."
+     }
+    },
+    {
+     "t": "Sahneyi devral",
+     "stat": "Pişkinlik",
+     "diff": "easy",
+     "r": {
+      "win": "Gülüşmeleri alkışa çevirdin. Artık gösterinin sahibisin.",
+      "crit": "Doğaçlama bir şov yaptın. Ertesi gün tekrar istendi.",
+      "fail": "Sahneyi devraldın; seyirci dağıldı.",
+      "bad": "Sahneyi devraldın ve takıldın. Artık gerçekten gülüyorlar."
+     },
+     "req": "Sahne Sever"
+    }
+   ]
+  },
+  {
+   "id": "ilk-kucuk-sir",
+   "ch": 2,
+   "age": "5 yaş",
+   "icon": "🤫",
+   "title": "İlk Küçük Sır",
+   "text": "Bir arkadaşın sana bir şey söyledi ve kimseye söylememen gerektiğini ekledi.",
+   "fam": "social",
+   "choices": [
+    {
+     "t": "Sırrı tut",
+     "stat": "Vicdan",
+     "diff": "easy",
+     "r": {
+      "win": "Güven puanı görünmeden arttı.",
+      "crit": "Sırrı tuttun. Arkadaşın sana ikinci, daha büyük bir sır verdi. Terfi aldın.",
+      "fail": "Sırrı tuttun ama ağzından yarım kelime kaçtı.",
+      "bad": "Sırrı tutmaya o kadar odaklandın ki uykunda söyledin."
+     }
+    },
+    {
+     "t": "Başkasına anlat",
+     "stat": "Çene",
+     "diff": "medium",
+     "r": {
+      "win": "Bilgi hızla dolaşıma girdi. Sen de bir anda popüler oldun.",
+      "crit": "Sırrı öyle anlattın ki kimse kaynağın sen olduğunu bilmiyor. Profesyonel.",
+      "fail": "Anlattın; dinleyen zaten biliyormuş.",
+      "bad": "Anlattığın kişi, sırrın sahibinin en yakın arkadaşıydı."
+     },
+     "flag": "sirVerdi"
+    },
+    {
+     "t": "Önemini değerlendir",
+     "stat": "Sosyal Radar",
+     "diff": "easy",
+     "r": {
+      "win": "Her sırrın aynı ağırlıkta olmadığını fark ettin.",
+      "crit": "Sırrın aslında sır bile olmadığını fark ettin. Herkes biliyordu.",
+      "fail": "Değerlendirmeye çalıştın; sır çok karışıktı.",
+      "bad": "Değerlendirirken yüksek sesle düşündün."
+     }
+    }
+   ]
+  },
+  {
+   "id": "aileler-kiyasliyor",
+   "ch": 2,
+   "age": "5 yaş 2 ay",
+   "icon": "📏",
+   "title": "Aileler Kıyaslıyor",
+   "text": "Yetişkinler çocuklardan konuşuyor ama aslında birbirleriyle yarışıyorlar.",
+   "fam": "education",
+   "voices": [
+    {
+     "stat": "Sosyal Radar",
+     "diff": "medium",
+     "text": "Karşıdaki annenin gülümsemesi 'Bizimki de okuyor' diyor. Gözleri 'Ama sizinki kadar değil' diyor."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Görmezden gel",
+     "stat": "Dayanıklılık",
+     "diff": "easy",
+     "r": {
+      "win": "Yetişkin olimpiyatlarından çekildin.",
+      "crit": "Görmezden geldin; yetişkinler senin olgunluğunu kıyaslamaya başladı. Kazandın.",
+      "fail": "Görmezden gelmeye çalıştın; adın on kez geçti.",
+      "bad": "Görmezden gelirken 'Bizimki okumayı söktü' cümlesini duydun. Sen sökmemiştin."
+     }
+    },
+    {
+     "t": "Bildiğini göster",
+     "stat": "Pişkinlik",
+     "diff": "medium",
+     "r": {
+      "win": "Rekabetin ortasına gönüllü girdin ve puan aldın.",
+      "crit": "Alfabeyi tersten okudun. Karşı aile çocuğunu hemen kursa yazdırdı.",
+      "fail": "Göstermeye çalıştın; heyecandan unuttun.",
+      "bad": "Bildiğini gösterdin. Yanlış biliyormuşsun."
+     }
+    },
+    {
+     "t": "Yetişkinleri gözlemle",
+     "stat": "Sosyal Radar",
+     "diff": "medium",
+     "r": {
+      "win": "Bunun aslında çocuklarla ilgili olmadığını fark ettin.",
+      "crit": "Kimin kiminle neden yarıştığını çözdün. Aile sosyolojisinde ilk makale.",
+      "fail": "Gözlemledin. Sonuç: yetişkinler garip.",
+      "bad": "Gözlemlerini yüksek sesle paylaştın. Misafirler erken kalktı."
+     }
+    }
+   ]
+  },
+  {
+   "id": "kirilan-oyuncak",
+   "ch": 2,
+   "age": "5 yaş 4 ay",
+   "icon": "🔧",
+   "title": "Kırılan Oyuncak",
+   "text": "Oyuncak kırıldı. Sen dokundun. Ama 'dokunmak' geniş bir kavram.",
+   "recall": [
+    {
+     "flag": "kediSuclu",
+     "text": "Bu evde bir şey kırılınca artık önce sana bakıyorlar. Kedi aklandı."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Hemen söyle",
+     "direct": {
+      "Vicdan": 2
+     },
+     "r": "Hasar raporu gecikmeden teslim edildi."
+    },
+    {
+     "t": "Yerine koy, uzaklaş",
+     "stat": "Kurnazlık",
+     "diff": "hard",
+     "r": {
+      "win": "Olayın keşif saatini erteledin.",
+      "crit": "Oyuncağı öyle yerleştirdin ki kırık, bir hafta sonra başkasının elinde ortaya çıktı.",
+      "fail": "Yerine koydun; tam o sırada bir parça düştü.",
+      "bad": "Uzaklaşırken çağrıldın: 'Bu ne?'"
+     }
+    },
+    {
+     "t": "Tamir etmeye çalış",
+     "stat": "Akıl",
+     "diff": "medium",
+     "r": {
+      "win": "Mühendislik departmanı kuruldu.",
+      "crit": "Tamir ettin; oyuncak eskisinden iyi çalışıyor. Üstelik artık ışığı da yanıyor.",
+      "fail": "Tamir ettin; bir parça arttı.",
+      "bad": "Tamir ederken ikinci oyuncağı da söktün."
+     }
+    }
+   ]
+  },
+  {
+   "id": "mahalle-turnuvasi",
+   "ch": 2,
+   "age": "5 yaş 5 ay",
+   "icon": "🏃",
+   "title": "Mahalle Turnuvası",
+   "text": "Çocuklar yarış hazırlığında. Kurallar henüz tam belli değil.",
+   "choices": [
+    {
+     "t": "Yarış",
+     "stat": "Dayanıklılık",
+     "diff": "medium",
+     "r": {
+      "win": "Burun farkıyla öndesin. Zafer yine zaferdir.",
+      "crit": "Bitiş çizgisine vardığında rakibin hâlâ yarı yoldaydı.",
+      "fail": "Rakibin biraz daha hızlıydı.",
+      "bad": "Başlangıçta ayakkabın çıktı. Yarış ayakkabısız devam etti.",
+      "mid": "Neredeyse aynı anda vardınız."
+     },
+     "mini": {
+      "type": "race",
+      "title": "Mahalle Yarışı",
+      "hint": "5 saniye boyunca olabildiğince hızlı dokun."
+     }
+    },
+    {
+     "t": "Başlangıç avantajı bul",
+     "stat": "Kurnazlık",
+     "diff": "hard",
+     "r": {
+      "win": "Kurallarda küçük bir boşluk keşfettin.",
+      "crit": "Boşluğu buldun, kullandın; kural kitabına senin adın eklendi.",
+      "fail": "Boşluk bulamadın. Kurallar sıkıymış.",
+      "bad": "Erken çıktın, diskalifiye edildin. Hakem mahalle bakkalıydı."
+     }
+    },
+    {
+     "t": "Hakem olmaya çalış",
+     "stat": "Çene",
+     "diff": "hard",
+     "r": {
+      "win": "Yarışmadın. Yarışın kurallarına karar verdin.",
+      "crit": "Hakem oldun, ödül töreni düzenledin, madalyaları kendin dağıttın.",
+      "fail": "Hakemlik başvurun reddedildi. Yarışçı olarak kaydedildin.",
+      "bad": "Hakem oldun ama iki taraf da sana itiraz etti. Turnuva iptal."
+     },
+     "trait": "Organizatör"
+    }
+   ]
+  },
+  {
+   "id": "tepsiyle-kayak",
+   "ch": 2,
+   "age": "5 yaş 10 ay",
+   "icon": "🛷",
+   "title": "Tepsiyle Kayak",
+   "text": "Kar yağdı. Mahallenin en dik yokuşu trafiğe kapandı. Çocuklar mutfaklardan tepsi kaçırıyor.",
+   "voices": [
+    {
+     "stat": "Akıl",
+     "diff": "medium",
+     "text": "Yokuşun sonunda bir çöp konteyneri var. Tepsinin freni yok. Bu iki bilgiyi aynı cümlede düşün."
+    },
+    {
+     "stat": "Cesaret",
+     "diff": "easy",
+     "text": "Hayatta bazı yokuşlar bir kez kaydırılır. Genelde son kez değil. Genelde."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Pencereden izle",
+     "direct": {
+      "Akıl": 1
+     },
+     "r": "Kar fiziğini güvenli bir mesafeden inceledin. Bilim böyle ilerler."
+    },
+    {
+     "t": "Tepsiyle kay",
+     "stat": "Cesaret",
+     "diff": "medium",
+     "r": {
+      "win": "Yokuşu baştan sona kaydın. Mahalle seni alkışladı, annen seni aradı.",
+      "crit": "Öyle bir kaydın ki yokuşun sonunda bir tur daha attın. Efsane doğdu.",
+      "fail": "Tepsi döndü, sen döndün, yokuş dönmedi. Kar dolu bir kafayla eve vardın.",
+      "bad": "Tepsi bir yöne, sen öbür yöne. Kolun alçıya alındı; alçının üstü mahallenin imza defterine döndü."
+     },
+     "flagBad": "alcili-kol"
+    },
+    {
+     "t": "Tepsi kiralama işi kur",
+     "stat": "Kurnazlık",
+     "diff": "medium",
+     "r": {
+      "win": "Evden üç tepsi getirdin, tur başına bir şeker. Kış ekonomisi canlandı.",
+      "crit": "Öğlene kadar tüm mahallenin tepsileri sende toplandı. Kar tekeli.",
+      "fail": "Tepsileri kiraladın; kimse geri getirmedi.",
+      "bad": "Kiraladığın tepsilerden biri annenin baklava tepsisiydi."
+     },
+     "flag": "tepsiTekeli"
+    },
+    {
+     "t": "Kardan adam yap",
+     "stat": "Dayanıklılık",
+     "diff": "easy",
+     "r": {
+      "win": "Sağlam bir kardan adam yaptın. Havuçlu, düğmeli, vakur.",
+      "crit": "Kardan adamın o kadar iyi oldu ki mahalle muhtarı fotoğrafını çekti.",
+      "fail": "Kardan adam yarıda eridi. Tam bir kardan yarım adam.",
+      "bad": "Kardan adamın kafası düştü. Çocuklar bunu bir işaret olarak yorumladı."
+     }
+    }
+   ]
+  },
+  {
+   "id": "harclik-pazarligi",
+   "ch": 2,
+   "age": "5 yaş 7 ay",
+   "icon": "💰",
+   "title": "İlk Harçlık Pazarlığı",
+   "text": "Sana bir miktar söylendi. Sen miktarların konuşulabilir olduğunu yeni öğrendin.",
+   "fam": "money",
+   "recall": [
+    {
+     "flag": "ilkKelimePara",
+     "text": "İlk kelimesi 'Para' olan birinden beklenen an nihayet geldi."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Kabul et",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "Sözleşme imzalandı."
+    },
+    {
+     "t": "Biraz daha iste",
+     "stat": "Çene",
+     "diff": "hard",
+     "r": {
+      "win": "Ücret pazarlığı başladı ve zam aldın.",
+      "crit": "Yüzde elli zam aldın. Aile bütçesi yeniden düzenlendi.",
+      "fail": "İstedin; 'büyüyünce' denildi.",
+      "bad": "İstedin; harçlığın donduruldu ve denetime alındı."
+     }
+    },
+    {
+     "t": "Ev işi karşılığı teklif et",
+     "stat": "Kurnazlık",
+     "diff": "medium",
+     "r": {
+      "win": "Hizmet karşılığı gelir modeli doğdu.",
+      "crit": "Sofra kurmak için tarife açıkladın, bulaşık için ek paket. Ailen kabul etti.",
+      "fail": "Teklifin kabul edildi; ücretsiz stajyer olarak.",
+      "bad": "Ev işi teklif ettin; tüm ev işleri sana verildi, ücret konusu ertelendi."
+     },
+     "trait": "İş Modeli Kurar"
+    },
+    {
+     "t": "Enflasyon farkı talep et",
+     "stat": "Akıl",
+     "diff": "medium",
+     "r": {
+      "win": "Enflasyon farkı talep ettin. Ailen şaşkınlıkla kabul etti.",
+      "crit": "Farkı hesapladın, geriye dönük talep ettin, tahsil ettin.",
+      "fail": "'Enflasyon' kelimesini doğru söyleyemedin. Dava düştü.",
+      "bad": "Enflasyon farkı istedin; babanın maaş konuşması başladı. Kimse mutlu değil."
+     },
+     "req": "Erken Ekonomi Bilinci"
+    }
+   ]
+  },
+  {
+   "id": "okul-hazirligi",
+   "ch": 2,
+   "age": "5 yaş 9 ay",
+   "icon": "🎒",
+   "title": "Okul Hazırlığı",
+   "text": "Çanta, harfler, defterler. Sistem seni bekliyor.",
+   "fam": "education",
+   "choices": [
+    {
+     "t": "Harflerle ilgilen",
+     "stat": "Akıl",
+     "diff": "easy",
+     "r": {
+      "win": "Sistemle ilk dostane temas.",
+      "crit": "Harfleri öğrendin ve markette etiketleri okumaya başladın. Fiyatlar seni endişelendirdi.",
+      "fail": "Harflerle ilgilendin; harfler seninle ilgilenmedi.",
+      "bad": "B ile D'yi karıştırdın. Hâlâ karıştırıyorsun.",
+      "mid": "Harf oldu ama biraz yamuk. Öğretmen yine de yıldız verdi."
+     },
+     "mini": {
+      "type": "trace",
+      "title": "İlk Harf",
+      "hint": "Parmağını kaldırmadan kesikli çizginin üstünden M harfini çiz."
+     }
+    },
+    {
+     "t": "Çantayı kendin hazırla",
+     "stat": "Dayanıklılık",
+     "diff": "easy",
+     "r": {
+      "win": "Operasyonel bağımsızlık arttı.",
+      "crit": "Beslenme, kalem, yedek çorap. Ailen sana kendi çantasını da verdi.",
+      "fail": "Çantayı hazırladın; içinde sadece oyuncak var.",
+      "bad": "Çantayı öyle doldurdun ki kaldıramadın."
+     }
+    },
+    {
+     "t": "Aileye bırak",
+     "direct": {
+      "Sosyal Radar": 1
+     },
+     "r": "Görev dağılımı da bir yetkinliktir."
+    }
+   ]
+  },
+  {
+   "id": "ilkokul-kapisi",
+   "ch": 2,
+   "age": "6 yaş",
+   "icon": "🏫",
+   "title": "İlkokul Kapısı",
+   "text": "Büyük bina, küçük sıra, çok sayıda kural. Bölüm III kapıda.",
+   "fam": "education",
+   "fixed": true,
+   "voices": [
+    {
+     "stat": "Cesaret",
+     "diff": "easy",
+     "text": "Bina büyük ama kapı normal boyutta. Başlangıç için yeterli."
+    },
+    {
+     "stat": "Akıl",
+     "diff": "medium",
+     "text": "Koridorda on iki kapı var. Resimli olanlar küçük sınıflar. Sen artık küçük sınıfsın. Bunu kabullen."
+    }
+   ],
+   "recall": [
+    {
+     "flag": "yapiskan",
+     "text": "Kreş kapısındaki bacak olayı ailede hâlâ anlatılıyor."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Cesurca gir",
+     "stat": "Cesaret",
+     "diff": "medium",
+     "r": {
+      "win": "Yeni sistem açıldı.",
+      "crit": "İçeri girdin, öğretmene 'Günaydın' dedin, en öndeki sırayı aldın.",
+      "fail": "Kapıda bir an durdun. Arkadaki kalabalık seni içeri itti.",
+      "bad": "Cesurca girdin; tuvalete."
+     }
+    },
+    {
+     "t": "Önce ortamı oku",
+     "stat": "Sosyal Radar",
+     "diff": "medium",
+     "r": {
+      "win": "Sınıfın görünmeyen haritasını çıkarmaya başladın.",
+      "crit": "Kimin lider, kimin sessiz dahi, kimin kantincinin yeğeni olduğunu ilk gün öğrendin.",
+      "fail": "Ortamı okudun; ortam seni okumadı.",
+      "bad": "Ortamı okurken zil çaldı ve kapı kapandı."
+     }
+    },
+    {
+     "t": "Sınıfı kendin bul",
+     "stat": "Akıl",
+     "diff": "easy",
+     "r": {
+      "win": "Kapıyı buldun ve içeri girdin.",
+      "crit": "İpucunu tek bakışta çözdün. Doğru sınıf, ilk sıra.",
+      "fail": "Yanlış sınıfa girdin, sonra doğrusunu buldun.",
+      "bad": "Yanlış sınıfa girdin. Herkes sana baktı. Dördüncü sınıftı.",
+      "mid": "Doğru koridor, yanlış kapı; ama öğretmen seni yönlendirdi."
+     },
+     "mini": {
+      "type": "doors",
+      "title": "Doğru Sınıfı Bul",
+      "hint": "Sınıfının işaretini aklında tut. Birazdan kaybolacak."
+     }
+    }
+   ]
+  },
+  {
+   "id": "ilk-ders",
+   "ch": 3,
+   "age": "6 yaş 1 ay",
+   "icon": "✏️",
+   "title": "İlk Ders",
+   "text": "Öğretmen 'Kim okumayı biliyor?' diye sordu. Sınıfta 28 el ya havada ya cepte.",
+   "fam": "education",
+   "fixed": true,
+   "choices": [
+    {
+     "t": "El kaldır",
+     "stat": "Cesaret",
+     "diff": "easy",
+     "r": {
+      "win": "Tahtaya kalktın, adını yazdın. İlk kamu görevin.",
+      "crit": "Tahtaya çıktın ve koca bir cümle yazdın. Öğretmen defterine yıldız koydu.",
+      "fail": "El kaldırdın; öğretmen başkasını seçti.",
+      "bad": "Tahtaya kalktın, kalemi ters tuttun."
+     }
+    },
+    {
+     "t": "Sessizce defterine yaz",
+     "stat": "Akıl",
+     "diff": "easy",
+     "r": {
+      "win": "Sessizce yaptın. Öğretmen defterini görünce kaşlarını kaldırdı.",
+      "crit": "Defterin sınıfa örnek olarak gösterildi.",
+      "fail": "Yazdın ama silgi de yazdı.",
+      "bad": "Deftere değil sıraya yazdın."
+     }
+    },
+    {
+     "t": "Yanındakine yardım et",
+     "direct": {
+      "Vicdan": 1,
+      "Sosyal Radar": 1
+     },
+     "r": "İlk dayanışma ağın kuruldu."
+    },
+    {
+     "t": "Tabletten öğrendiklerini göster",
+     "stat": "Akıl",
+     "diff": "easy",
+     "r": {
+      "win": "Harfleri bir oyundan öğrendiğini anlattın. Öğretmen not aldı.",
+      "crit": "Sınıfa harf oyunu tanıttın. Öğretmen dersin yarısını sana bıraktı.",
+      "fail": "Anlatırken oyunun adını hatırlayamadın.",
+      "bad": "Tabletten öğrendiğin şeyin reklam şarkısı olduğu anlaşıldı."
+     },
+     "req": "Teknoloji Merakı"
+    }
+   ]
+  },
+  {
+   "id": "sira-arkadasi",
+   "ch": 3,
+   "age": "6 yaş 2 ay",
+   "icon": "🪑",
+   "title": "Sıra Arkadaşı",
+   "text": "Yanına oturan çocuk kalemlerini sayıyor. Senin kalemlerini de.",
+   "fam": "social",
+   "recall": [
+    {
+     "flag": "sirVerdi",
+     "text": "Kreşteki sır hikâyesi okula senden önce gelmiş. Yeni sıra arkadaşın biraz temkinli."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Kendini tanıt",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "Adını söyledin, o da söyledi. Diplomatik ilişkiler kuruldu.",
+      "crit": "Tanıştınız, güldünüz, ortak düşman olarak matematiği seçtiniz. Ömürlük dostluk.",
+      "fail": "Tanıttın; o kalem saymaya devam etti.",
+      "bad": "Kendini tanıtırken adını yanlış söyledin. Tüm yıl öyle çağrıldın."
+     }
+    },
+    {
+     "t": "Kalemlerini paylaş",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "Kalem ekonomisinde güven tesis edildi."
+    },
+    {
+     "t": "Sıraya sınır çiz",
+     "stat": "Cesaret",
+     "diff": "medium",
+     "r": {
+      "win": "Sıranın ortasına görünmez bir sınır çektin. İki taraf da saygı duydu.",
+      "crit": "Sınırı çizdin, anlaşma imzaladınız, ek protokolle silgi ortak kullanıma açıldı.",
+      "fail": "Sınırı çizdin; dirseği her gün sınırı ihlal etti.",
+      "bad": "Sınırı kalemle sıraya çizdin. Müdür yardımcısı tanıştırıldı."
+     }
+    },
+    {
+     "t": "Espriyle buzları kır",
+     "stat": "Pişkinlik",
+     "diff": "veryEasy",
+     "r": {
+      "win": "Bir espri yaptın, o güldü. Sıra artık ortak bölge.",
+      "crit": "Espriyi o kadar beğendi ki teneffüste başkalarına anlattı. Kaynak olarak seni gösterdi.",
+      "fail": "Espri havada kaldı. Kalem saymaya devam edildi.",
+      "bad": "Espri yaparken sandalyeden düştün. Aslında bu daha komikti."
+     },
+     "req": "Kendine Gülebilir"
+    }
+   ]
+  },
+  {
+   "id": "teneffus-kantini",
+   "ch": 3,
+   "age": "6 yaş 4 ay",
+   "icon": "🥪",
+   "title": "Kantin Kuyruğu",
+   "text": "Teneffüs 10 dakika. Kuyruk 12 dakika. Matematik kantinde başlıyor.",
+   "fam": "money",
+   "choices": [
+    {
+     "t": "Sırada bekle",
+     "direct": {
+      "Dayanıklılık": 1,
+      "Vicdan": 1
+     },
+     "r": "Tost soğuktu ama vicdanın sıcak."
+    },
+    {
+     "t": "Öndeki arkadaşına sipariş verdir",
+     "stat": "Çene",
+     "diff": "medium",
+     "r": {
+      "win": "Sipariş zincirini kurdun, tost sana ulaştı.",
+      "crit": "Üç arkadaşının siparişini birleştirip toplu indirim aldın.",
+      "fail": "Arkadaşın siparişi unuttu. Kendi tostunu yedi.",
+      "bad": "Sipariş verdirdin; kantinci ikinizi de sıranın sonuna gönderdi.",
+      "mid": "Siparişin yarısı doğru geldi. Tost geldi, ayran yerine su geldi."
+     },
+     "mini": {
+      "type": "simon",
+      "title": "Siparişi Ezberle",
+      "hint": "Arkadaşın siparişi bir kez söyleyecek. Aynı sırayla tekrar et."
+     }
+    },
+    {
+     "t": "Kantinciye yardım et",
+     "stat": "Dayanıklılık",
+     "diff": "medium",
+     "r": {
+      "win": "Dökülen bozuklukları topladın. Kantinci seni sıranın önüne aldı.",
+      "crit": "Kantinci sana ömür boyu 'ekstra kaşar' hakkı tanıdı.",
+      "fail": "Topladın ama zil çaldı. Yardım ettin, aç kaldın.",
+      "bad": "Yardım ederken peynir kasesini devirdin. Kantin geçici olarak kapandı.",
+      "mid": "Çoğunu topladın; kantinci teşekkür etti ama sıra aynı."
+     },
+     "mini": {
+      "type": "collect",
+      "title": "Bozuklukları Topla",
+      "hint": "Yere saçılan paraları zil çalmadan topla.",
+      "piece": "🪙"
+     }
+    },
+    {
+     "t": "Kantincinin hesap hatasını düzelt",
+     "stat": "Kurnazlık",
+     "diff": "easy",
+     "r": {
+      "win": "Kantincinin hesabındaki hatayı buldun. Sana 'Muhasebeci' lakabı takıldı.",
+      "crit": "Hatayı buldun, kantinci ödül olarak sana çikolata verdi. Hata aslında senin lehineydi.",
+      "fail": "Hatayı söyledin; kantinci 'Sen önce toplama öğren' dedi.",
+      "bad": "Hatayı söyledin; hata yokmuş. Kuyruk seni izledi."
+     },
+     "req": "Para Üstü Radarı"
+    }
+   ]
+  },
+  {
+   "id": "odev-nerede",
+   "ch": 3,
+   "age": "6 yaş 7 ay",
+   "icon": "📚",
+   "title": "Ödev Nerede?",
+   "text": "Sabah 07.40. Ödev defteri evde değil, çantada değil. Belki de hiç yapılmadı.",
+   "fam": "home",
+   "recall": [
+    {
+     "flag": "kediSuclu",
+     "text": "Bu evde hayvanlar sanık olarak sık kullanılır. Kedi, ödev defterinden uzak duruyor."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Doğruyu söyle",
+     "direct": {
+      "Vicdan": 2
+     },
+     "r": "Öğretmen dürüstlüğünü not etti. Ödevi de not etti."
+    },
+    {
+     "t": "Teneffüste yetiştir",
+     "stat": "Akıl",
+     "diff": "medium",
+     "r": {
+      "win": "On dakikada iki sayfa. Kalite tartışılır, teslim kesin.",
+      "crit": "Teneffüste bitirdin; öğretmen 'En temiz ödev bu' dedi. Kimse sormadı.",
+      "fail": "Yetiştiremedin; yarım ödev teslim edildi.",
+      "bad": "Yazarken kalemin bitti. Sonra zil çaldı. Sonra silgin kayboldu."
+     }
+    },
+    {
+     "t": "'Köpek yedi' de",
+     "stat": "Pişkinlik",
+     "diff": "hard",
+     "r": {
+      "win": "Öğretmen güldü ve bir gün ek süre verdi.",
+      "crit": "Öyle anlattın ki öğretmen köpeğin sağlığını sordu. Ek süre ve geçmiş olsun dileği.",
+      "fail": "'Sizin köpeğiniz yok ki' dedi öğretmen.",
+      "bad": "Veli toplantısında köpek konusu açıldı. Köpeğiniz yoktu."
+     },
+     "flag": "yalanci"
+    }
+   ]
+  },
+  {
+   "id": "sinif-baskani",
+   "ch": 3,
+   "age": "7 yaş",
+   "icon": "🗳️",
+   "title": "Sınıf Başkanlığı Seçimi",
+   "text": "Seçim var. Vaatler belli: daha uzun teneffüs, daha az ödev, sınıfa bir akvaryum.",
+   "fam": "social",
+   "voices": [
+    {
+     "stat": "Çene",
+     "diff": "medium",
+     "text": "Vaat ne kadar büyükse oy o kadar çok. Uygulama kısmı seçimden sonraki bir sorun."
+    },
+    {
+     "stat": "Vicdan",
+     "diff": "medium",
+     "text": "Akvaryum vaat eden aday, balıklara kimin bakacağını söylemedi. Seçim kampanyalarına hoş geldin."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Aday ol",
+     "stat": "Cesaret",
+     "diff": "hard",
+     "r": {
+      "win": "Seçildin. İlk icraatın: akvaryum için bağış kampanyası.",
+      "crit": "Oyların çoğunu aldın. Rakibin tebrik etti, sonra yardımcın oldu.",
+      "fail": "Aday oldun; iki oy aldın. Biri senin, biri sıra arkadaşının.",
+      "bad": "Seçim konuşmasında 'Herkese dondurma' dedin. Öğretmen adaylığını iptal etti."
+     },
+     "trait": "Seçim Makinesi",
+     "flagWin": "baskan"
+    },
+    {
+     "t": "Arkadaşının kampanyasını yönet",
+     "stat": "Sosyal Radar",
+     "diff": "medium",
+     "r": {
+      "win": "Adayın kazandı. Sen gölge başkansın.",
+      "crit": "Adayın açık farkla kazandı. Tüm kararlar önce sana danışılıyor.",
+      "fail": "Adayın kaybetti. Kampanya analizi yapılacak.",
+      "bad": "Adayın kaybetti ve suçu sana attı."
+     }
+    },
+    {
+     "t": "Oy ver, geç",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "Demokrasiye katkıda bulundun. Akvaryum gelmedi."
+    },
+    {
+     "t": "Seçim kurulunu kur",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "Seçim kurulu başkanı oldun. Aday olmadan kazanmanın yolu.",
+      "crit": "Sandığı sen tasarladın, oyları sen saydın, sonucu sen açıkladın. Tam yetki.",
+      "fail": "Kurul kuruldu; kimse seni dinlemedi.",
+      "bad": "Oyları sayarken iki kez saydın. Seçim yenilendi."
+     },
+     "req": "Organizatör"
+    },
+    {
+     "t": "Seçim konuşması yap",
+     "stat": "Pişkinlik",
+     "diff": "medium",
+     "r": {
+      "win": "Konuşmanı yaptın; sınıf ayakta alkışladı.",
+      "crit": "Konuşman o kadar etkiliydi ki diğer adaylar çekildi.",
+      "fail": "Konuşman uzun sürdü; teneffüs zili yarıda kesti.",
+      "bad": "Konuşmanın ortasında ne diyeceğini unuttun. Sessizlik 40 saniye sürdü."
+     },
+     "req": "Sahne Sever",
+     "flagWin": "baskan"
+    }
+   ]
+  },
+  {
+   "id": "davetiyeler",
+   "ch": 3,
+   "age": "7 yaş 3 ay",
+   "icon": "💌",
+   "title": "Davetiyeler Dağıtıldı",
+   "text": "Sınıfta doğum günü davetiyeleri dağıtılıyor. Sende yok. Henüz.",
+   "fam": "social",
+   "choices": [
+    {
+     "t": "Umursama",
+     "direct": {
+      "Dayanıklılık": 2
+     },
+     "r": "Davetiyesiz de hayat var. Hatta pastasız bile."
+    },
+    {
+     "t": "Nedenini sor",
+     "stat": "Çene",
+     "diff": "medium",
+     "r": {
+      "win": "Sordun; davetiyen çantada unutulmuş.",
+      "crit": "Sordun; sen 'onur konuğu' listesindeymişsin. Ayrı davetiye basılıyormuş.",
+      "fail": "Sordun; cevap 'yer kalmadı' oldu.",
+      "bad": "Sorarken sesin titredi; tüm sınıf duydu."
+     }
+    },
+    {
+     "t": "Aynı gün kendi partini planla",
+     "stat": "Kurnazlık",
+     "diff": "medium",
+     "r": {
+      "win": "Aynı gün kendi partini ilan ettin. Katılım oranı yüzde elli.",
+      "crit": "Partinde havuz olduğunu duyurdun. Diğer parti ertelendi.",
+      "fail": "Parti planladın; kimse gelmedi, çünkü herkes öbür partideydi.",
+      "bad": "Parti planladın; ailen haberdar değildi."
+     }
+    },
+    {
+     "t": "Kimin gerçekten gideceğini tahmin et",
+     "stat": "Sosyal Radar",
+     "diff": "easy",
+     "r": {
+      "win": "Partiye yarısının gitmeyeceğini tahmin ettin. Haklıydın.",
+      "crit": "Tahminin o kadar isabetliydi ki parti sahibi davetiye listesini sana danıştı.",
+      "fail": "Tahmin ettin; yanıldın. Herkes gitti.",
+      "bad": "Tahminini yüksek sesle söyledin. Parti sahibi duydu."
+     },
+     "req": "Odayı Okur"
+    }
+   ]
+  },
+  {
+   "id": "bayram-harcligi",
+   "ch": 3,
+   "age": "7 yaş 6 ay",
+   "icon": "🧧",
+   "title": "Bayram Harçlığı",
+   "text": "Bayram. Eller öpüldü, zarflar toplandı. Toplam bütçe çocuk standartlarında rekor.",
+   "fam": "money",
+   "recall": [
+    {
+     "flag": "ilkKelimePara",
+     "text": "Akrabalar zarfı uzatırken 'Hani ilk kelimesi para olan' diye gülüştü."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Ailene teslim et",
+     "direct": {
+      "Vicdan": 2
+     },
+     "r": "Varlıklar merkez bankasına aktarıldı. Faiz oranı belirsiz."
+    },
+    {
+     "t": "Hepsini harca",
+     "stat": "Pişkinlik",
+     "diff": "easy",
+     "r": {
+      "win": "Bir günde mahalle ekonomisini canlandırdın.",
+      "crit": "Bakkal, oyuncakçı ve simitçi aynı gün rekor kırdı. Sana teşekkür kartı gönderildi.",
+      "fail": "Harcadın; aldıklarının yarısı ertesi gün bozuldu.",
+      "bad": "Hepsini tek bir oyuncağa harcadın. Oyuncak ilk gün kırıldı."
+     }
+    },
+    {
+     "t": "Akrabalarla ikinci tur yap",
+     "stat": "Çene",
+     "diff": "medium",
+     "r": {
+      "win": "İkinci el öpme turuyla bütçeyi ikiye katladın.",
+      "crit": "Uzak akrabaları bile ziyaret listesine ekledin. Bayram cirosu rekor.",
+      "fail": "İkinci turda 'Sen gelmiştin ya' dediler.",
+      "bad": "İkinci tur fark edildi. Zarflar geri çağrıldı."
+     }
+    },
+    {
+     "t": "Kumbaraya at, kimseye söyleme",
+     "stat": "Kurnazlık",
+     "diff": "easy",
+     "r": {
+      "win": "Kumbara ağırlaştı. Kimse bilmiyor.",
+      "crit": "Kumbara o kadar doldu ki ikinci kumbara açıldı. Yastık altı büyüyor.",
+      "fail": "Kumbarayı açmak için çekiç gerekti.",
+      "bad": "Kumbarayı sakladığın yeri kuzenin buldu."
+     },
+     "req": "Yastık Altı Ekonomisti"
+    },
+    {
+     "t": "Harçlıkla limonata standı kur",
+     "stat": "Kurnazlık",
+     "diff": "medium",
+     "r": {
+      "win": "Sermayeyi limona çevirdin, limonu kâra.",
+      "crit": "Stant o kadar tuttu ki mahallede ikinci şube açıldı.",
+      "fail": "Limonata ekşi oldu. Tek müşteri annendi.",
+      "bad": "Şekeri unuttun. Sağlık müfettişi (baban) standı kapattı."
+     },
+     "req": "İş Modeli Kurar",
+     "trait": "Limonata Baronu"
+    }
+   ]
+  },
+  {
+   "id": "mahalle-maci",
+   "ch": 3,
+   "age": "7 yaş 10 ay",
+   "icon": "🥅",
+   "title": "Mahalle Maçı",
+   "text": "Maç berabere. Son vuruş sende. Kalenin arkasında komşunun camı parlıyor.",
+   "recall": [
+    {
+     "flag": "cesurPark",
+     "text": "Parktaki büyük çocuk karşı takımda. Seni tanıdı, selam verdi."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Şut çek",
+     "stat": "Cesaret",
+     "diff": "medium",
+     "r": {
+      "win": "Gol! Cam sağlam. Mahalle sallandı.",
+      "crit": "Köşeye gol. Komşu bile balkondan alkışladı.",
+      "fail": "Top kaleciye gitti. Maç berabere bitti.",
+      "bad": "Top cama gitti. Komşu kapıya geldi. Maç ertelendi.",
+      "mid": "Direk! Cam sağlam, skor aynı."
+     },
+     "mini": {
+      "type": "timing",
+      "title": "Şut Çek!",
+      "hint": "Kırmızı işareti yeşil alanda durdur."
+     },
+     "flagBad": "camKirildi"
+    },
+    {
+     "t": "Pas ver",
+     "stat": "Sosyal Radar",
+     "diff": "easy",
+     "r": {
+      "win": "Pas verdin, arkadaşın attı. Asist de bir sanattır.",
+      "crit": "Öyle bir pas verdin ki arkadaşın boş kaleye attı. Herkes seni kucakladı.",
+      "fail": "Pas verdin; top karşı takıma gitti.",
+      "bad": "Pas verdin; top komşunun camına gitti."
+     },
+     "trait": "Asist Ustası",
+     "flagBad": "camKirildi"
+    },
+    {
+     "t": "Camı düşün, yavaş vur",
+     "direct": {
+      "Vicdan": 1,
+      "Dayanıklılık": 1
+     },
+     "r": "Top kaleye yavaşça yuvarlandı. Kaleci aldı. Cam teşekkür etti."
+    }
+   ]
+  },
+  {
+   "id": "balkondaki-ucurtma",
+   "ch": 3,
+   "age": "7 yaş 8 ay",
+   "icon": "🪁",
+   "title": "Balkondaki Uçurtma",
+   "text": "Uçurtman üst kattaki balkonun korkuluğuna takıldı. Balkonun sahibi tatilde. Uçurtma rüzgârda sana el sallıyor.",
+   "voices": [
+    {
+     "stat": "Cesaret",
+     "diff": "easy",
+     "text": "İki kat. Aslında bir buçuk. Bir de korkuluk var. Korkuluklar bunun için yapılmış olabilir mi? Hayır."
+    },
+    {
+     "stat": "Vicdan",
+     "diff": "medium",
+     "text": "Bu uçurtmayı sana dedenin aldığını hatırlıyor musun? Dede de seni hatırlıyor. Canlı olarak.",
+     "fail": "…Vicdan sesini rüzgâra kaptırdı."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Vazgeç, yenisini iste",
+     "direct": {
+      "Çene": 1
+     },
+     "r": "Yeni uçurtma talebin aile bütçe komisyonuna gönderildi. Gündem yoğun."
+    },
+    {
+     "t": "Süpürge sapıyla kurtar",
+     "stat": "Akıl",
+     "diff": "medium",
+     "r": {
+      "win": "Süpürge, sandalye ve bir bant rulosuyla mühendislik harikası kurdun. Uçurtma kurtuldu.",
+      "crit": "Uçurtmayı kurtardın; üstüne komşunun balkonundan düşen bir top da geldi. Bonus.",
+      "fail": "Süpürge kısa geldi. Sandalye de. Sen de.",
+      "bad": "Süpürge sapı balkona takıldı. Artık orada bir uçurtma ve bir süpürge var."
+     }
+    },
+    {
+     "t": "Kapıcıyı ikna et",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "Kapıcı yedek anahtarla çıktı ve uçurtmayı indirdi. Bürokrasi bazen işler.",
+      "crit": "Kapıcı uçurtmayı indirdi, üstüne bir de nasıl daha iyi uçurulacağını gösterdi.",
+      "fail": "Kapıcı 'Sahibi gelsin' dedi. Sahibi üç hafta sonra geliyor.",
+      "bad": "Kapıcıyı ikna ettin; kapıcı korkuluktan düştü, iyi ki çalılar vardı. Uçurtma hâlâ orada."
+     }
+    },
+    {
+     "t": "Korkuluğa tırman",
+     "stat": "Cesaret",
+     "diff": "hard",
+     "r": {
+      "win": "Tırmandın, uzandın, aldın. Aşağıdakiler nefeslerini ancak sen inince bıraktı.",
+      "crit": "Tırmandın, uçurtmayı aldın ve balkondan uçurarak indirdin. Mahalle bunu yıllarca anlattı.",
+      "fail": "Yarıya kadar tırmandın, sonra aşağı baktın. Aşağı bakmak hataydı.",
+      "bad": "Tırmandın, ayağın kaydı, bir saksıya tutundun. Saksı dayandı, bileğin dayanmadı. Altı hafta alçı."
+     },
+     "flagBad": "alcili-kol"
+    }
+   ]
+  },
+  {
+   "id": "kedi-istiyoruz",
+   "ch": 3,
+   "age": "8 yaş",
+   "icon": "🐱",
+   "title": "Evde Kedi Oylaması",
+   "text": "Eve kedi alınması gündemde. Karar oturumu akşam yemeğinde.",
+   "fam": "home",
+   "recall": [
+    {
+     "flag": "kediSuclu",
+     "text": "Vazo davasından beri ailede 'Kediye güven olmaz' diyen bir hizip var."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Duygusal konuşma yap",
+     "stat": "Çene",
+     "diff": "medium",
+     "r": {
+      "win": "Gözlerin doldu, sesin titredi. Kedi onaylandı.",
+      "crit": "Konuşma sırasında babaannen ağladı. Bir değil iki kedi onaylandı.",
+      "fail": "Konuşman etkileyiciydi ama karar 'yazın bakarız'.",
+      "bad": "Konuşurken 'Söz, her gün ben temizleyeceğim' dedin. Kayıt altına alındı. Kedi gelmedi."
+     },
+     "flagWin": "kediGeldi"
+    },
+    {
+     "t": "Sorumluluk planı sun",
+     "stat": "Akıl",
+     "diff": "medium",
+     "r": {
+      "win": "Mama, kum, veteriner: üç maddelik plan sundun. Kedi onaylandı.",
+      "crit": "Tablolu, bütçeli bir plan sundun. Ailen kedi yerine seni işe almayı düşündü.",
+      "fail": "Plan iyiydi ama bütçe onaylanmadı.",
+      "bad": "Planın ilk maddesi 'Kediye telefon alalım' idi. Oturum kapandı."
+     },
+     "flagWin": "kediGeldi"
+    },
+    {
+     "t": "Büyükanneyi ikna et",
+     "stat": "Sosyal Radar",
+     "diff": "medium",
+     "r": {
+      "win": "Büyükanneyi yanına çektin. Oturum bitmeden karar çıktı.",
+      "crit": "Büyükanne kediyi kendisi getirdi. Tartışma bile olmadı.",
+      "fail": "Büyükanne kuş istiyormuş.",
+      "bad": "Büyükanne ikna oldu; kendi evine kedi aldı."
+     },
+     "flagWin": "kediGeldi"
+    },
+    {
+     "t": "Vazo için kediden resmen özür dile",
+     "direct": {
+      "Vicdan": 3
+     },
+     "r": "Yıllar sonra gelen itiraf. Aile duygulandı, oturum oybirliğiyle sonuçlandı. Kedi geliyor.",
+     "reqFlag": "kediSuclu",
+     "flag": "kediGeldi"
+    }
+   ]
+  },
+  {
+   "id": "tablet-saati",
+   "ch": 3,
+   "age": "8 yaş 4 ay",
+   "icon": "🎮",
+   "title": "Tablet Saati",
+   "text": "Ekran süresi günde bir saat. Oyunun bölüm sonu canavarı ise 61. dakikada.",
+   "fam": "home",
+   "choices": [
+    {
+     "t": "Süreye uy",
+     "direct": {
+      "Vicdan": 1,
+      "Dayanıklılık": 1
+     },
+     "r": "Canavar yarına kaldı. İrade bugün kazandı."
+    },
+    {
+     "t": "Beş dakika daha iste",
+     "stat": "Çene",
+     "diff": "easy",
+     "r": {
+      "win": "Beş dakika aldın, canavarı yendin.",
+      "crit": "Beş dakika istedin, on beş aldın. Pazarlık dersi.",
+      "fail": "Beş dakika istedin; 'Yarın' dendi.",
+      "bad": "Beş dakika istedin; ertesi günün süresi de kesildi."
+     }
+    },
+    {
+     "t": "Saati gizlice geri al",
+     "stat": "Kurnazlık",
+     "diff": "hard",
+     "r": {
+      "win": "Tabletin saati bir saat geri gitti. Canavar yenildi.",
+      "crit": "Saati geri aldın, canavarı yendin, iz bırakmadın. Kusursuz operasyon.",
+      "fail": "Saati geri aldın; alarm çaldı.",
+      "bad": "Saati geri aldın; ertesi sabah ailen işe bir saat geç kaldı."
+     }
+    },
+    {
+     "t": "Ebeveyn kilidini çöz",
+     "stat": "Akıl",
+     "diff": "medium",
+     "r": {
+      "win": "Kilidi çözdün. Sınırsız ekran, sınırsız sorumluluk.",
+      "crit": "Kilidi çözdün ve ailenin telefonuna ekran süresi koydun.",
+      "fail": "Kilit çözülmedi; tablet 10 dakika kilitlendi.",
+      "bad": "Kilidi çözmeye çalışırken tableti fabrika ayarlarına döndürdün."
+     },
+     "req": "Teknoloji Merakı",
+     "trait": "Kilit Kırıcı"
+    }
+   ]
+  },
+  {
+   "id": "veli-toplantisi",
+   "ch": 3,
+   "age": "8 yaş 8 ay",
+   "icon": "🚪",
+   "title": "Veli Toplantısı",
+   "text": "Ailen okulda. Sen kapının önündesin. İçeriden arada bir adın duyuluyor.",
+   "fam": "education",
+   "voices": [
+    {
+     "stat": "Sosyal Radar",
+     "diff": "hard",
+     "text": "Öğretmenin elindeki dosya kalın. İnce dosyalar iyi haberdir. Kalın dosyalar tarihtir."
+    },
+    {
+     "stat": "Dayanıklılık",
+     "diff": "easy",
+     "text": "Kapının bu tarafında olmak, ömrünün en uzun yirmi dakikası olacak. Şimdilik."
+    }
+   ],
+   "recall": [
+    {
+     "flag": "yalanci",
+     "text": "Öğretmenin elinde 'yaratıcı açıklamalar' başlıklı bir dosya var."
+    },
+    {
+     "flag": "camKirildi",
+     "text": "Komşunun camı konusu da gündemde."
+    },
+    {
+     "flag": "baskan",
+     "text": "Sınıf başkanlığın hanene artı olarak yazıldı."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Kapıyı dinle",
+     "stat": "Sosyal Radar",
+     "diff": "medium",
+     "r": {
+      "win": "Kilit cümleleri duydun: 'zeki' ve 'biraz konuşkan'. Hazırlıklısın.",
+      "crit": "Her şeyi duydun ve ailen çıkmadan savunmanı hazırladın.",
+      "fail": "Hiçbir şey duyamadın. Kapı çok kalınmış.",
+      "bad": "Kapıya yaslandın, kapı açıldı. İçeri düştün."
+     }
+    },
+    {
+     "t": "Öğretmene önceden çiçek götür",
+     "stat": "Pişkinlik",
+     "diff": "medium",
+     "r": {
+      "win": "Çiçek kabul edildi. Toplantının tonu yumuşadı.",
+      "crit": "Öğretmen çiçeği vazoya koydu ve toplantıyı 'Ne kadar kibar bir çocuk' diye açtı.",
+      "fail": "Çiçeği verdin; öğretmen alerjikmiş.",
+      "bad": "Çiçeği okul bahçesinden kopardığın anlaşıldı."
+     }
+    },
+    {
+     "t": "Sonucu bekle",
+     "direct": {
+      "Dayanıklılık": 1
+     },
+     "r": "Kontrol edemediğin şeyleri beklemeyi öğrendin."
+    },
+    {
+     "t": "Ailenin yüzünden sonucu oku",
+     "stat": "Sosyal Radar",
+     "diff": "easy",
+     "r": {
+      "win": "Kapıdan çıkarken yüzlerine baktın. Sonuç iyi. Rahatladın.",
+      "crit": "Yüz ifadesinden sadece sonucu değil, akşam yemeğini de tahmin ettin.",
+      "fail": "Yüzleri hiçbir şey söylemiyordu.",
+      "bad": "'İyi geçti' diye sevinçle koştun. İyi geçmemişti."
+     },
+     "req": "Odayı Okur"
+    }
+   ]
+  },
+  {
+   "id": "karne-gunu",
+   "ch": 3,
+   "age": "9 yaş",
+   "icon": "📜",
+   "title": "Karne Günü",
+   "text": "Yılın son günü. Karne elinde. Eve kadar 800 metre, düşünmek için bolca zaman.",
+   "fam": "education",
+   "fixed": true,
+   "voices": [
+    {
+     "stat": "Dayanıklılık",
+     "diff": "medium",
+     "text": "Eve 800 metre var. Her adım bir savunma cümlesi. Yeterince yürüdün, yeterince yazdın."
+    },
+    {
+     "stat": "Akıl",
+     "diff": "easy",
+     "text": "Karnedeki notlar değişmeyecek. Değişecek tek şey, onları nasıl sunduğun. Bu da bir tür matematik."
+    }
+   ],
+   "choices": [
+    {
+     "t": "Karneyi gururla göster",
+     "stat": "Pişkinlik",
+     "diff": "easy",
+     "r": {
+      "win": "Karneyi kapıda açtın. Alkış geldi.",
+      "crit": "Karneyi gösterdin; ailen fotoğrafını çekip aile grubuna gönderdi.",
+      "fail": "Karneyi gösterdin; tek zayıf not da görüldü.",
+      "bad": "Karneyi gösterirken yere düşürdün. Kedi üstüne oturdu."
+     }
+    },
+    {
+     "t": "Önce iyi haberleri anlat",
+     "stat": "Çene",
+     "diff": "medium",
+     "r": {
+      "win": "İyi haberlerle başladın; kötü haber gölgede kaldı.",
+      "crit": "Sunumun o kadar iyiydi ki karneyi açmalarına gerek kalmadı.",
+      "fail": "İyi haberleri anlattın; karne yine de açıldı.",
+      "bad": "İyi haber bulamadın. Sessizlik uzadı."
+     }
+    },
+    {
+     "t": "İmzayı yarına ertele",
+     "stat": "Kurnazlık",
+     "diff": "hard",
+     "r": {
+      "win": "İmza bir gün ertelendi. Bu bir günü iyi kullandın.",
+      "crit": "Karne tatil boyunca 'kayıp' kaldı ve ilk gün imzalı bulundu. Kimse nasıl olduğunu sormadı.",
+      "fail": "Ertelemeye çalıştın; öğretmen aradı.",
+      "bad": "Ertelemeye çalıştın; karne çantadan çıktı ve herkesin önünde açıldı."
+     }
+    },
+    {
+     "t": "Olduğu gibi ver",
+     "direct": {
+      "Vicdan": 1
+     },
+     "r": "Karne teslim edildi. Değerlendirme aile meclisinde."
+    }
+   ]
+  }
+ ],
+ "flags": [
+  {
+   "flag": "kediSuclu",
+   "label": "Vazo davasında kediyi suçladı."
+  },
+  {
+   "flag": "ilkKelimePara",
+   "label": "İlk kelimesi 'Para' oldu."
+  },
+  {
+   "flag": "yalanci",
+   "label": "Yaratıcı açıklamalar dosyası kabarık."
+  },
+  {
+   "flag": "sirVerdi",
+   "label": "Kreşte bir sırrı dolaşıma soktu."
+  },
+  {
+   "flag": "cesurPark",
+   "label": "Parktaki büyük çocuğa kafa tuttu."
+  },
+  {
+   "flag": "yapiskan",
+   "label": "Kreş kapısında bacağa sarıldı."
+  },
+  {
+   "flag": "baskan",
+   "label": "Sınıf başkanı seçildi."
+  },
+  {
+   "flag": "kediGeldi",
+   "label": "Eve bir kedi getirtti."
+  },
+  {
+   "flag": "camKirildi",
+   "label": "Komşunun camıyla tanıştı."
+  },
+  {
+   "flag": "tepsiTekeli",
+   "label": "Bir kış boyunca mahallenin tepsi tekelini elinde tuttu."
+  },
+  {
+   "flag": "alcili-kol",
+   "label": "Çocukluğunda bir kolu alçıda geçti."
+  }
+ ]
+}

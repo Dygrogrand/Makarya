@@ -1,4 +1,6 @@
 /* Makarya — oyun kuralları (arayüzden bağımsız, simülasyonla test edilebilir) */
+var AUTO_TRAITS = {};
+Object.keys(TRAITS).forEach(function (k) { if (TRAITS[k].auto) AUTO_TRAITS[TRAITS[k].auto] = k; });
 
 function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
@@ -20,6 +22,8 @@ EVENTS.forEach(function (e) { e._m = ageMonths(e.age); });
 /* when: { fam: [..], gender: "kiz", trait: "..", flag: "..", notFlag: "..", minStat: {stat: n} } */
 function eligible(S, e) {
   var w = e.when; if (!w) return true;
+  if (w.flags && w.flags.some(function (f) { return S.flags.indexOf(f) < 0; })) return false;
+  if (w.notFlags && w.notFlags.some(function (f) { return S.flags.indexOf(f) >= 0; })) return false;
   if (w.fam && w.fam.indexOf(S.family) < 0) return false;
   if (w.gender && w.gender !== S.gender) return false;
   if (w.trait && S.traits.indexOf(w.trait) < 0) return false;
@@ -28,16 +32,39 @@ function eligible(S, e) {
   for (var k in (w.minStat || {})) if (S.stats[k] < w.minStat[k]) return false;
   return true;
 }
-function buildPlan(S, ch, rnd) {
+function pickEvents(S, ch, n, exclude, minM, rnd) {
   rnd = rnd || Math.random;
-  var pool = EVENTS.filter(function (e) { return e.ch === ch && eligible(S, e); });
+  var pool = EVENTS.filter(function (e) { return e.ch === ch && eligible(S, e) && exclude.indexOf(e.id) < 0 && e._m >= minM; });
   var fixed = pool.filter(function (e) { return e.fixed; });
   var rest = pool.filter(function (e) { return !e.fixed; })
     .map(function (e) { return { e: e, k: Math.pow(rnd(), 1 / (e.weight || 1)) }; })
     .sort(function (a, b) { return b.k - a.k; }).map(function (x) { return x.e; });
-  var n = Math.max(0, (CHAPTERS[ch].pick || pool.length) - fixed.length);
-  return fixed.concat(rest.slice(0, n)).sort(function (a, b) { return a._m - b._m || a._i - b._i; }).map(function (e) { return e.id; });
+  return fixed.concat(rest.slice(0, Math.max(0, n - fixed.length))).sort(function (a, b) { return a._m - b._m || a._i - b._i; }).map(function (e) { return e.id; });
 }
+function buildPlan(S, ch, rnd) {
+  if (ch === 6 && S.flags.indexOf("universiteli") < 0) addFlag(S, "universitesiz");
+  var plan = pickEvents(S, ch, CHAPTERS[ch].pick, [], 0, rnd);
+  S._sig = stateSig(S);
+  if (ch === 10) setEndAge(S, plan);
+  return plan;
+}
+/* Hafıza ya da özellik değişince bölümün kalanı yeniden seçilir (ör. meslek seçilince meslek olayları, evlenince evli hattı) */
+function stateSig(S) { return S.flags.join(",") + "|" + S.traits.join(","); }
+function replanRest(S, rnd) {
+  if (S._sig === stateSig(S)) return;
+  S._sig = stateSig(S);
+  var played = S.plan.slice(0, S.pi + 1), cur = EV_BY_ID[S.plan[S.pi]];
+  var rest = pickEvents(S, S.ch, CHAPTERS[S.ch].pick - played.length, played, cur ? cur._m : 0, rnd);
+  S.plan = played.concat(rest);
+  if (S.ch === 10) setEndAge(S, S.plan);
+}
+function setEndAge(S, plan) {
+  var last = 0;
+  plan.forEach(function (id) { if (id !== "son-soz") last = Math.max(last, EV_BY_ID[id]._m); });
+  S.endAge = Math.floor(last / 12) + 1 + Math.floor(Math.random() * 5);
+}
+function eventAge(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge + " yaş" : e.age; }
+function ageYears(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge : e._m / 12; }
 function hasChapter(ch) { return !!CHAPTERS[ch] && EVENTS.some(function (e) { return e.ch === ch; }); }
 function curEvent(S) { return EV_BY_ID[S.plan[S.pi]]; }
 
@@ -88,7 +115,7 @@ function familyEventBonus(S, e, stat) {
 /* Hedef zarın bileşenleri: her satır oyuncuya açıkça gösterilir */
 function needBreakdown(S, e, c) {
   var d = DIFF[c.diff], ch = CHAPTERS[e.ch], rows = [];
-  var base = d.base + ch.step;
+  var base = d.base + (ch.step || 0);
   rows.push({ icon: "🎯", label: d.label + " zorluk", val: base, kind: "base" });
   var st = S.stats[c.stat];
   var statAdj = -Math.round((st - ch.expected) / 4);
@@ -156,6 +183,7 @@ function applyOutcome(S, e, c, outcome, extra) {
   var res = { outcome: outcome, deltas: [], traits: [], note: "", text: "" };
   extra = extra || {};
   addFlag(S, c.flag);
+  if (c.unflag) S.flags = S.flags.filter(function (f) { return f !== c.unflag; });
   if (outcome === "direct") {
     for (var k in (c.direct || {})) addStat(S, k, c.direct[k], res);
     gainTrait(S, c.trait, res);
@@ -181,10 +209,35 @@ function applyOutcome(S, e, c, outcome, extra) {
   }
   if (c.risk && (extra.deathRoll != null ? extra.deathRoll : Math.random()) < c.risk.p) {
     res.death = c.risk.cause;
-    S.dead = { cause: c.risk.cause, age: e.age, title: e.title };
+    S.dead = { cause: c.risk.cause, age: eventAge(S, e), title: e.title };
+  } else if (e.ch >= 6) {
+    var bg = backgroundDeath(S, e, extra.bgRoll);
+    if (bg) { res.death = bg; res.natural = true; S.dead = { cause: bg, age: eventAge(S, e), title: e.title }; }
   }
   S.log.push({ id: e.id, ch: e.ch, age: e.age, title: e.title, choice: c.t, outcome: outcome, roll: extra.roll || null });
   return res;
+}
+
+/* 18 yaş sonrası yaşla artan arka plan riski (olay başına) */
+function hazard(S, e) {
+  var y = ageYears(S, e);
+  if (y < 18) return 0;
+  var h = y < 26 ? 0.0012 : y < 40 ? 0.0018 : y < 55 ? 0.0035 : y < 70 ? 0.009 : y < 80 ? 0.022 : 0.04;
+  if (S.flags.indexOf("sigara") >= 0) h *= 1.6;
+  if (S.flags.indexOf("sporcu") >= 0) h *= 0.7;
+  h *= clamp(1 - (S.stats["Dayanıklılık"] - CHAPTERS[e.ch].expected) / 60, 0.6, 1.4);
+  return h;
+}
+function backgroundDeath(S, e, roll) {
+  if (e.id === "son-soz") return null;
+  if ((roll != null ? roll : Math.random()) >= hazard(S, e)) return null;
+  var y = ageYears(S, e);
+  var pool = DEATH_CAUSES.filter(function (d) { return y >= d.min && y <= d.max && (!d.flag || S.flags.indexOf(d.flag) >= 0); });
+  if (!pool.length) return "Bir salı öğleden sonrası, hiç beklenmedik bir anda. Salılar zaten hep tuhaftır.";
+  var wsum = 0; pool.forEach(function (d) { wsum += d.flag ? 3 : 1; });
+  var r = Math.random() * wsum;
+  for (var i = 0; i < pool.length; i++) { r -= pool[i].flag ? 3 : 1; if (r <= 0) return pool[i].text; }
+  return pool[pool.length - 1].text;
 }
 
 /* Final kartı: en güçlü iki stat (mevcut değer + gelişimin iki katı) */
@@ -192,7 +245,7 @@ var ARCH_ADJ = { "Akıl": "Hesaplı", "Çene": "Dili Güçlü", "Kurnazlık": "K
 var ARCH_NOUN = { "Akıl": "Mühendis", "Çene": "Diplomat", "Kurnazlık": "Tüccar", "Cesaret": "Kaptan", "Pişkinlik": "Şovmen", "Vicdan": "Arabulucu", "Dayanıklılık": "Maratoncu", "Sosyal Radar": "Dedektif" };
 var PROPHECY = {
   "Akıl": "Makarya'da bir gün bir köprü, bir yazılım ya da en azından bir tablo dosyası senin adını taşıyacak.",
-  "Çene": "Ya büyükelçi olacaksın ya da Kapalıçarşı'da en iyi pazarlığı yapan kişi.",
+  "Çene": "Ya büyükelçi olacaksın ya da çarşının en iyi pazarlığını yapan kişi.",
   "Kurnazlık": "Makarya Merkez Bankası seni artık izliyor.",
   "Cesaret": "Makarya'da 'Bunu kim yapar?' sorusunun cevabı genelde sen olacaksın.",
   "Pişkinlik": "Sahneler, kameralar ve aile düğünleri seni bekliyor.",
@@ -200,8 +253,8 @@ var PROPHECY = {
   "Dayanıklılık": "Makarya trafiğine bile sabredebilecek nadir insanlardan biri olacaksın.",
   "Sosyal Radar": "Bir odaya girdiğinde, kimin kime kızgın olduğunu herkesten önce bileceksin."
 };
-/* Bazı statlar oyunda daha sık geçtiği için simülasyonla dengelenir (20.000 oyun ortalaması) */
-var ARCH_NORM = { "Akıl": -17, "Çene": 23, "Kurnazlık": 3, "Cesaret": -15, "Pişkinlik": -5, "Vicdan": 6, "Dayanıklılık": 0, "Sosyal Radar": 5 };
+/* Bazı statlar oyunda daha sık geçtiği için simülasyonla dengelenir (tools/simulasyon.js, 3.000 tam hayat) */
+var ARCH_NORM = {"Akıl":-18,"Çene":49,"Kurnazlık":1,"Cesaret":-37,"Pişkinlik":-19,"Vicdan":1,"Dayanıklılık":37,"Sosyal Radar":-14};
 function archetype(S) {
   var base = S.famStats || S.stats;
   var scored = STATS.map(function (k) { return { k: k, s: S.stats[k] + 2 * (S.stats[k] - base[k]) - (ARCH_NORM[k] || 0) }; })

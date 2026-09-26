@@ -1,10 +1,10 @@
 # Makarya · Oyun tasarım belgesi
 
-*Sürüm 2 · 26 Eylül 2026 · kararlar işlendi*
+*Sürüm 3 · 26 Eylül 2026 · 10 bölüm yazıldı, 328 olay*
 
 ## 1. Vizyon
 
-**Makarya, bir Türk hayatının doğumdan ölüme kara mizahlı simülasyonu.**
+**Makarya, doğumdan ölüme bir hayatın kara mizahlı simülasyonu.** Makarya, Türkiye'ye benzeyen kurgusal bir ülkedir ve günümüzde geçer. Hedef kitle 20–50 yaş.
 
 - **Biçim:** Eski "kendi maceranı seç" kitaplarının kurgusu ve Disco Elysium'un konuşan iç sesleri bir araya geliyor. Görsellik 2 boyutlu resimler; oyun metin ağırlıklı, dikey tutulan telefon için tasarlanıyor.
 - **İmza:** Hayatın büyük anlarını, bürokratik ve kurumsal bir dille anlatan soğukkanlı anlatıcı ("İlk basın açıklamanı yaptın").
@@ -85,9 +85,12 @@ Hatlar ayrı ağaçlar olarak değil, **etiketli olay havuzları** olarak yazıl
 - **Özellikler olay örgüsünü değiştirir:** Bir olay yalnızca belirli bir özelliği, hafıza kaydını ya da stat eşiğini taşıyan oyuncuya çıkabilir (motor hazır: `when` koşulu).
 
 ### 3.5 Ölüm
-- **Her yaşta mümkün, ama hak edilmiş olmalı.** Ölüm riski yalnızca riskli seçimlerde vardır ve **yüzdesi seçenek üstünde görünür** (☠️ %5). Oyuncu riski bilerek alır; ölünce kızmaz, güler.
+- **Yalnızca 18 yaşından sonra.** Çocukluk ve gençlikte tehlike kalıcı sonuç bırakır (alçılı kol, lakap, borç) ama öldürmez.
+- **Hak edilmiş olmalı.** Riskli seçimlerde **yüzde seçenek üstünde görünür** (☠️ %5). Oyuncu riski bilerek alır; ölünce kızmaz, güler.
+- **Her hayat bir mezar taşıyla biter.** Son bölümün sabit final olayı "Son Söz"de oyuncu son cümlesini seçer; o cümle mezar taşına yazılır.
 - **18 yaşından sonra** her olayda küçük bir arka plan riski eklenir; yaşla artar. Sağlık seçimleri, Dayanıklılık ve bazı özellikler bu riski düşürür, kötü alışkanlıklar yükseltir.
-- **Çocuklukta ve gençlikte ölümler absürttür** (uçurtma, tepsiyle kayak, düğün kurşunu). Gerçekçi şiddetle ölüm yoktur. Haraççılar, zorbalar ve kavgalar kalıcı sonuç bırakır: borç, sakatlık, lakap, bir sokağa bir daha girememek.
+- **Ölümler absürttür** ("Site yönetimine itiraz dilekçesini teslim ederken. Dilekçe hâlâ değerlendiriliyor."). Gerçekçi şiddet ve hastalık adı yoktur. Haraççılar, zorbalar ve kavgalar kalıcı sonuç bırakır: borç, lakap, bir sokağa bir daha girememek.
+- **Simülasyon (3.000 tam hayat, rastgele oynayan oyuncu):** Hayatların yaklaşık %8'i 40 yaşından önce, %15'i 40–70 arasında biter; yaklaşık %58'i Son Söz'e ulaşır. Ortalama ölüm yaşı 80. Bir hayatta ortalama 114 olay, 6 mini oyun.
 - **Ölüm içeriktir:** Her ölüm "Mezar Taşı" kartı olarak paylaşılabilir ve cihazdaki koleksiyona girer. Koleksiyon, açılan karakter unvanlarını da tutar. Sonraki adım: koleksiyon ilerledikçe yeni aileler, özellikler ve olaylar açılır.
 
 ### 3.6 Başarısızlık da hikâyedir (mevcut, korunacak)
@@ -112,6 +115,8 @@ Anlatıcı acımasız değil, soğukkanlı. Oyuncu gülerken biraz da içi sızl
 - "Cenazende en çok ağlayan kişi sana borcu olandı. Duygusaldı ama tutarlıydı."
 - "Emeklilik ikramiyen bir arabaya, arabanın taksitleri de torununa kaldı."
 - "Doktor 'Stres yapmayın' dedi. Randevu için 3 ay beklediğini söylemedin."
+
+**Dünya kuralları:** Gerçek şehir, anıt, kurum, sınav, marka, uygulama, kulüp ve kişi adı yoktur. Din ve siyaset espri konusu değildir; siyasetçi yalnızca isimsiz ve genel olarak geçebilir. Ayrıntılı kurallar: `content/YAZIM_YONERGESI.md`. İçerik doğrulayıcısı yasaklı kelimeleri otomatik yakalar.
 
 **Yaş derecesi hedefi: 12+.** Alkol ve sigara yalnızca metinde ima edilir, görselde yer almaz. Romantik sahneler "el ele tutuşma" düzeyinde kalır. Şiddet sahne dışında kalır; ölümler absürt ve soğukkanlı anlatılır.
 
@@ -183,9 +188,13 @@ Meslek, evlilik, erken ölüm ve kısa hayatlar içeren **BitLife**, uygulama ma
 
 ## 8. Görsel strateji
 
-- Her olaya görsel koymak 300'ü aşkın resim demek. Bunun yerine **perde başına 8–10 ana sahne** üretilir; havuz olayları simgeli kapak ya da ortak mekân görselleri kullanır. Ortak mekânlar: ev, okul, sokak, iş yeri, hastane.
-- Kız versiyonu, erkek hikâyesi bitince bitmiş erkek görsellerinden "çocuğu değiştir" yöntemiyle türetilir.
-- **Satış öncesi yapılacak temizlik:** Bazı mevcut görsellerde gerçek marka logoları var; örneğin Keskin ailesinin bakkal rafında cips markaları görünüyor. Uygulama mağazasında satıştan önce bu görseller yazısız ve markasız yeniden üretilmeli.
+- **Stil korunuyor:** resimli, sıcak ışıklı, animasyon filmi konsept sanatı tarzı.
+- **Ölçek için üç katman (motor hazır):**
+  1. **Büyük anlar** (~60): Dönüm noktaları ve çocukluk sahneleri kendi resmini taşır.
+  2. **Mekân arka planları** (28): Resmi olmayan olaylar, geçtiği mekânın insansız arka planını gösterir (ev, ofis, devlet dairesi, düğün salonu…). Böylece 328 olay için 328 resim gerekmez.
+  3. **Simge:** Mekân resmi de yoksa olayın simgesi gösterilir.
+- **Görsel yasakları:** Yazı, marka, gerçek yer, bayrak ve ön planda dini sembol yok. Denetimde 14 eski görselde ihlal bulundu (ör. bakkal rafında gerçek cips markaları, ayakkabıda gerçek logo, Galata Kulesi); hepsi yeniden üretim listesinde (`CHATGPT_PAKETLERI.md`).
+- **Kız karakter:** Erkek hikâyesinin görselleri tamamlanınca "çocuğu değiştir" yöntemiyle türetilecek.
 
 ## 9. Uygulama mağazasına giden yol
 
@@ -212,7 +221,8 @@ Meslek, evlilik, erken ölüm ve kısa hayatlar içeren **BitLife**, uygulama ma
 | Faz | İçerik |
 |---|---|
 | 1 · Tamamlandı | İç sesler, 12 mini oyun, havuz motoru, görünür ölüm riski, mezar taşı ve koleksiyon, geri alınamaz kayıt |
-| 2 · Sıradaki | IV. ve V. perdeler (ergenlik, sınav çağı), haraççılar ve zorbalar, beyaz/kırmızı kontroller, kafa takıntıları |
+| 2 · Tamamlandı | 10 bölümün tamamı (328 olay), 4 meslek hattı, evli/bekâr/çocuk hatları, 16 mini oyun, 18+ ölüm ve Son Söz, Excel ile içerik düzenleme |
+| 3 · Sıradaki | Görseller (71), beyaz/kırmızı kontroller, kafa takıntıları, ses ve titreşim, Capacitor ile uygulama paketi |
 | 3 | Ses, müzik, titreşim; Capacitor paketi; TestFlight ile kapalı test (Apple'ın deneme dağıtımı) |
 | 4 | VI.–X. perdeler, kız yolu, mağaza yayını |
 
@@ -220,11 +230,13 @@ Meslek, evlilik, erken ölüm ve kısa hayatlar içeren **BitLife**, uygulama ma
 
 | Konu | Karar |
 |---|---|
-| Erken ölüm | Var; her yaşta mümkün, 18'den sonra yaşla artan arka plan riski |
+| Erken ölüm | Yalnızca 18 yaşından sonra; riskli seçimler ve yaşla artan arka plan riski; her hayat Son Söz ya da mezar taşıyla biter |
 | Şiddet | Sahne dışında; gençlikte ölümler absürt, haraççılar kalıcı sonuç bırakır |
 | Seçimler | Geri alınamaz |
 | Süre | Ortalama hayat yaklaşık 45 dakika, kayıtla bölünerek |
 | Havuz | Yayında 250, hedef 400–500 olay |
 | Hatlar | Meslek, medeni durum, cinsiyet ve özelliklere göre etiketli havuzlar; ilk sürümde 4 meslek |
 | Kız karakter | Erkek hikâyesi tamamlanınca görselleri türetilecek; kurgu şimdiden iki cinsiyet düşünülerek yazılıyor |
-| Hedef kitle | Henüz karar verilmedi: "bunu ben de yaşadım" diyecek 25–45 yaş mı, daha genç oyuncular mı? |
+| Hedef kitle | 20–50 yaş; göndermeler bugünün hayatından |
+| Dünya | Türkiye'ye benzeyen kurgusal ülke Makarya; gerçek kişi, marka, yer, siyaset ve din esprisi yok |
+| İçerik düzenleme | `Makarya_Icerik.xlsx` ana kaynak; GitHub'a yüklenince oyuna otomatik aktarılır |

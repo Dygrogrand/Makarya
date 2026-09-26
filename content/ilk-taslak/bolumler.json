@@ -1,0 +1,12 @@
+{"chapters": [
+ {"ch": 1, "name": "Ev", "pick": 10, "expected": 25, "range": "Doğum → 3 yaş", "endImg": "kres-kapisi", "endAge": "3 YAŞ", "endText": "Ev güvenliydi. Şimdi başka çocuklar var.", "next": "BÖLÜM II · DIŞ DÜNYA"},
+ {"ch": 2, "name": "Dış Dünya", "pick": 12, "expected": 30, "range": "3 → 6 yaş", "endImg": "ilkokul-kapisi", "endAge": "6 YAŞ", "endText": "Artık yalnızca aileyi değil, dış dünyanın kurallarını da okumaya başladın.", "next": "BÖLÜM III · OKUL YILLARI"},
+ {"ch": 3, "name": "Okul Yılları", "pick": 10, "expected": 36, "range": "6 → 9 yaş", "endImg": "karne-gunu", "endAge": "9 YAŞ", "endText": "Karne elinde, karakter ortada.", "next": "BÖLÜM IV · ERGENLİK"},
+ {"ch": 4, "name": "Ergenlik", "pick": 13, "expected": 40, "range": "10 → 14 yaş", "endImg": "b4-lise-sinavi", "endAge": "14 YAŞ", "endText": "Sesin çatladı, telefonun çatlamadı. Önceliklerin belli.", "next": "BÖLÜM V · SINAV ÇAĞI"},
+ {"ch": 5, "name": "Sınav Çağı", "pick": 13, "expected": 44, "range": "15 → 18 yaş", "endImg": "b5-mezuniyet", "endAge": "18 YAŞ", "endText": "Resmen yetişkinsin. Sistem bunu kutlamak için sana ilk faturanı hazırlıyor.", "next": "BÖLÜM VI · GENÇ YETİŞKİN"},
+ {"ch": 6, "name": "Genç Yetişkin", "pick": 14, "expected": 48, "range": "18 → 26 yaş", "endImg": "b6-meslek-secimi", "endAge": "26 YAŞ", "endText": "Bir mesleğin, bir kiran ve bir kredi kartı ekstren var. Hayat seni artık ciddiye alıyor.", "next": "BÖLÜM VII · KARİYER VE AİLE"},
+ {"ch": 7, "name": "Kariyer ve Aile", "pick": 14, "expected": 52, "range": "26 → 40 yaş", "endImg": "b7-evlilik-karari", "endAge": "40 YAŞ", "endText": "Kırk yaşına bastın. Ayakkabın da bastı; o da artık yorgun.", "next": "BÖLÜM VIII · ORTA YAŞ"},
+ {"ch": 8, "name": "Orta Yaş", "pick": 13, "expected": 55, "range": "40 → 55 yaş", "endImg": "b8-lise-bulusmasi", "endAge": "55 YAŞ", "endText": "Gözlüğün yakın için, sabrın uzak için. İkisi de reçeteli.", "next": "BÖLÜM IX · OLGUNLUK"},
+ {"ch": 9, "name": "Olgunluk", "pick": 13, "expected": 58, "range": "55 → 70 yaş", "endImg": "b9-emeklilik", "endAge": "70 YAŞ", "endText": "Emeklisin. Zamanın bol, randevuların dolu.", "next": "BÖLÜM X · SON PERDE"},
+ {"ch": 10, "name": "Son Perde", "pick": 11, "expected": 60, "range": "70 yaş ve sonrası", "endImg": "son-soz", "endAge": "", "endText": "", "next": ""}
+]}

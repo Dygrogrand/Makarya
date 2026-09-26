@@ -1,0 +1,181 @@
+{
+ "traits": [
+  {
+   "name": "Sessiz Gözlemci",
+   "desc": "Konuşmadan önce ortamı okursun.",
+   "bonus": {
+    "Sosyal Radar": 2,
+    "Akıl": 1
+   }
+  },
+  {
+   "name": "Ses Yükseltince Oluyor",
+   "desc": "Ses seviyesini bir müzakere aracına çevirebilirsin.",
+   "bonus": {
+    "Çene": 2
+   }
+  },
+  {
+   "name": "Erken Ekonomi Bilinci",
+   "desc": "Paranın yalnızca metal olmadığını erken fark ettin.",
+   "bonus": {
+    "Kurnazlık": 2
+   }
+  },
+  {
+   "name": "Teknoloji Merakı",
+   "desc": "Ekranlar ve sistemler ilgini çeker.",
+   "bonus": {
+    "Akıl": 1,
+    "Kurnazlık": 1
+   }
+  },
+  {
+   "name": "Yastık Altı Ekonomisti",
+   "desc": "Küçük kaynakları saklama refleksin gelişti.",
+   "bonus": {
+    "Kurnazlık": 1,
+    "Dayanıklılık": 1
+   }
+  },
+  {
+   "name": "Küçük Tüccar",
+   "desc": "Takas ve pazarlık sana doğal geliyor.",
+   "bonus": {
+    "Çene": 1,
+    "Kurnazlık": 1
+   }
+  },
+  {
+   "name": "Sahne Sever",
+   "desc": "İlginin merkezine çıkmaktan çekinmezsin.",
+   "bonus": {
+    "Pişkinlik": 2
+   }
+  },
+  {
+   "name": "Para Üstü Radarı",
+   "desc": "Küçük rakam farklarını yakalarsın.",
+   "bonus": {
+    "Kurnazlık": 2
+   }
+  },
+  {
+   "name": "Kendine Gülebilir",
+   "desc": "Sosyal baskıyı mizahla azaltırsın.",
+   "bonus": {
+    "Pişkinlik": 1,
+    "Dayanıklılık": 1
+   }
+  },
+  {
+   "name": "Organizatör",
+   "desc": "Oyuna katılmak kadar kuralları koymak da ilgini çeker.",
+   "bonus": {
+    "Çene": 1,
+    "Sosyal Radar": 1
+   }
+  },
+  {
+   "name": "İş Modeli Kurar",
+   "desc": "Kaynak ile emek arasında bağlantı kurarsın.",
+   "bonus": {
+    "Kurnazlık": 1,
+    "Akıl": 1
+   }
+  },
+  {
+   "name": "Seçim Makinesi",
+   "desc": "Kalabalığı arkana almayı biliyorsun.",
+   "bonus": {
+    "Çene": 1,
+    "Cesaret": 1
+   }
+  },
+  {
+   "name": "Asist Ustası",
+   "desc": "Başkasının parlamasını sağlamak da bir yetenek.",
+   "bonus": {
+    "Sosyal Radar": 2
+   }
+  },
+  {
+   "name": "Limonata Baronu",
+   "desc": "Küçük sermayeyle büyük işler.",
+   "bonus": {
+    "Kurnazlık": 2
+   }
+  },
+  {
+   "name": "Kilit Kırıcı",
+   "desc": "Her sistemin bir açığı vardır.",
+   "bonus": {
+    "Akıl": 2
+   }
+  },
+  {
+   "name": "Analitik Zihin",
+   "desc": "Sorunu parçalarına ayırırsın.",
+   "bonus": {
+    "Akıl": 2
+   },
+   "auto": "Akıl"
+  },
+  {
+   "name": "Sözünü Geçirir",
+   "desc": "Söylediğin şey genelde olur.",
+   "bonus": {
+    "Çene": 2
+   },
+   "auto": "Çene"
+  },
+  {
+   "name": "Açık Bulur",
+   "desc": "Kurallardaki boşlukları fark edersin.",
+   "bonus": {
+    "Kurnazlık": 2
+   },
+   "auto": "Kurnazlık"
+  },
+  {
+   "name": "Geri Adım Atmaz",
+   "desc": "Korkuyu hissedersin ama yine de yaparsın.",
+   "bonus": {
+    "Cesaret": 2
+   },
+   "auto": "Cesaret"
+  },
+  {
+   "name": "Yüzü Kızarmaz",
+   "desc": "Utanma duygusu seni yavaşlatmaz.",
+   "bonus": {
+    "Pişkinlik": 2
+   },
+   "auto": "Pişkinlik"
+  },
+  {
+   "name": "İç Pusula",
+   "desc": "Doğruyu bulmakta zorlanmazsın.",
+   "bonus": {
+    "Vicdan": 2
+   },
+   "auto": "Vicdan"
+  },
+  {
+   "name": "Kolay Dağılmaz",
+   "desc": "Baskı altında toparlanırsın.",
+   "bonus": {
+    "Dayanıklılık": 2
+   },
+   "auto": "Dayanıklılık"
+  },
+  {
+   "name": "Odayı Okur",
+   "desc": "Kimin ne hissettiğini herkesten önce anlarsın.",
+   "bonus": {
+    "Sosyal Radar": 2
+   },
+   "auto": "Sosyal Radar"
+  }
+ ]
+}

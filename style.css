@@ -232,3 +232,20 @@ button:disabled{cursor:default}
 .primary.dark{background:#1d1915;box-shadow:0 3px 0 #000}
 .finalCard.grave{background:linear-gradient(180deg,#3b3631,#1d1915);border:2px solid #5a524a}
 .finalCard.grave .k{color:#c9c0b3}
+
+/* Pazarlık, kart ayırma, nefes, denge */
+.mgPatience{height:12px;border-radius:99px;background:#e5d9c3;overflow:hidden}
+.mgPatience i{display:block;height:100%;background:linear-gradient(90deg,#a52f26,#c69b49);transition:width .3s}
+.bgOffer{font-size:44px;font-weight:900;text-align:center;font-family:var(--serif)}
+.bgSlider{width:100%;accent-color:#a52f26;height:34px}
+.swCard{min-height:120px;border-radius:16px;background:#fffaf0;border:1px solid var(--line);display:grid;place-items:center;text-align:center;padding:14px;font-size:17px;font-weight:800;line-height:1.35;touch-action:none;transition:transform .15s,opacity .15s}
+.swCard.out{opacity:0;transform:scale(.9)}.swCard.out.r{transform:translateX(40%) rotate(8deg)}.swCard.out.l{transform:translateX(-40%) rotate(-8deg)}
+.mgTimerBar{height:6px;border-radius:99px;background:#e5d9c3;overflow:hidden}.mgTimerBar i{display:block;height:100%;background:#26405e}
+.mgBig.sw{font-size:15px;min-height:60px}.mgBig.sw.right{background:#2b7a4f;box-shadow:0 4px 0 #1d5a39}
+.brWrap{height:190px;display:grid;place-items:center}
+.brCircle{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,#f6d9a4,#c69b49);box-shadow:0 0 30px rgba(198,155,73,.5)}
+.brCircle.in{background:radial-gradient(circle,#dff0d8,#6fae8a)}
+.blField{position:relative;height:200px;border-radius:14px;background:#f1e5cc;border:1px solid var(--line);overflow:hidden}
+.blItem{position:absolute;top:70px;transform:translateX(-50%);font-size:42px;transition:filter .1s}
+.blItem.bad{filter:drop-shadow(0 0 8px rgba(165,47,38,.9))}
+.blTray{position:absolute;top:122px;height:12px;transform:translateX(-50%);border-radius:99px;background:#6b5a48;box-shadow:0 3px 0 #3d3329}
