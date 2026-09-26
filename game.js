@@ -2,10 +2,10 @@
 var S = newState();
 var CUR = null;          // o anki seçim: {e, c, idx, b, res, roll, mini}
 var MG = { timers: [], raf: null, done: false };
-var SAVE_KEY = "makarya-kayit-v3";
+var SAVE_KEY = "makarya-kayit-v5", META_KEY = "makarya-meta-v1";
 var VOICE_COLORS = { "Akıl": "#3b6ea5", "Çene": "#b0572b", "Kurnazlık": "#8a6d1c", "Cesaret": "#b3322a", "Pişkinlik": "#8e3f86", "Vicdan": "#5f7d6a", "Dayanıklılık": "#6b5a48", "Sosyal Radar": "#2f7f86" };
 var GIRL_OPEN = false;  // kız karakter görselleri tamamlanınca true yap
-var ROMAN = { 1: "I", 2: "II", 3: "III" };
+var ROMAN = { 1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 6: "VI", 7: "VII", 8: "VIII", 9: "IX", 10: "X" };
 var app = document.getElementById("app");
 
 /* ── yardımcılar ── */
@@ -13,7 +13,9 @@ function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function
 function cloneStats() { return Object.assign({}, S.stats); }
 function signed(v) { return v > 0 ? "+" + v : String(v); }
 function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
-function loadSave() { try { var s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && s.v === 3 && s.family && s.screen !== "final") return s; } catch (e) {} return null; }
+function loadSave() { try { var s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && s.v === 5 && s.family && s.plan && s.plan.length && s.screen !== "final") return s; } catch (e) {} return null; }
+function loadMeta() { try { var m = JSON.parse(localStorage.getItem(META_KEY)); if (m && m.deaths) return m; } catch (e) {} return { lives: 0, deaths: [], titles: {} }; }
+function saveMeta(m) { try { localStorage.setItem(META_KEY, JSON.stringify(m)); } catch (e) {} }
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
 
 function withExt(base) { return [base + ".webp", base + ".png", base + ".jpg"]; }
@@ -34,7 +36,7 @@ function art(srcs, icon, kicker, title, text, tall) {
 function topbar(title) {
   return '<div class="topbar"><button class="topBtn" onclick="showCharacter()" aria-label="Karakter">☻</button><div class="brandWord">' + esc(title) +
     '</div><button class="topBtn" onclick="showRules()" aria-label="Kurallar">?</button></div>' +
-    '<div class="progress"><i style="width:' + Math.round(100 * S.i / EVENTS.length) + '%"></i></div>';
+    '<div class="progress"><i style="width:' + (S.plan && S.plan.length ? Math.round(100 * S.pi / S.plan.length) : 0) + '%"></i></div>';
 }
 function shell(title, artHtml, panelHtml) {
   app.innerHTML = '<div class="screen">' + topbar(title) + artHtml + '<div class="panel">' + panelHtml + "</div></div>";
@@ -46,14 +48,14 @@ function render() {
   var f = { start: renderStart, family: renderFamily, familyResult: renderFamilyResult, event: renderEvent, check: renderCheck,
     minigame: renderMini, result: renderResult, chapterEnd: renderChapterEnd, final: renderFinal }[S.screen] || renderStart;
   f();
-  if (["familyResult", "event", "chapterEnd", "final"].indexOf(S.screen) >= 0) save();
+  if (["familyResult", "event", "result", "chapterEnd", "final"].indexOf(S.screen) >= 0) save();
 }
 
 /* ── başlangıç ── */
 function renderStart() {
   var sv = loadSave(), saveHtml = "";
   if (sv) {
-    var e = EVENTS[Math.min(sv.i, EVENTS.length - 1)];
+    var e = EV_BY_ID[sv.plan[Math.min(sv.pi, sv.plan.length - 1)]];
     saveHtml = '<div class="saveCard"><div><b>Kaldığın yer</b><small>' + esc(sv.family) + " ailesi · " + esc(e.age) + " · " + esc(e.title) +
       '</small></div><button onclick="resume()">DEVAM ET</button></div>';
   }
@@ -62,10 +64,29 @@ function renderStart() {
     '<div class="sectionSub">Hayatındaki pek çok şeyi seçemeyeceksin. Ama bu kez bazı cevapları sen vereceksin.</div>' + saveHtml +
     '<div class="genderRow"><button class="genderBtn kiz soon" disabled><span>👧</span> Kız<em>Yakında</em></button>' +
     '<button class="genderBtn erkek" onclick="startGame(\'erkek\')"><span>👦</span> Erkek</button></div>' +
-    '<button class="secondary" onclick="showRules()">Nasıl oynanır?</button>' +
+    '<div class="row"><button class="secondary" onclick="showRules()">Nasıl oynanır?</button>' +
+    (loadMeta().lives ? '<button class="secondary" onclick="showGraveyard()">🪦 Koleksiyon</button>' : "") + "</div>" +
     '<div class="muted">Kız karakterin hikâyesi hazırlanıyor.</div>');
 }
-function resume() { var sv = loadSave(); if (!sv) return; S = sv; render(); }
+function resume() {
+  var sv = loadSave(); if (!sv) return; S = sv; CUR = null;
+  var e = curEvent(S);
+  if (S.screen === "result" && S.last) restoreCur();
+  else if ((S.screen === "check" || S.screen === "minigame") && S.lock) {
+    CUR = { e: e, c: e.choices[S.lock.idx], idx: S.lock.idx };
+    if (S.screen === "check") CUR.b = needBreakdown(S, e, CUR.c);
+  } else if (S.screen === "check" || S.screen === "minigame" || S.screen === "result") S.screen = "event";
+  render();
+}
+function restoreCur() {
+  var e = curEvent(S), L = S.last;
+  CUR = { e: e, c: e.choices[L.idx], idx: L.idx, res: L.res, roll: L.roll, mini: L.mini, b: { need: L.need } };
+}
+/* Sonuç uygulandığı anda kaydedilir: sayfayı yenileyerek seçim geri alınamaz */
+function commit() {
+  S.last = { idx: CUR.idx, res: CUR.res, roll: CUR.roll == null ? null : CUR.roll, mini: CUR.mini == null ? null : CUR.mini, need: CUR.b ? CUR.b.need : null };
+  S.lock = null; S.screen = "result"; save();
+}
 function startGame(g) { if (g === "kiz" && !GIRL_OPEN) return; clearSave(); S = newState(); S.gender = g; S.screen = "family"; render(); }
 
 /* ── aile kurası ── */
@@ -104,14 +125,14 @@ function renderFamilyResult() {
     '<div class="statGrid">' + stats + '</div><div class="idCard"><div class="idTitle">AİLEDEN GELEN ÖZELLİKLER</div>' + traits + "</div>" +
     '<button class="primary" onclick="beginGame()">HİKÂYEYE BAŞLA</button>');
 }
-function beginGame() { S.i = 0; S.chStart[1] = cloneStats(); S.chTraits[1] = S.traits.slice(); S.screen = "event"; render(); }
+function beginGame() { S.ch = 1; S.plan = buildPlan(S, 1); S.pi = 0; S.chStart[1] = cloneStats(); S.chTraits[1] = S.traits.slice(); S.screen = "event"; render(); }
 
 /* ── olay ── */
 function directSummary(c) {
   return Object.keys(c.direct).map(function (k) { return STAT_ICONS[k] + " " + k + " " + signed(c.direct[k]); }).join(" · ");
 }
 function renderEvent() {
-  var e = EVENTS[S.i];
+  var e = curEvent(S);
   var recall = (e.recall || []).filter(function (r) { return S.flags.indexOf(r.flag) >= 0; })
     .map(function (r) { return '<div class="recall"><b>GEÇMİŞTEN</b>' + esc(r.text) + "</div>"; }).join("");
   var voices = eventVoices(S, e).filter(function (v) { return v.pass || v.fail; }).map(function (v) {
@@ -129,6 +150,7 @@ function renderEvent() {
     if (c.req) tags.push('<span class="tag trait">⭐ ' + esc(c.req) + "</span>");
     if (c.reqFlag) tags.push('<span class="tag trait">📜 Geçmişten gelen seçenek</span>');
     if (c.reqVoice) tags.push('<span class="tag voiceTag">💭 ' + esc(VOICE_NAMES[c.reqVoice]) + ' açtı</span>');
+    if (c.risk) tags.push('<span class="tag risk">☠️ Ölüm riski %' + Math.round(c.risk.p * 100) + "</span>");
     if (c.trait && S.traits.indexOf(c.trait) < 0) tags.push('<span class="tag trait">🏅 Kazandırır: ' + esc(c.trait) + "</span>");
     if (c.direct) {
       sub = "Kesin sonuç · " + directSummary(c);
@@ -150,10 +172,10 @@ function renderEvent() {
   shell(chTitle(e.ch), art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + e.age, e.title, e.text), recall + voices + famLine + choices);
 }
 function choose(idx) {
-  var e = EVENTS[S.i], c = e.choices[idx];
+  var e = curEvent(S), c = e.choices[idx];
   if (!hasReq(S, c, e)) return;
   CUR = { e: e, c: c, idx: idx };
-  if (c.direct) { CUR.res = applyOutcome(S, e, c, "direct"); S.screen = "result"; }
+  if (c.direct) { CUR.res = applyOutcome(S, e, c, "direct"); commit(); }
   else if (c.mini) S.screen = "minigame";
   else { CUR.b = needBreakdown(S, e, c); S.screen = "check"; }
   render();
@@ -171,21 +193,22 @@ function renderCheck() {
     '<div class="checkFocus"><div class="dieFace" id="die">🎲</div><div class="targetPill">Hedef ' + b.need + "+</div></div>" +
     '<div class="breakdown">' + rows + '<div class="bRow total"><span>Atman gereken en düşük sayı</span><b>' + b.need + "</b></div></div>" +
     '<div class="muted">20 her zaman kritik başarı, 1 her zaman kritik hata.</div>' +
-    '<div class="row"><button class="secondary" id="backBtn" onclick="S.screen=\'event\';render()">Vazgeç</button><button class="primary" id="rollBtn" onclick="rollDie()">ZAR AT</button></div>');
+    '<div class="row">' + (S.lock ? "" : '<button class="secondary" id="backBtn" onclick="S.screen=\'event\';render()">Vazgeç</button>') + '<button class="primary" id="rollBtn" onclick="rollDie()">ZAR AT</button></div>');
 }
 function rollDie() {
   var btn = document.getElementById("rollBtn"); if (!btn || btn.disabled) return;
-  btn.disabled = true; document.getElementById("backBtn").disabled = true;
+  btn.disabled = true; var bk = document.getElementById("backBtn"); if (bk) bk.disabled = true;
+  if (!S.lock) { S.lock = { idx: CUR.idx, roll: 1 + Math.floor(Math.random() * 20) }; S.screen = "check"; save(); }
   var d = document.getElementById("die"); d.classList.add("spin");
   var n = 0;
   (function spin() {
     d.textContent = 1 + Math.floor(Math.random() * 20);
     if (++n < 14) { setTimeout(spin, 45 + n * 6); return; }
-    var r = 1 + Math.floor(Math.random() * 20);
+    var r = S.lock.roll;
     d.textContent = r; d.classList.remove("spin");
     var o = rollOutcome(r, CUR.b.need);
-    CUR.roll = r; CUR.res = applyOutcome(S, CUR.e, CUR.c, o, { roll: r });
-    setTimeout(function () { S.screen = "result"; render(); }, 550);
+    CUR.roll = r; CUR.res = applyOutcome(S, CUR.e, CUR.c, o, { roll: r }); commit();
+    setTimeout(function () { render(); }, 550);
   })();
 }
 
@@ -193,6 +216,7 @@ function rollDie() {
 var OUT_LABEL = { crit: "Kritik başarı", win: "Başarılı", mid: "Yarım başarı", fail: "Başarısız", bad: "Kritik hata", direct: "Seçimin" };
 var OUT_TITLE = { crit: "Mükemmel!", win: "Başarılı!", mid: "Fena Değil", fail: "Olmadı", bad: "Berbat!" };
 function renderResult() {
+  if (!CUR && S.last) restoreCur();
   var e = CUR.e, c = CUR.c, res = CUR.res, o = res.outcome;
   var rollCard = "";
   if (CUR.roll != null) rollCard = '<div class="rollCard"><div class="l">Atılan zar</div><div class="v">' + CUR.roll + '</div><div class="t">Hedef ' + CUR.b.need + "+</div></div>";
@@ -208,12 +232,15 @@ function renderResult() {
     '<div class="resultImg"><div class="artIcon">' + e.icon + "</div>" + imgTag(sceneSrcs(e.id)) + "</div>" +
     '<div class="resultHeader"><div class="badge o-' + o + '">' + OUT_LABEL[o] + '</div><div class="resultTitle">' + esc(o === "direct" ? c.t : OUT_TITLE[o]) + "</div>" +
     '<div class="resultText">' + esc(res.text) + "</div>" + (res.note ? '<div class="note">' + esc(res.note) + "</div>" : "") + "</div>" +
-    rollCard + gains + traits + '<button class="primary" onclick="advance()">DEVAM ET</button></div></div>';
+    rollCard + gains + traits +
+    (res.death ? '<div class="deathCard"><div class="l">☠️ HAYAT BURADA SONA ERDİ</div><div class="d">' + esc(res.death) + "</div></div>" +
+      '<button class="primary dark" onclick="advance()">🪦 MEZAR TAŞINI GÖR</button>' : '<button class="primary" onclick="advance()">DEVAM ET</button>') + "</div></div>";
 }
 function advance() {
-  var prev = EVENTS[S.i]; S.i++; CUR = null;
-  if (S.i >= EVENTS.length) { S.endedCh = prev.ch; S.screen = "final"; }
-  else if (EVENTS[S.i].ch !== prev.ch) { S.endedCh = prev.ch; S.screen = "chapterEnd"; }
+  CUR = null; S.last = null;
+  if (S.dead) { S.screen = "final"; render(); return; }
+  S.pi++;
+  if (S.pi >= S.plan.length) S.screen = hasChapter(S.ch + 1) ? "chapterEnd" : "final";
   else S.screen = "event";
   render();
 }
@@ -230,7 +257,7 @@ function highlights(ch, n) {
     .map(function (l) { return '<div class="logItem"><small>' + esc(l.age) + " · " + esc(l.title) + " · " + OUT_LABEL[l.outcome] + "</small>" + esc(l.choice) + "</div>"; }).join("");
 }
 function renderChapterEnd() {
-  var ch = S.endedCh, C = CHAPTERS[ch], ev = EVENTS.filter(function (x) { return x.id === C.endImg; })[0];
+  var ch = S.ch, C = CHAPTERS[ch], ev = EVENTS.filter(function (x) { return x.id === C.endImg; })[0];
   var before = S.chTraits[ch] || [], gained = S.traits.filter(function (t) { return before.indexOf(t) < 0; });
   var hl = highlights(ch, 3);
   shell(chTitle(ch), art(sceneSrcs(C.endImg), ev ? ev.icon : "📖", "BÖLÜM " + ROMAN[ch] + " TAMAMLANDI", C.endAge, C.endText),
@@ -241,7 +268,7 @@ function renderChapterEnd() {
     (hl ? '<h3 class="sectionTitle" style="font-size:18px">Unutulmayan anlar</h3><div class="logList">' + hl + "</div>" : "") +
     '<button class="primary" onclick="nextChapter()">' + esc(C.next) + "</button>");
 }
-function nextChapter() { var ch = S.endedCh + 1; S.chStart[ch] = cloneStats(); S.chTraits[ch] = S.traits.slice(); S.screen = "event"; render(); }
+function nextChapter() { var ch = S.ch + 1; S.ch = ch; S.plan = buildPlan(S, ch); S.pi = 0; S.chStart[ch] = cloneStats(); S.chTraits[ch] = S.traits.slice(); S.screen = "event"; render(); }
 
 /* ── final ── */
 function barsHtml() {
@@ -253,18 +280,29 @@ function barsHtml() {
 function lifeLog() {
   return S.flags.filter(function (f) { return FLAG_LABELS[f]; }).map(function (f) { return '<div class="logItem">📜 ' + esc(FLAG_LABELS[f]) + "</div>"; }).join("") + highlights(null, 4);
 }
+function lifeAge() { return S.dead ? S.dead.age : CHAPTERS[S.ch].endAge.toLowerCase(); }
+function recordLife() {
+  if (S.recorded) return; S.recorded = true;
+  var m = loadMeta(), a = archetype(S);
+  m.lives++; m.titles[a.title] = (m.titles[a.title] || 0) + 1;
+  if (S.dead) m.deaths.push({ cause: S.dead.cause, age: S.dead.age, title: S.dead.title, family: S.family, arch: a.title });
+  saveMeta(m); save();
+}
 function renderFinal() {
-  var a = archetype(S), gender = S.gender === "kiz" ? "Kız" : "Erkek";
-  var C = CHAPTERS[3], before = S.chTraits[3] || [];
+  recordLife();
+  var a = archetype(S), gender = S.gender === "kiz" ? "Kız" : "Erkek", dead = S.dead;
+  var C = CHAPTERS[S.ch], before = S.chTraits[S.ch] || [];
   var gained = S.traits.filter(function (t) { return before.indexOf(t) < 0; });
-  shell("Hayat Kartı", art(sceneSrcs(C.endImg), "📜", "BÖLÜM III TAMAMLANDI", C.endAge, C.endText),
-    '<div class="finalCard"><div class="k">MAKARYA · HAYAT KARTI</div><h2>' + esc(a.title) + "</h2><p><b>" + esc(S.family) + " ailesi · " + gender + " · 9 yaş</b></p><p>" + esc(a.prophecy) + "</p></div>" +
+  var head = dead ? art(sceneSrcs(curEvent(S).id), "🪦", "HAYAT SONA ERDİ · " + dead.age, dead.title, dead.cause)
+    : art(sceneSrcs(C.endImg), "📜", "BÖLÜM " + ROMAN[S.ch] + " TAMAMLANDI", C.endAge, C.endText + " Hikâyenin devamı yazılıyor.");
+  shell(dead ? "Mezar Taşı" : "Hayat Kartı", head,
+    '<div class="finalCard' + (dead ? " grave" : "") + '"><div class="k">' + (dead ? "MAKARYA · MEZAR TAŞI" : "MAKARYA · HAYAT KARTI") + "</div><h2>" + esc(a.title) + "</h2><p><b>" + esc(S.family) + " ailesi · " + gender + " · " + esc(lifeAge()) + "</b></p><p>" + esc(dead ? dead.cause : a.prophecy) + "</p></div>" +
     '<button class="primary" onclick="shareCard()">📤 KARTI PAYLAŞ</button>' +
     '<h3 class="sectionTitle" style="font-size:18px">Karakterin</h3>' + barsHtml() +
     '<h3 class="sectionTitle" style="font-size:18px">Özellikler</h3>' +
     (S.traits.length ? '<div class="chips">' + S.traits.map(function (t) { return '<span class="chip">' + (gained.indexOf(t) >= 0 ? "🆕 " : "🏅 ") + esc(t) + "</span>"; }).join("") + "</div>" : '<div class="muted">Hiç özellik açılmadı. Bu da bir tarz.</div>') +
     '<h3 class="sectionTitle" style="font-size:18px">Hayat kaydı</h3><div class="logList">' + (lifeLog() || '<div class="muted">Sakin bir çocukluk.</div>') + "</div>" +
-    '<h3 class="sectionTitle" style="font-size:18px">Bölüm III gelişimi</h3>' + compareHtml(S.chStart[3] || cloneStats(), cloneStats()) +
+    '<h3 class="sectionTitle" style="font-size:18px">Bölüm ' + ROMAN[S.ch] + " gelişimi</h3>" + compareHtml(S.chStart[S.ch] || cloneStats(), cloneStats()) +
     '<button class="secondary" onclick="newLife()">🎲 YENİ HAYAT</button>');
 }
 function newLife() { clearSave(); S = newState(); CUR = null; S.screen = "start"; render(); }
@@ -290,13 +328,13 @@ function shareCard() {
       ctx.fillStyle = g; ctx.fillRect(0, 300, W, 280);
     }
     ctx.textAlign = "center";
-    ctx.fillStyle = "#d8b16a"; ctx.font = "900 30px sans-serif"; ctx.fillText("MAKARYA · HAYAT KARTI", W / 2, 620);
+    ctx.fillStyle = "#d8b16a"; ctx.font = "900 30px sans-serif"; ctx.fillText(S.dead ? "MAKARYA · MEZAR TAŞI" : "MAKARYA · HAYAT KARTI", W / 2, 620);
     ctx.fillStyle = "#fff"; ctx.font = "900 84px Georgia, serif";
     var y = wrapText(ctx, a.title, W / 2, 715, 960, 90);
     ctx.fillStyle = "#e7dbc4"; ctx.font = "700 34px sans-serif";
-    ctx.fillText(S.family + " ailesi · " + (S.gender === "kiz" ? "Kız" : "Erkek") + " · 9 yaş", W / 2, y + 10);
+    ctx.fillText(S.family + " ailesi · " + (S.gender === "kiz" ? "Kız" : "Erkek") + " · " + lifeAge(), W / 2, y + 10);
     ctx.font = "italic 32px Georgia, serif";
-    y = wrapText(ctx, a.prophecy, W / 2, y + 70, 900, 42);
+    y = wrapText(ctx, S.dead ? S.dead.cause : a.prophecy, W / 2, y + 70, 900, 42);
     ctx.textAlign = "left"; ctx.font = "700 30px sans-serif";
     var max = Math.max(60, Math.max.apply(null, STATS.map(function (k) { return S.stats[k]; })));
     STATS.forEach(function (k, i) {
@@ -346,6 +384,15 @@ function showCharacter() {
     barsHtml() + "<h3>Aile özellikleri</h3>" + fam + "<h3>Kazanılan özellikler</h3>" + tr +
     (S.flags.length ? "<h3>Hafıza</h3>" + lifeLog() : ""));
 }
+function showGraveyard() {
+  var m = loadMeta();
+  var titles = Object.keys(m.titles).sort(function (a, b) { return m.titles[b] - m.titles[a]; });
+  modal("<h2>Koleksiyon</h2><p>" + m.lives + " hayat yaşandı · " + m.deaths.length + " erken veda · " + titles.length + " farklı karakter</p>" +
+    (m.deaths.length ? "<h3>🪦 Ölüm koleksiyonu</h3>" + m.deaths.slice().reverse().map(function (d) {
+      return '<div class="tCard"><b>' + esc(d.age) + " · " + esc(d.title) + "</b><div>" + esc(d.cause) + " (" + esc(d.family) + " ailesi, " + esc(d.arch) + ")</div></div>";
+    }).join("") : "") +
+    (titles.length ? "<h3>🎭 Açılan karakterler</h3><div class=\"chips\">" + titles.map(function (t) { return '<span class="chip">' + esc(t) + (m.titles[t] > 1 ? " ×" + m.titles[t] : "") + "</span>"; }).join("") + "</div>" : ""));
+}
 function showRules() {
   modal("<h2>Nasıl oynanır?</h2>" +
     "<p><b>Seçimler.</b> Her olayda bir seçim yaparsın. Bazıları kesin sonuç verir, bazıları zar ya da mini oyun ister.</p>" +
@@ -354,7 +401,9 @@ function showRules() {
     "<p><b>Risk ve ödül.</b> Zor seçimler daha fazla stat kazandırır, başarılırsa özellik de açar. Zor bir kontrolde kaybetmek bile Dayanıklılık +1 getirir.</p>" +
     "<p><b>Özellikler.</b> Kazandığın özellikler hedefleri düşürür ve ileride yeni seçeneklerin kilidini açar (🔒).</p>" +
     "<p><b>Hafıza.</b> Bazı seçimler unutulmaz; yıllar sonra karşına çıkar.</p>" +
-    "<p><b>Kayıt.</b> Oyun her olayda otomatik kaydedilir.</p>");
+    "<p><b>Her hayat farklı.</b> Her bölümde olaylar geniş bir havuzdan seçilir; iki hayat birbirinin aynısı olmaz.</p>" +
+    "<p><b>Ölüm.</b> ☠️ işaretli seçenekler ölüm riski taşır. Risk yüzdesi her zaman görünür. Ölen hayatlar koleksiyona girer.</p>" +
+    "<p><b>Kayıt.</b> Oyun otomatik kaydedilir. Seçimler geri alınamaz: zar atıldığı ya da mini oyun başladığı an karar verilmiş olur.</p>");
 }
 
 /* ── mini oyunlar ── */
@@ -368,8 +417,8 @@ function finishMini(score) {
   MG.done = true; stopMini();
   score = clamp(score, 0, 1);
   CUR.mini = score;
-  CUR.res = applyOutcome(S, CUR.e, CUR.c, miniOutcome(score));
-  later(function () { S.screen = "result"; render(); }, 350);
+  CUR.res = applyOutcome(S, CUR.e, CUR.c, miniOutcome(score)); commit();
+  later(function () { render(); }, 350);
 }
 function renderMini() {
   var e = CUR.e, c = CUR.c, m = c.mini;
@@ -380,9 +429,10 @@ function renderMini() {
     '<div class="mgStage" id="mg"><div class="mgTitle">' + esc(m.title) + '</div><div class="mgHint">' + esc(m.hint) + "</div>" +
     '<div class="muted">' + STAT_ICONS[c.stat] + " " + esc(c.stat) + " " + S.stats[c.stat] + " · " + esc(help) + "</div>" +
     '<button class="mgBig" onclick="startMini()">BAŞLA</button></div>' +
-    '<button class="secondary" onclick="S.screen=\'event\';render()">Vazgeç</button>');
+    (S.lock ? "" : '<button class="secondary" onclick="S.screen=\'event\';render()">Vazgeç</button>'));
 }
 function startMini() {
+  if (!S.lock) { S.lock = { idx: CUR.idx }; S.screen = "minigame"; save(); }
   var m = CUR.c.mini, st = document.getElementById("mg");
   var back = st.parentNode.querySelector(".secondary"); if (back) back.remove();
   ({ timing: mgTiming, hold: mgHold, collect: mgCollect, race: mgRace, memory: mgMemory, cups: mgCups, doors: mgDoors,

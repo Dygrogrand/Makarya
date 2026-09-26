@@ -223,3 +223,12 @@ button:disabled{cursor:default}
 .mgTrace .guide{fill:none;stroke:#c9b48c;stroke-width:14;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2 14}
 .mgTrace .ink{fill:none;stroke:#26405e;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
 .mgTrace .startDot{fill:var(--green)}
+
+/* Ölüm */
+.tag.risk{background:#2a211c;color:#f3d9c9}
+.deathCard{border-radius:14px;background:#1d1915;color:#f1e4cf;padding:13px;text-align:center}
+.deathCard .l{font-size:11.5px;letter-spacing:1px;font-weight:900;color:#e0a07a}
+.deathCard .d{font-family:var(--serif);font-size:17px;line-height:1.4;margin-top:5px}
+.primary.dark{background:#1d1915;box-shadow:0 3px 0 #000}
+.finalCard.grave{background:linear-gradient(180deg,#3b3631,#1d1915);border:2px solid #5a524a}
+.finalCard.grave .k{color:#c9c0b3}

@@ -9,8 +9,8 @@ Seçimlerinle ve 20 yüzlü zarla şekillenen, doğumdan 9 yaşına uzanan bir �
 |---|---|
 | `index.html` | Sayfa iskeleti |
 | `style.css` | Tüm görünüm |
-| `data.js` | Aileler, özellikler, 46 olay ve tüm metinler (yeni olay buraya eklenir) |
-| `rules.js` | Zar, hedef hesabı, sonuçlar, final kartı |
+| `data.js` | Aileler, özellikler, 48 olaylık havuz ve tüm metinler (yeni olay buraya eklenir) |
+| `rules.js` | Zar, hedef hesabı, hayat planı (havuzdan seçim), ölüm, final kartı |
 | `game.js` | Ekranlar, mini oyunlar, kayıt, paylaşım kartı |
 | `img/` | Görseller (`sahne/`, `aile/`, `kiz/sahne/`, `kiz/aile/`) |
 | `TASARIM.md` | Oyun tasarım belgesi: 10 perdelik hayat, iç sesler, ton rehberi, mini oyun kataloğu, mağaza yolu |

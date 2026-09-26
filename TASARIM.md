@@ -1,6 +1,6 @@
 # Makarya · Oyun tasarım belgesi
 
-*Sürüm 1 · 26 Eylül 2026*
+*Sürüm 2 · 26 Eylül 2026 · kararlar işlendi*
 
 ## 1. Vizyon
 
@@ -8,7 +8,8 @@
 
 - **Biçim:** Eski "kendi maceranı seç" kitaplarının kurgusu ve Disco Elysium'un konuşan iç sesleri bir araya geliyor. Görsellik 2 boyutlu resimler; oyun metin ağırlıklı, dikey tutulan telefon için tasarlanıyor.
 - **İmza:** Hayatın büyük anlarını, bürokratik ve kurumsal bir dille anlatan soğukkanlı anlatıcı ("İlk basın açıklamanı yaptın").
-- **Oturum:** Bir bölüm 20–30 dakika, tam bir hayat 4–5 saat.
+- **Süre:** Tam bir hayat 50–60 dakika. Erken ölümlerle birlikte ortalama hayat yaklaşık **45 dakika**. Oyun her an kaydedildiği için telefonda 5–10 dakikalık oturumlarla bölünerek oynanır.
+- **Seçimler geri alınamaz.** Zar atıldığı ya da mini oyun başladığı an karar kaydedilir; sayfayı yenilemek sonucu değiştirmez.
 - **Tekrar oynanabilirlik:** Aile kurası, olay havuzları, kilitli seçenekler ve farklı sonlar sayesinde her hayat başka türlü geçer.
 - **Teknik sınır:** 3 boyut yok. Mevcut HTML ve JavaScript altyapısı, uygulama mağazası paketine kadar taşıyabilir (bkz. bölüm 8).
 
@@ -27,7 +28,9 @@
 | IX · Olgunluk | 55–70 | Emeklilik, torunlar, doktor randevuları | Yazılacak |
 | X · Son Perde | 70+ | Miras, vasiyet, cenazede kim ne diyecek | Yazılacak |
 
-**Olay sayısı:** Perde başına 6 sabit dönüm noktası artı 20'lik bir havuzdan çekilen 8 olay. Bu, toplamda yaklaşık 140 omurga olayı ve 200 havuz olayı eder. Her oyunda farklı havuz olayları çıktığı için iki hayat birbirinin aynısı olmaz.
+**Olay sayısı:** Bir hayatta yaklaşık 120–130 olay görülür (olay başına ortalama 20 saniye). İki hayatın aynı olmaması için havuz bunun 3–4 katı olmalı: **400–500 olay**. Yayın için ilk hedef 250 olay; sonrası güncellemelerle gelir.
+
+**Nasıl seçilir (motor hazır):** Her perdenin başında sabit dönüm noktaları (doğum, kreş kapısı, ilkokul kapısı, karne günü…) ve koşullara uyan havuz olaylarından rastgele bir seçki yapılır, yaşa göre sıralanır. Bugünkü çocukluk perdelerinde bir hayatta 32 olay görülüyor; havuzda 48 olay var. 5.000 hayatlık simülasyonda ardışık iki hayatın aynı olduğu hiç görülmedi.
 
 **Havuz koşulları:** Aile, statlar, özellikler, hafıza kayıtları ve cinsiyet. Örneğin yalnızca Keskin ailesinde "Dükkânda kasaya geç" olayı çıkar; yalnızca vazo için kediyi suçlamış oyuncuda "Kedinin intikamı" olayı gelir.
 
@@ -70,7 +73,24 @@ Seslerin kişilikleri:
 ### 3.3 Kafa takıntıları (Disco Elysium'daki "Düşünce Dolabı"nın karşılığı, öncelik 3)
 Bazı olaylar bir "takıntı" bırakır: "Herkes bana mı bakıyor?", "Babam aslında haklı mıydı?", "Emeklilikte bir kafe açsam". Oyuncu bunu kafasına yerleştirir, takıntı birkaç olay boyunca "demlenir" ve sonra kalıcı bir özelliğe dönüşür. Bu özellik bir artı bir eksi getirir; örneğin "Kafe Hayali: Çene +2, Akıl −1, her para olayında 'kafe' seçeneği."
 
-### 3.4 Başarısızlık da hikâyedir (mevcut, korunacak)
+### 3.4 Hayat hatları: meslek, ilişki, aile
+Hatlar ayrı ağaçlar olarak değil, **etiketli olay havuzları** olarak yazılır. Oyuncunun durumu bir etiket kümesidir ("memur", "evli", "çocuklu", "Keskin ailesi", "askerliğini yaptı"); o etiketleri taşıyan olaylar havuza girer. Böylece meslek × medeni durum × cinsiyet × aile birleşimleri içeriği katlamadan çeşitlenir.
+
+- **Meslek seçimi** VI. perdede yapılır ve kendi olay hattını açar. İlk sürümde 4 meslek, her birine yaklaşık 15 olay ve 2 mesleğe özel mini oyun:
+  - **esnaf:** pazarlık kaydırıcısı, veresiye defteri
+  - **memur:** evrak labirenti, imza sırası
+  - **beyaz yaka:** toplantıda uyanık kalma, e-posta yağmuru
+  - **serbest çalışan ya da sanatçı:** müşteri kovalamaca, fatura tahsilatı
+- **Evli ve bekâr hatları** ayrışır: kayınvalide, düğün, çocuk, boşanma ya da "Neden hâlâ evlenmedin?" soruları, yalnız tatiller, bekâr evi ekonomisi.
+- **Özellikler olay örgüsünü değiştirir:** Bir olay yalnızca belirli bir özelliği, hafıza kaydını ya da stat eşiğini taşıyan oyuncuya çıkabilir (motor hazır: `when` koşulu).
+
+### 3.5 Ölüm
+- **Her yaşta mümkün, ama hak edilmiş olmalı.** Ölüm riski yalnızca riskli seçimlerde vardır ve **yüzdesi seçenek üstünde görünür** (☠️ %5). Oyuncu riski bilerek alır; ölünce kızmaz, güler.
+- **18 yaşından sonra** her olayda küçük bir arka plan riski eklenir; yaşla artar. Sağlık seçimleri, Dayanıklılık ve bazı özellikler bu riski düşürür, kötü alışkanlıklar yükseltir.
+- **Çocuklukta ve gençlikte ölümler absürttür** (uçurtma, tepsiyle kayak, düğün kurşunu). Gerçekçi şiddetle ölüm yoktur. Haraççılar, zorbalar ve kavgalar kalıcı sonuç bırakır: borç, sakatlık, lakap, bir sokağa bir daha girememek.
+- **Ölüm içeriktir:** Her ölüm "Mezar Taşı" kartı olarak paylaşılabilir ve cihazdaki koleksiyona girer. Koleksiyon, açılan karakter unvanlarını da tutar. Sonraki adım: koleksiyon ilerledikçe yeni aileler, özellikler ve olaylar açılır.
+
+### 3.6 Başarısızlık da hikâyedir (mevcut, korunacak)
 Başarısız zarlar en komik metinleri taşır. Kritik hata, hikâyeye kalıcı bir iz bırakır.
 
 ## 4. Ton rehberi: kara mizahın sınırları
@@ -93,7 +113,7 @@ Anlatıcı acımasız değil, soğukkanlı. Oyuncu gülerken biraz da içi sızl
 - "Emeklilik ikramiyen bir arabaya, arabanın taksitleri de torununa kaldı."
 - "Doktor 'Stres yapmayın' dedi. Randevu için 3 ay beklediğini söylemedin."
 
-**Yaş derecesi hedefi: 12+.** Alkol ve sigara yalnızca metinde ima edilir, görselde yer almaz. Romantik sahneler "el ele tutuşma" düzeyinde kalır.
+**Yaş derecesi hedefi: 12+.** Alkol ve sigara yalnızca metinde ima edilir, görselde yer almaz. Romantik sahneler "el ele tutuşma" düzeyinde kalır. Şiddet sahne dışında kalır; ölümler absürt ve soğukkanlı anlatılır.
 
 ## 5. Olay yazım şablonu
 
@@ -151,13 +171,23 @@ Kurallar:
 | 19 | Çatal-bıçak dengesi | Sürükleyerek dengede tut | Tepsiyle çay taşıma, bebek taşıma | Sonraki |
 | 20 | Kelime yakala | Doğru kelimeye dokun | Kavgada laf yetiştirme | Sonraki |
 
-## 7. Görsel strateji
+## 7. Rakip: BitLife ve fark
+
+Meslek, evlilik, erken ölüm ve kısa hayatlar içeren **BitLife**, uygulama mağazalarının en başarılı hayat simülasyonlarından biri. Pazar kanıtlanmış; ama "Türkçe BitLife" olarak algılanan bir oyun kaybeder. BitLife menülerle ve rakamlarla ilerler. Makarya'nın farkı şunlar ve her tasarım kararında korunur:
+- el yazımı mizah ve soğukkanlı anlatıcı
+- konuşan iç sesler
+- resimli sahneler
+- Türkiye'ye özgü deneyim
+
+**Kural:** Menüden mekanik eylem seçilmez ("spor yap", "sevgili bul"). Her şey yazılmış bir sahne olarak gelir. Kara mizahlı ölümü koleksiyona çeviren bir başka örnek olarak **Reigns** incelenmeli.
+
+## 8. Görsel strateji
 
 - Her olaya görsel koymak 300'ü aşkın resim demek. Bunun yerine **perde başına 8–10 ana sahne** üretilir; havuz olayları simgeli kapak ya da ortak mekân görselleri kullanır. Ortak mekânlar: ev, okul, sokak, iş yeri, hastane.
 - Kız versiyonu, erkek hikâyesi bitince bitmiş erkek görsellerinden "çocuğu değiştir" yöntemiyle türetilir.
 - **Satış öncesi yapılacak temizlik:** Bazı mevcut görsellerde gerçek marka logoları var; örneğin Keskin ailesinin bakkal rafında cips markaları görünüyor. Uygulama mağazasında satıştan önce bu görseller yazısız ve markasız yeniden üretilmeli.
 
-## 8. Uygulama mağazasına giden yol
+## 9. Uygulama mağazasına giden yol
 
 - **Paketleme:** Mevcut kod, Capacitor adlı araçla iPhone ve Android uygulamasına dönüştürülür. 3 boyut ya da oyun motoru gerekmez.
 - **Gerekenler:**
@@ -177,17 +207,24 @@ Kurallar:
   - Reklam önerilmez; kara mizahın ritmini bozar.
 - **Dil:** Önce Türkçe. İngilizce çeviri pazarı büyütür ama mizahın uyarlanması ayrı bir yazım işi.
 
-## 9. Yol haritası
+## 10. Yol haritası
 
 | Faz | İçerik |
 |---|---|
-| 1 · Şimdi | İç sesler prototipi, 5 yeni mini oyun, Bölüm III görselleri |
-| 2 | IV. ve V. perdeler, olay havuzu motoru, beyaz/kırmızı kontroller, kafa takıntıları |
+| 1 · Tamamlandı | İç sesler, 12 mini oyun, havuz motoru, görünür ölüm riski, mezar taşı ve koleksiyon, geri alınamaz kayıt |
+| 2 · Sıradaki | IV. ve V. perdeler (ergenlik, sınav çağı), haraççılar ve zorbalar, beyaz/kırmızı kontroller, kafa takıntıları |
 | 3 | Ses, müzik, titreşim; Capacitor paketi; TestFlight ile kapalı test (Apple'ın deneme dağıtımı) |
 | 4 | VI.–X. perdeler, kız yolu, mağaza yayını |
 
-## 10. Karar bekleyen sorular
+## 11. Alınan kararlar
 
-1. **Erken ölüm olsun mu?** Kara mizahın doğal uzantısı: 34 yaşında bir muz kabuğu. Bu oyunu "hayat kısa, tekrar oyna" yapısına çevirir, ama oyuncuyu kızdırabilir.
-2. **Tek hayat mı, kayıt noktaları mı?** Seçimlerin geri alınamaması gerilimi artırır; perde başında kayıt noktası affedicidir.
-3. **Hedef kitle:** Türkiye'deki 25–45 yaş, "bunu ben de yaşadım" diyen kişi mi, daha genç oyuncu mu? Mizahın referansları buna göre değişir.
+| Konu | Karar |
+|---|---|
+| Erken ölüm | Var; her yaşta mümkün, 18'den sonra yaşla artan arka plan riski |
+| Şiddet | Sahne dışında; gençlikte ölümler absürt, haraççılar kalıcı sonuç bırakır |
+| Seçimler | Geri alınamaz |
+| Süre | Ortalama hayat yaklaşık 45 dakika, kayıtla bölünerek |
+| Havuz | Yayında 250, hedef 400–500 olay |
+| Hatlar | Meslek, medeni durum, cinsiyet ve özelliklere göre etiketli havuzlar; ilk sürümde 4 meslek |
+| Kız karakter | Erkek hikâyesi tamamlanınca görselleri türetilecek; kurgu şimdiden iki cinsiyet düşünülerek yazılıyor |
+| Hedef kitle | Henüz karar verilmedi: "bunu ben de yaşadım" diyecek 25–45 yaş mı, daha genç oyuncular mı? |

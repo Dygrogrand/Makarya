@@ -5,9 +5,41 @@ function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 function newState() {
   var stats = {};
   STATS.forEach(function (k) { stats[k] = BASE_STAT; });
-  return { v: 3, screen: "start", gender: "erkek", family: null, i: 0, stats: stats, famStats: null,
-    traits: [], flags: [], log: [], chStart: {}, chTraits: {} };
+  return { v: 5, screen: "start", gender: "erkek", family: null, ch: 1, plan: [], pi: 0, stats: stats, famStats: null,
+    traits: [], flags: [], log: [], chStart: {}, chTraits: {}, last: null, lock: null, dead: null };
 }
+
+/* ── Hayat planı: her perdede sabit dönüm noktaları + havuzdan rastgele olaylar ── */
+var EV_BY_ID = {};
+EVENTS.forEach(function (e, i) { e._i = i; EV_BY_ID[e.id] = e; });
+function ageMonths(a) {
+  var y = /(\d+)\s*yaş/.exec(a), m = /(\d+)\s*ay/.exec(a);
+  return (y ? +y[1] * 12 : 0) + (m ? +m[1] : 0);
+}
+EVENTS.forEach(function (e) { e._m = ageMonths(e.age); });
+/* when: { fam: [..], gender: "kiz", trait: "..", flag: "..", notFlag: "..", minStat: {stat: n} } */
+function eligible(S, e) {
+  var w = e.when; if (!w) return true;
+  if (w.fam && w.fam.indexOf(S.family) < 0) return false;
+  if (w.gender && w.gender !== S.gender) return false;
+  if (w.trait && S.traits.indexOf(w.trait) < 0) return false;
+  if (w.flag && S.flags.indexOf(w.flag) < 0) return false;
+  if (w.notFlag && S.flags.indexOf(w.notFlag) >= 0) return false;
+  for (var k in (w.minStat || {})) if (S.stats[k] < w.minStat[k]) return false;
+  return true;
+}
+function buildPlan(S, ch, rnd) {
+  rnd = rnd || Math.random;
+  var pool = EVENTS.filter(function (e) { return e.ch === ch && eligible(S, e); });
+  var fixed = pool.filter(function (e) { return e.fixed; });
+  var rest = pool.filter(function (e) { return !e.fixed; })
+    .map(function (e) { return { e: e, k: Math.pow(rnd(), 1 / (e.weight || 1)) }; })
+    .sort(function (a, b) { return b.k - a.k; }).map(function (x) { return x.e; });
+  var n = Math.max(0, (CHAPTERS[ch].pick || pool.length) - fixed.length);
+  return fixed.concat(rest.slice(0, n)).sort(function (a, b) { return a._m - b._m || a._i - b._i; }).map(function (e) { return e.id; });
+}
+function hasChapter(ch) { return !!CHAPTERS[ch] && EVENTS.some(function (e) { return e.ch === ch; }); }
+function curEvent(S) { return EV_BY_ID[S.plan[S.pi]]; }
 
 function applyFamily(S, name) {
   S.family = name;
@@ -146,6 +178,10 @@ function applyOutcome(S, e, c, outcome, extra) {
     }
     var r = c.r || {};
     res.text = r[outcome] || (outcome === "crit" ? r.win : null) || (outcome === "mid" ? r.fail : null) || DEFAULT_TEXT[outcome];
+  }
+  if (c.risk && (extra.deathRoll != null ? extra.deathRoll : Math.random()) < c.risk.p) {
+    res.death = c.risk.cause;
+    S.dead = { cause: c.risk.cause, age: e.age, title: e.title };
   }
   S.log.push({ id: e.id, ch: e.ch, age: e.age, title: e.title, choice: c.t, outcome: outcome, roll: extra.roll || null });
   return res;

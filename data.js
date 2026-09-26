@@ -22,9 +22,9 @@ var DIFF = {
 };
 
 var CHAPTERS = {
-  1: { name: "Ev", range: "Doğum → 3 yaş", expected: 25, step: 0, endImg: "kres-kapisi", endAge: "3 YAŞ", endText: "Ev güvenliydi. Şimdi başka çocuklar var.", next: "BÖLÜM II · DIŞ DÜNYA" },
-  2: { name: "Dış Dünya", range: "3 → 6 yaş", expected: 30, step: 0, endImg: "ilkokul-kapisi", endAge: "6 YAŞ", endText: "Artık yalnızca aileyi değil, dış dünyanın kurallarını da okumaya başladın.", next: "BÖLÜM III · OKUL YILLARI" },
-  3: { name: "Okul Yılları", range: "6 → 9 yaş", expected: 36, step: 0, endImg: "karne-gunu", endAge: "9 YAŞ", endText: "Karne elinde, karakter ortada.", next: null }
+  1: { name: "Ev", pick: 10, range: "Doğum → 3 yaş", expected: 25, step: 0, endImg: "kres-kapisi", endAge: "3 YAŞ", endText: "Ev güvenliydi. Şimdi başka çocuklar var.", next: "BÖLÜM II · DIŞ DÜNYA" },
+  2: { name: "Dış Dünya", pick: 12, range: "3 → 6 yaş", expected: 30, step: 0, endImg: "ilkokul-kapisi", endAge: "6 YAŞ", endText: "Artık yalnızca aileyi değil, dış dünyanın kurallarını da okumaya başladın.", next: "BÖLÜM III · OKUL YILLARI" },
+  3: { name: "Okul Yılları", pick: 10, range: "6 → 9 yaş", expected: 36, step: 0, endImg: "karne-gunu", endAge: "9 YAŞ", endText: "Karne elinde, karakter ortada.", next: null }
 };
 
 var FAMILIES = {
@@ -333,6 +333,13 @@ var EVENTS = [
   C("Başlangıç avantajı bul", "Kurnazlık", "hard", ["Kurallarda küçük bir boşluk keşfettin.", "Boşluğu buldun, kullandın; kural kitabına senin adın eklendi.", "Boşluk bulamadın. Kurallar sıkıymış.", "Erken çıktın, diskalifiye edildin. Hakem mahalle bakkalıydı."]),
   C("Hakem olmaya çalış", "Çene", "hard", ["Yarışmadın. Yarışın kurallarına karar verdin.", "Hakem oldun, ödül töreni düzenledin, madalyaları kendin dağıttın.", "Hakemlik başvurun reddedildi. Yarışçı olarak kaydedildin.", "Hakem oldun ama iki taraf da sana itiraz etti. Turnuva iptal."], { trait: "Organizatör" })
 ]},
+{ id: "tepsiyle-kayak", ch: 2, age: "5 yaş 10 ay", icon: "🛷", title: "Tepsiyle Kayak", text: "Kar yağdı. Mahallenin en dik yokuşu trafiğe kapandı. Çocuklar mutfaklardan tepsi kaçırıyor.",
+  voices: [{ stat: "Akıl", diff: "medium", text: "Yokuşun sonunda bir çöp konteyneri var. Tepsinin freni yok. Bu iki bilgiyi aynı cümlede düşün." }, { stat: "Cesaret", diff: "easy", text: "Hayatta bazı yokuşlar bir kez kaydırılır. Genelde son kez değil. Genelde." }], choices: [
+  D("Pencereden izle", { Akıl: 1 }, "Kar fiziğini güvenli bir mesafeden inceledin. Bilim böyle ilerler."),
+  C("Tepsiyle kay", "Cesaret", "medium", ["Yokuşu baştan sona kaydın. Mahalle seni alkışladı, annen seni aradı.", "Öyle bir kaydın ki yokuşun sonunda bir tur daha attın. Efsane doğdu.", "Tepsi döndü, sen döndün, yokuş dönmedi. Kar dolu bir kafayla eve vardın.", "Tepsi bir yöne, sen öbür yöne. Tepsi daha iyi kaydı."], { risk: { p: 0.03, cause: "Yokuşun sonundaki konteyner. 5 yaşında, bir tepsi üstünde. Tepsi kurtuldu; yokuşa hâlâ senin adın verilir." } }),
+  C("Tepsi kiralama işi kur", "Kurnazlık", "medium", ["Evden üç tepsi getirdin, tur başına bir şeker. Kış ekonomisi canlandı.", "Öğlene kadar tüm mahallenin tepsileri sende toplandı. Kar tekeli.", "Tepsileri kiraladın; kimse geri getirmedi.", "Kiraladığın tepsilerden biri annenin baklava tepsisiydi."], { flag: "tepsiTekeli" }),
+  C("Kardan adam yap", "Dayanıklılık", "easy", ["Sağlam bir kardan adam yaptın. Havuçlu, düğmeli, vakur.", "Kardan adamın o kadar iyi oldu ki mahalle muhtarı fotoğrafını çekti.", "Kardan adam yarıda eridi. Tam bir kardan yarım adam.", "Kardan adamın kafası düştü. Çocuklar bunu bir işaret olarak yorumladı."])
+]},
 { id: "harclik-pazarligi", ch: 2, age: "5 yaş 7 ay", icon: "💰", fam: "money", title: "İlk Harçlık Pazarlığı", text: "Sana bir miktar söylendi. Sen miktarların konuşulabilir olduğunu yeni öğrendin.",
   recall: [{ flag: "ilkKelimePara", text: "İlk kelimesi 'Para' olan birinden beklenen an nihayet geldi." }], choices: [
   D("Kabul et", { Vicdan: 1 }, "Sözleşme imzalandı."),
@@ -410,6 +417,13 @@ var EVENTS = [
   C("Pas ver", "Sosyal Radar", "easy", ["Pas verdin, arkadaşın attı. Asist de bir sanattır.", "Öyle bir pas verdin ki arkadaşın boş kaleye attı. Herkes seni kucakladı.", "Pas verdin; top karşı takıma gitti.", "Pas verdin; top komşunun camına gitti."], { trait: "Asist Ustası", flagBad: "camKirildi" }),
   D("Camı düşün, yavaş vur", { Vicdan: 1, Dayanıklılık: 1 }, "Top kaleye yavaşça yuvarlandı. Kaleci aldı. Cam teşekkür etti.")
 ]},
+{ id: "balkondaki-ucurtma", ch: 3, age: "7 yaş 8 ay", icon: "🪁", title: "Balkondaki Uçurtma", text: "Uçurtman üst kattaki balkonun korkuluğuna takıldı. Balkonun sahibi tatilde. Uçurtma rüzgârda sana el sallıyor.",
+  voices: [{ stat: "Cesaret", diff: "easy", text: "İki kat. Aslında bir buçuk. Bir de korkuluk var. Korkuluklar bunun için yapılmış olabilir mi? Hayır." }, { stat: "Vicdan", diff: "medium", text: "Bu uçurtmayı sana dedenin aldığını hatırlıyor musun? Dede de seni hatırlıyor. Canlı olarak.", fail: "…Vicdan sesini rüzgâra kaptırdı." }], choices: [
+  D("Vazgeç, yenisini iste", { Çene: 1 }, "Yeni uçurtma talebin aile bütçe komisyonuna gönderildi. Gündem yoğun."),
+  C("Süpürge sapıyla kurtar", "Akıl", "medium", ["Süpürge, sandalye ve bir bant rulosuyla mühendislik harikası kurdun. Uçurtma kurtuldu.", "Uçurtmayı kurtardın; üstüne komşunun balkonundan düşen bir top da geldi. Bonus.", "Süpürge kısa geldi. Sandalye de. Sen de.", "Süpürge sapı balkona takıldı. Artık orada bir uçurtma ve bir süpürge var."]),
+  C("Kapıcıyı ikna et", "Çene", "easy", ["Kapıcı yedek anahtarla çıktı ve uçurtmayı indirdi. Bürokrasi bazen işler.", "Kapıcı uçurtmayı indirdi, üstüne bir de nasıl daha iyi uçurulacağını gösterdi.", "Kapıcı 'Sahibi gelsin' dedi. Sahibi üç hafta sonra geliyor.", "Kapıcıyı ikna ettin; kapıcı korkuluktan düştü, iyi ki çalılar vardı. Uçurtma hâlâ orada."]),
+  C("Korkuluğa tırman", "Cesaret", "hard", ["Tırmandın, uzandın, aldın. Aşağıdakiler nefeslerini ancak sen inince bıraktı.", "Tırmandın, uçurtmayı aldın ve balkondan uçurarak indirdin. Mahalle bunu yıllarca anlattı.", "Yarıya kadar tırmandın, sonra aşağı baktın. Aşağı bakmak hataydı.", "Tırmandın, ayağın kaydı, bir saksıya tutundun. Saksı da senin kadar şaşırdı."], { risk: { p: 0.05, cause: "Bir uçurtma uğruna, 7 yaşında. Uçurtma kurtuldu; bugün hâlâ o balkonda." } })
+]},
 { id: "kedi-istiyoruz", ch: 3, age: "8 yaş", icon: "🐱", fam: "home", title: "Evde Kedi Oylaması", text: "Eve kedi alınması gündemde. Karar oturumu akşam yemeğinde.",
   recall: [{ flag: "kediSuclu", text: "Vazo davasından beri ailede 'Kediye güven olmaz' diyen bir hizip var." }], choices: [
   C("Duygusal konuşma yap", "Çene", "medium", ["Gözlerin doldu, sesin titredi. Kedi onaylandı.", "Konuşma sırasında babaannen ağladı. Bir değil iki kedi onaylandı.", "Konuşman etkileyiciydi ama karar 'yazın bakarız'.", "Konuşurken 'Söz, her gün ben temizleyeceğim' dedin. Kayıt altına alındı. Kedi gelmedi."], { flagWin: "kediGeldi" }),
@@ -439,3 +453,8 @@ var EVENTS = [
   D("Olduğu gibi ver", { Vicdan: 1 }, "Karne teslim edildi. Değerlendirme aile meclisinde.")
 ]}
 ];
+
+/* Her hayatta mutlaka görülen dönüm noktaları */
+["dogum", "kres-kapisi", "ilkokul-kapisi", "ilk-ders", "karne-gunu"].forEach(function (id) {
+  EVENTS.forEach(function (e) { if (e.id === id) e.fixed = true; });
+});
