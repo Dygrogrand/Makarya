@@ -1,0 +1,191 @@
+/* Makarya — Hayat Zarı */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#11100e; --paper:#f4ead7; --card:#fbf6ea; --card-2:#f8efd9;
+  --ink:#1d1915; --muted:#6c5f4d; --line:#d8c9ad;
+  --red:#a52f26; --red-dark:#7f231d; --green:#2b7a4f; --gold:#9a6d16;
+  --good-bg:#e6f1e1; --bad-bg:#f6e4df;
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px}
+body{display:flex;justify-content:center}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default}
+#app{width:100%;max-width:480px;height:100dvh;overflow:hidden;background:var(--paper);box-shadow:0 0 50px rgba(0,0,0,.5);position:relative}
+.screen{height:100%;display:flex;flex-direction:column;overflow:hidden}
+
+/* Üst çubuk */
+.topbar{flex:0 0 52px;background:#0f0f0f;color:#fff;display:grid;grid-template-columns:40px 1fr 40px;align-items:center;padding:0 10px;gap:6px}
+.brandWord{font-family:var(--serif);font-size:17px;font-weight:800;text-align:center;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topBtn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.04);color:#fff;font-size:17px;font-weight:900;display:grid;place-items:center}
+.progress{height:3px;background:#2a2622;flex:0 0 3px}
+.progress i{display:block;height:100%;background:var(--gold);transition:width .4s}
+
+/* Sahne görseli */
+.art{position:relative;flex:0 0 36%;overflow:hidden;
+  background:radial-gradient(circle at 50% 38%,#f6d9a4 0,#d9a25f 45%,#7a4a2a 100%)}
+.art.tall{flex-basis:46%}
+.artIcon{position:absolute;inset:0;display:grid;place-items:center;font-size:84px;padding-bottom:40px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.25))}
+.artImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 35%}
+.art:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.72) 100%);pointer-events:none}
+.artCaption{position:absolute;z-index:2;left:16px;right:16px;bottom:12px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+.artMeta{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:4px 9px;margin-bottom:6px}
+.artCaption h1{margin:0 0 4px;font-family:var(--serif);font-size:28px;line-height:1.05}
+.artCaption p{margin:0;font-size:14.5px;line-height:1.35}
+
+/* Panel */
+.panel{flex:1;min-height:0;overflow:auto;padding:14px 14px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+.sectionTitle{font-family:var(--serif);font-size:22px;font-weight:900;text-align:center;margin:2px 0 0}
+.sectionSub{font-size:13.5px;color:var(--muted);text-align:center;line-height:1.4}
+.muted{font-size:12.5px;color:var(--muted);text-align:center;line-height:1.35}
+.primary,.secondary{min-height:50px;border-radius:12px;padding:12px 14px;font-weight:900;font-size:15px;letter-spacing:.3px}
+.primary{border:0;background:var(--red);color:#fff;box-shadow:0 3px 0 var(--red-dark)}
+.primary:active{transform:translateY(2px);box-shadow:0 1px 0 var(--red-dark)}
+.secondary{border:1px solid var(--line);background:var(--card)}
+.row{display:flex;gap:10px}.row>*{flex:1}
+
+/* Başlangıç */
+.genderRow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.genderBtn{border:0;border-radius:14px;min-height:74px;color:#fff;font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.genderBtn.kiz{background:#a8433a}.genderBtn.erkek{background:#26405e}
+.genderBtn span{font-size:26px}
+.saveCard{border:1px solid #d7c08b;background:#f7edd3;border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.saveCard b{font-size:14px}.saveCard small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.saveCard button{border:0;background:var(--ink);color:#fff;border-radius:10px;padding:10px 12px;font-weight:900;font-size:13px}
+
+/* Aile */
+.familyGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.familyMini{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:9px 10px;font-size:12.5px;line-height:1.3;color:var(--muted);transition:.12s}
+.familyMini b{display:block;font-size:15px;color:var(--ink);font-family:var(--serif);margin-bottom:2px}
+.familyMini.hot{background:#1d1915;color:#e9dcc3;border-color:#1d1915;transform:scale(1.03)}
+.familyMini.hot b{color:#fff}
+.statGrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
+.statCard{border-bottom:1px solid var(--line);padding:7px 2px;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.delta{font-size:12px;font-weight:900;margin-left:4px}.delta.pos{color:var(--green)}.delta.neg{color:var(--red)}
+.idCard{border:1px solid #dcc99f;background:linear-gradient(135deg,#fff8e9,#f1dfbb);border-radius:14px;padding:11px 12px}
+.idTitle{font-size:11.5px;font-weight:900;letter-spacing:.9px;color:var(--gold);margin-bottom:7px}
+.famTrait{display:flex;justify-content:space-between;gap:10px;border-radius:9px;padding:8px 9px;font-size:13.5px;font-weight:800;margin-top:5px}
+.famTrait.good{background:var(--good-bg);color:#2c6945}.famTrait.bad{background:var(--bad-bg);color:#8a3028}
+.famTrait small{display:block;font-size:12px;font-weight:600;opacity:.9;margin-top:2px}
+
+/* Olay */
+.recall{border-left:3px solid var(--gold);background:var(--card-2);border-radius:0 10px 10px 0;padding:8px 10px;font-size:13.5px;line-height:1.35;font-style:italic;color:#4c3f2e}
+.recall b{font-style:normal;color:var(--gold);font-size:11.5px;letter-spacing:.8px;display:block;margin-bottom:2px}
+.famLine{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:flex-start;line-height:1.35}
+.choice{border:1px solid #d6c8ad;background:var(--card);border-radius:13px;min-height:62px;padding:10px 12px;text-align:left;display:flex;gap:11px;align-items:center;width:100%}
+.choice:active{background:#f1e6cf}
+.choiceIcon{width:34px;height:34px;flex:0 0 34px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:#f1e8d4;border:1px solid #ddcfb2}
+.choiceMain{flex:1;min-width:0}
+.choiceMain b{display:block;font-size:16px;line-height:1.2}
+.choiceMain small{display:block;margin-top:4px;font-size:12.5px;line-height:1.3;color:var(--muted);font-weight:650}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.tag{display:inline-flex;align-items:center;gap:3px;border-radius:999px;padding:3px 8px;font-size:11.5px;font-weight:850}
+.tag.mini{background:#1b1b1b;color:#fff}.tag.fam{background:var(--good-bg);color:#256140}.tag.trait{background:#f7e9c6;color:#7a560f}
+.chance{flex:0 0 auto;text-align:right;font-weight:900;font-size:15px}
+.chance small{display:block;font-size:10.5px;color:var(--muted);font-weight:700}
+.chance.hi{color:var(--green)}.chance.lo{color:var(--red)}
+.choice.locked{opacity:.55;border-style:dashed;background:transparent}
+.choice.locked .choiceMain b{font-size:14.5px}
+
+/* Zar */
+.checkFocus{display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:4px}
+.dieFace{width:108px;height:108px;border-radius:22px;background:#fff;box-shadow:0 10px 25px rgba(0,0,0,.12),inset 0 0 0 1px #ded3c1;display:grid;place-items:center;font-size:50px;font-weight:900;overflow:hidden}
+.dieFace.spin{animation:wob .1s linear infinite}
+@keyframes wob{0%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}100%{transform:rotate(-6deg)}}
+.targetPill{padding:8px 18px;border-radius:999px;background:#101010;color:#fff;font-size:24px;font-weight:900}
+.breakdown{border:1px solid var(--line);background:var(--card);border-radius:12px;overflow:hidden}
+.bRow{display:flex;justify-content:space-between;gap:10px;padding:9px 11px;font-size:14px;border-bottom:1px solid #eadfca}
+.bRow:last-child{border-bottom:0}
+.bRow b{white-space:nowrap}.bRow .minus{color:var(--green)}.bRow .plus{color:var(--red)}
+.bRow.total{background:#f1e6cf;font-weight:900}
+
+/* Sonuç */
+.resultImg{width:100%;height:150px;border-radius:16px;position:relative;overflow:hidden;flex:0 0 150px;
+  background:radial-gradient(circle at 50% 40%,#f6d9a4 0,#d9a25f 50%,#7a4a2a 100%)}
+.resultImg .artIcon{font-size:60px;padding:0}
+.resultHeader{text-align:center}
+.badge{display:inline-block;border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
+.o-crit{background:#dff0d8;color:#1f5d39}.o-win{background:#e5f0e8;color:#23623f}.o-mid,.o-direct{background:#eee8da;color:#5a5044}.o-fail{background:#f6e4df;color:#8b2d26}.o-bad{background:#f0d0ca;color:#7b211b}
+.resultTitle{font-family:var(--serif);font-size:30px;font-weight:900;line-height:1.05}
+.resultText{font-size:16px;line-height:1.45;margin-top:8px;color:#2e2720}
+.note{font-size:13px;color:var(--muted);font-style:italic;margin-top:4px}
+.rollCard{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px;text-align:center}
+.rollCard .l{font-size:12px;color:var(--muted);font-weight:800}
+.rollCard .v{font-size:40px;font-weight:900;line-height:1.1}
+.rollCard .t{font-size:13px;color:#5c5145;font-weight:800}
+.gainGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.gainCard{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:8px;text-align:center}
+.gainCard .k{font-size:12.5px;color:var(--muted);font-weight:800}
+.gainCard .v{font-size:22px;font-weight:900}
+.gainCard.good .v{color:var(--green)}.gainCard.bad .v{color:var(--red)}
+.traitCard{border:1px solid #dcc48e;background:#f8efd8;border-radius:14px;padding:12px}
+.traitCard .l{font-size:11.5px;font-weight:900;color:var(--gold);letter-spacing:.6px}
+.traitCard .n{font-size:21px;font-weight:900;font-family:var(--serif);margin-top:3px}
+.traitCard .d{font-size:13.5px;color:#5d5246;margin-top:4px;line-height:1.35}
+
+/* Bölüm sonu ve final */
+.compare{display:grid;grid-template-columns:1fr auto;border-bottom:1px solid var(--line);padding:8px 2px;font-size:14px}
+.compare b .up{color:var(--green)}.compare b .down{color:var(--red)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 10px;font-size:13px;font-weight:800}
+.finalCard{border-radius:18px;background:#1d1915;color:#f4ead7;padding:16px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.finalCard .k{font-size:11.5px;letter-spacing:1.2px;font-weight:900;color:#d8b16a}
+.finalCard h2{font-family:var(--serif);font-size:30px;margin:6px 0 4px;line-height:1.05}
+.finalCard p{margin:6px 0 0;font-size:14.5px;line-height:1.4;color:#e7dbc4}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:120px 1fr 34px;gap:8px;align-items:center;font-size:13.5px}
+.bar .track{height:10px;background:#e5d9c3;border-radius:99px;overflow:hidden}
+.bar .fill{height:100%;background:linear-gradient(90deg,#c69b49,#a52f26);border-radius:99px}
+.bar b{text-align:right}
+.logList{display:flex;flex-direction:column;gap:6px}
+.logItem{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;font-size:13.5px;line-height:1.35}
+.logItem small{color:var(--muted);font-weight:800;display:block;font-size:11.5px}
+
+/* Pencere */
+.modal{position:fixed;z-index:100;inset:0;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:16px}
+.modalCard{width:min(94vw,440px);max-height:86dvh;overflow:auto;background:var(--paper);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.modalCard h2{font-family:var(--serif);margin:0;font-size:23px}
+.modalCard h3{font-family:var(--serif);margin:6px 0 0;font-size:18px}
+.modalCard p{font-size:14px;line-height:1.45;margin:0}
+.tCard{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 10px}
+.tCard b{font-size:14.5px}.tCard div{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.3}
+
+/* Mini oyunlar */
+.mgStage{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:250px;justify-content:center}
+.mgTitle{font-family:var(--serif);font-size:21px;font-weight:900;text-align:center}
+.mgHint{font-size:14px;line-height:1.4;color:var(--muted);text-align:center}
+.mgBar{position:relative;height:40px;border-radius:999px;overflow:hidden;background:#e5d9c3;border:1px solid #cdbb99}
+.mgZone{position:absolute;top:0;bottom:0;background:rgba(46,118,81,.3);border-left:2px solid #2e7651;border-right:2px solid #2e7651}
+.mgNeedle{position:absolute;top:-4px;bottom:-4px;width:5px;margin-left:-2px;border-radius:4px;background:var(--red);box-shadow:0 0 0 1px rgba(255,255,255,.8)}
+.mgBig{min-height:72px;border:0;border-radius:16px;background:var(--red);color:#fff;font-weight:900;font-size:18px;box-shadow:0 4px 0 var(--red-dark);touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.mgBig:active{transform:translateY(2px);box-shadow:0 2px 0 var(--red-dark)}
+.mgPower{position:relative;height:44px;border-radius:12px;overflow:hidden;background:#e6d9c2;border:1px solid #cdbb99}
+.mgFill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#d8c792,#a9c69a)}
+.mgStatus{font-size:15px;font-weight:900;text-align:center;color:#5d5043;min-height:20px}
+.mgField{position:relative;height:210px;border:1px solid var(--line);border-radius:14px;background:#f1e5cc;overflow:hidden}
+.mgPiece{position:absolute;width:52px;height:52px;border:0;border-radius:50%;background:#fff8ea;font-size:26px;display:grid;place-items:center;box-shadow:0 3px 10px rgba(0,0,0,.15);animation:pop .25s ease-out}
+@keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}
+.mgTrack{position:relative;height:96px;border-radius:14px;overflow:hidden;border:1px solid #cdbb99;background:repeating-linear-gradient(90deg,#e5d8bf 0 22px,#dccdb0 22px 24px)}
+.mgRunner{position:absolute;font-size:30px;left:4px;transition:left .08s linear}
+.mgRunner.you{top:8px}.mgRunner.opp{bottom:8px}
+.mgRunner small{position:absolute;left:0;top:-2px;font-size:9px;font-weight:900;background:#1d1915;color:#fff;border-radius:4px;padding:0 3px}
+.mgFinish{position:absolute;right:10px;top:0;bottom:0;width:4px;background:repeating-linear-gradient(0deg,#111 0 6px,#fff 6px 12px)}
+.mgKids{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mgKid{border:1px solid var(--line);background:#fffaf0;border-radius:12px;padding:10px 4px;text-align:center;min-height:92px}
+.mgKid .face{font-size:34px}.mgKid .stars{font-size:13px;margin-top:4px;font-weight:900;color:#9b731e}
+.mgCups{position:relative;height:130px}
+.mgCup{position:absolute;top:30px;width:30%;height:84px;border:0;background:transparent;transition:left .35s ease-in-out,transform .3s;font-size:58px;display:grid;place-items:center;padding:0}
+.mgCup.lift{transform:translateY(-34px)}
+.mgCoin{position:absolute;top:78px;width:30%;text-align:center;font-size:34px;transition:opacity .2s}
+.mgDoors{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.mgDoor{border:1px solid var(--line);border-radius:14px;background:#fffaf0;padding:10px 6px;text-align:center;min-height:118px}
+.mgDoor .door{font-size:40px}
+.sign{display:inline-flex;align-items:center;gap:4px;border-radius:8px;padding:4px 8px;font-size:12.5px;font-weight:900;margin-top:6px;color:#1d1915}
+.sign.Sarı{background:#f3d34a}.sign.Mavi{background:#8cc2ec}.sign.Kırmızı{background:#ec8f86}.sign.Yeşil{background:#9fd49a}
+.clue{border:2px dashed var(--gold);border-radius:12px;padding:12px;text-align:center;font-size:15px;font-weight:800;background:#fff8e6}
+
+@media (max-height:700px){
+  .art{flex-basis:30%}.artCaption h1{font-size:24px}.artCaption p{font-size:13.5px}
+  .choice{min-height:56px;padding:8px 10px}.mgStage{min-height:210px}
+}
