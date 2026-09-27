@@ -249,3 +249,6 @@ button:disabled{cursor:default}
 .blItem{position:absolute;top:70px;transform:translateX(-50%);font-size:42px;transition:filter .1s}
 .blItem.bad{filter:drop-shadow(0 0 8px rgba(165,47,38,.9))}
 .blTray{position:absolute;top:122px;height:12px;transform:translateX(-50%);border-radius:99px;background:#6b5a48;box-shadow:0 3px 0 #3d3329}
+
+/* Panel içindeki kutular küçülüp içeriğini kırpmasın; sığmazsa panel kaydırılır */
+.panel > *{flex-shrink:0}
