@@ -402,7 +402,7 @@ function showRules() {
     "<p><b>Seçimler.</b> Her olayda bir seçim yaparsın. Bazıları kesin sonuç verir, bazıları zar ya da mini oyun ister.</p>" +
     "<p><b>Zar.</b> 20 yüzlü zar atılır. Hedef sayıya ya da üstüne atarsan başarırsın. 20 her zaman kritik başarı, 1 her zaman kritik hatadır.</p>" +
     "<p><b>Hedef nasıl belirlenir?</b> Zorluk, ilgili statın, ailenin etkisi ve kazandığın özellikler hedefi yukarı ya da aşağı çeker. Zar ekranında her kalemi tek tek görürsün.</p>" +
-    "<p><b>Risk ve ödül.</b> Zor seçimler daha fazla stat kazandırır, başarılırsa özellik de açar. Zor bir kontrolde kaybetmek bile Dayanıklılık +1 getirir.</p>" +
+    "<p><b>Risk ve ödül.</b> Zor seçimler başarılırsa daha fazla stat kazandırır ve özellik açar; kritik başarı en büyük kazancı getirir. Başarısızlık puan kazandırmaz, kritik başarısızlıkta ise puan kaybedersin.</p>" +
     "<p><b>Özellikler.</b> Kazandığın özellikler hedefleri düşürür ve ileride yeni seçeneklerin kilidini açar (🔒).</p>" +
     "<p><b>Hafıza.</b> Bazı seçimler unutulmaz; yıllar sonra karşına çıkar.</p>" +
     "<p><b>Her hayat farklı.</b> Her bölümde olaylar geniş bir havuzdan seçilir; iki hayat birbirinin aynısı olmaz.</p>" +
