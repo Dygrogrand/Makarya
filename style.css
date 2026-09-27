@@ -165,6 +165,12 @@ button:disabled{cursor:default}
 .mgPower{position:relative;height:44px;border-radius:12px;overflow:hidden;background:#e6d9c2;border:1px solid #cdbb99}
 .mgFill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#d8c792,#a9c69a)}
 .mgStatus{font-size:15px;font-weight:900;text-align:center;color:#5d5043;min-height:20px}
+.mgDots i.cur{background:var(--gold);animation:mgCurPulse 1s ease-in-out infinite}
+.mgStage.mgFlashGood{animation:mgFlashG .35s ease}
+.mgStage.mgFlashBad{animation:mgFlashB .4s ease}
+@keyframes mgCurPulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes mgFlashG{0%{box-shadow:inset 0 0 0 3px var(--green);background:var(--good-bg)}100%{box-shadow:inset 0 0 0 0 rgba(0,0,0,0);background:var(--card)}}
+@keyframes mgFlashB{0%{box-shadow:inset 0 0 0 3px var(--red);background:var(--bad-bg)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}100%{box-shadow:inset 0 0 0 0 rgba(0,0,0,0);background:var(--card);transform:translateX(0)}}
 .mgField{position:relative;height:210px;border:1px solid var(--line);border-radius:14px;background:#f1e5cc;overflow:hidden}
 .mgPiece{position:absolute;width:52px;height:52px;border:0;border-radius:50%;background:#fff8ea;font-size:26px;display:grid;place-items:center;box-shadow:0 3px 10px rgba(0,0,0,.15);animation:pop .25s ease-out}
 @keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}

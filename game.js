@@ -417,6 +417,30 @@ function stopMini() {
   MG.timers = []; if (MG.raf) cancelAnimationFrame(MG.raf); MG.raf = null;
 }
 function later(fn, ms) { MG.timers.push(setTimeout(fn, ms)); }
+
+/* ── mini oyun "juice": dosya indirmeden anlık sentezlenen ses + ekran tepkisi ── */
+var MG_AC = null;
+function mgTone(freq, dur, type, gain) {
+  try {
+    if (!MG_AC) MG_AC = new (window.AudioContext || window.webkitAudioContext)();
+    if (MG_AC.state === "suspended") MG_AC.resume();
+    var t0 = MG_AC.currentTime, osc = MG_AC.createOscillator(), g = MG_AC.createGain();
+    osc.type = type || "sine"; osc.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(gain || 0.16, t0 + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g); g.connect(MG_AC.destination);
+    osc.start(t0); osc.stop(t0 + dur + 0.02);
+  } catch (err) { /* ses çalışmazsa oyun sessizce devam eder */ }
+}
+function mgHit(comboN) { mgTone(500 + Math.min(comboN || 1, 6) * 60, 0.16, "sine", 0.17); }
+function mgMiss() { mgTone(150, 0.22, "sawtooth", 0.12); }
+function mgGo() { mgTone(720, 0.05, "square", 0.05); }
+function mgFlash(st, ok) {
+  if (!st) return;
+  st.classList.remove("mgFlashGood", "mgFlashBad"); void st.offsetWidth;
+  st.classList.add(ok ? "mgFlashGood" : "mgFlashBad");
+}
 function finishMini(score) {
   if (MG.done || S.screen !== "minigame") return;
   MG.done = true; stopMini();
@@ -444,24 +468,58 @@ function startMini() {
      rhythm: mgRhythm, lanes: mgLanes, simon: mgSimon, poker: mgPoker, trace: mgTrace,
      bargain: mgBargain, swipe: mgSwipe, breath: mgBreath, balance: mgBalance })[m.type](st, MG.assist, m);
 }
+/* Zamanlama: 5 turluk seri, her tur biraz hızlanır/daralır; art arda tutturmak kombo katar */
 function mgTiming(st, a, m) {
-  var width = 18 + a * 44, left = 50 - width / 2;
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgBar" id="bar"><div class="mgZone" style="left:' + left + "%;width:" + width +
-    '%"></div><div class="mgNeedle" id="needle"></div></div><button class="mgBig" id="stopBtn">DURDUR</button>';
-  var x = 0, dir = 1, last = performance.now(), v = 0.085 - a * 0.08;
-  function tick(now) {
-    var dt = Math.min(32, now - last); last = now;
-    x += dir * dt * v; if (x >= 100) { x = 100; dir = -1; } if (x <= 0) { x = 0; dir = 1; }
-    var n = document.getElementById("needle"); if (n) n.style.left = x + "%";
+  var ROUNDS = 5, results = [], combo = 0;
+  function dotsHtml() {
+    var out = "";
+    for (var i = 0; i < ROUNDS; i++) {
+      out += i < results.length ? '<i class="' + (results[i] >= 0.68 ? "hit" : "miss") + '"></i>'
+        : i === results.length ? '<i class="cur"></i>' : "<i></i>";
+    }
+    return out;
+  }
+  function playRound() {
+    var round = results.length + 1;
+    var speed = 1 + (round - 1) * 0.14;
+    var width = clamp(18 + a * 44 - (round - 1) * 2.6, 9, 62), left = 50 - width / 2;
+    var roundDur = Math.max(2700, 5600 - (round - 1) * 320 - a * 500);
+    st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgDots" id="dots">' + dotsHtml() +
+      '</div><div class="mgBar" id="bar"><div class="mgZone" style="left:' + left + "%;width:" + width +
+      '%"></div><div class="mgNeedle" id="needle"></div></div><div class="mgStatus" id="ts">Tur ' + round + "/" + ROUNDS +
+      (combo > 1 ? " · 🔥 Kombo ×" + combo : "") + '</div><button class="mgBig" id="stopBtn">DURDUR</button>';
+    mgGo();
+    var x = 0, dir = 1, last = performance.now(), v = (0.082 - a * 0.055) * speed, t0 = performance.now(), locked = false;
+    function tick(now) {
+      if (locked) return;
+      var dt = Math.min(32, now - last); last = now;
+      x += dir * dt * v; if (x >= 100) { x = 100; dir = -1; } if (x <= 0) { x = 0; dir = 1; }
+      var n = document.getElementById("needle"); if (n) n.style.left = x + "%";
+      if (now - t0 >= roundDur) { locked = true; resolveRound(x, false); return; }
+      MG.raf = requestAnimationFrame(tick);
+    }
     MG.raf = requestAnimationFrame(tick);
+    function stopNow() { if (locked) return; locked = true; resolveRound(x, true); }
+    document.getElementById("stopBtn").onclick = stopNow;
+    document.getElementById("bar").onclick = stopNow;
+    function resolveRound(finalX, tapped) {
+      var d = Math.abs(finalX - 50), half = width / 2;
+      var base = d <= half ? 0.7 + 0.3 * (1 - d / half) : Math.max(0, 0.6 - (d - half) / 40);
+      if (!tapped) base = Math.min(base, 0.3);
+      var hit = base >= 0.68;
+      if (hit) { combo++; base = clamp(base + Math.min(combo - 1, 3) * 0.03, 0, 1); mgHit(combo); }
+      else { combo = 0; mgMiss(); }
+      mgFlash(st, hit);
+      results.push(base);
+      later(function () { if (results.length < ROUNDS) playRound(); else finish(); }, 480);
+    }
   }
-  MG.raf = requestAnimationFrame(tick);
-  function stop() {
-    var d = Math.abs(x - 50), half = width / 2;
-    finishMini(d <= half ? 0.7 + 0.3 * (1 - d / half) : 0.6 - (d - half) / 40);
+  function finish() {
+    var avg = results.reduce(function (s, v) { return s + v; }, 0) / results.length;
+    var allHit = results.every(function (v) { return v >= 0.68; });
+    finishMini(allHit ? Math.max(avg, 0.93) : avg);
   }
-  document.getElementById("stopBtn").onclick = stop;
-  document.getElementById("bar").onclick = stop;
+  playRound();
 }
 function mgHold(st, a, m) {
   var width = 16 + a * 40, center = 62, left = center - width / 2;
