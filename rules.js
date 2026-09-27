@@ -200,10 +200,6 @@ function applyOutcome(S, e, c, outcome, extra) {
       if (!c.trait && (outcome === "crit" || c.diff === "hard" || c.diff === "veryHard")) gainTrait(S, AUTO_TRAITS[c.stat], res);
     }
     if (outcome === "bad") addFlag(S, c.flagBad);
-    if (outcome === "fail" && (c.diff === "hard" || c.diff === "veryHard") && c.stat !== "Dayanıklılık") {
-      addStat(S, "Dayanıklılık", 1, res);
-      res.note = "Kaybetmek de antrenmandır.";
-    }
     var r = c.r || {};
     res.text = r[outcome] || (outcome === "crit" ? r.win : null) || (outcome === "mid" ? r.fail : null) || DEFAULT_TEXT[outcome];
   }
@@ -254,7 +250,7 @@ var PROPHECY = {
   "Sosyal Radar": "Bir odaya girdiğinde, kimin kime kızgın olduğunu herkesten önce bileceksin."
 };
 /* Bazı statlar oyunda daha sık geçtiği için simülasyonla dengelenir (tools/simulasyon.js, 3.000 tam hayat) */
-var ARCH_NORM = {"Akıl":-18,"Çene":49,"Kurnazlık":1,"Cesaret":-37,"Pişkinlik":-19,"Vicdan":1,"Dayanıklılık":37,"Sosyal Radar":-14};
+var ARCH_NORM = {"Akıl":-13,"Çene":52,"Kurnazlık":5,"Cesaret":-34,"Pişkinlik":-17,"Vicdan":4,"Dayanıklılık":13,"Sosyal Radar":-11};
 function archetype(S) {
   var base = S.famStats || S.stats;
   var scored = STATS.map(function (k) { return { k: k, s: S.stats[k] + 2 * (S.stats[k] - base[k]) - (ARCH_NORM[k] || 0) }; })
