@@ -189,10 +189,7 @@ Meslek, evlilik, erken ölüm ve kısa hayatlar içeren **BitLife**, uygulama ma
 ## 8. Görsel strateji
 
 - **Stil korunuyor:** resimli, sıcak ışıklı, animasyon filmi konsept sanatı tarzı.
-- **Ölçek için üç katman (motor hazır):**
-  1. **Büyük anlar** (~60): Dönüm noktaları ve çocukluk sahneleri kendi resmini taşır.
-  2. **Mekân arka planları** (28): Resmi olmayan olaylar, geçtiği mekânın insansız arka planını gösterir (ev, ofis, devlet dairesi, düğün salonu…). Böylece 328 olay için 328 resim gerekmez.
-  3. **Simge:** Mekân resmi de yoksa olayın simgesi gösterilir.
+- **Her olayın kendi görseli olur** (karar: boş mekân arka planları oyunu yarım gösterir). 328 olay için 309 yeni görsel (294 sahne, 14 yenileme, 1 yetişkin karakter kartı) `CHATGPT_PAKETLERI.md` içinde 31 mesaja bölündü; kronolojik sıra, karakterin sohbet boyunca doğal yaşlanmasını sağlar. Görseli henüz gelmemiş olaylarda simge gösterilir.
 - **Görsel yasakları:** Yazı, marka, gerçek yer, bayrak ve ön planda dini sembol yok. Denetimde 14 eski görselde ihlal bulundu (ör. bakkal rafında gerçek cips markaları, ayakkabıda gerçek logo, Galata Kulesi); hepsi yeniden üretim listesinde (`CHATGPT_PAKETLERI.md`).
 - **Kız karakter:** Erkek hikâyesinin görselleri tamamlanınca "çocuğu değiştir" yöntemiyle türetilecek.
 
@@ -222,7 +219,7 @@ Meslek, evlilik, erken ölüm ve kısa hayatlar içeren **BitLife**, uygulama ma
 |---|---|
 | 1 · Tamamlandı | İç sesler, 12 mini oyun, havuz motoru, görünür ölüm riski, mezar taşı ve koleksiyon, geri alınamaz kayıt |
 | 2 · Tamamlandı | 10 bölümün tamamı (328 olay), 4 meslek hattı, evli/bekâr/çocuk hatları, 16 mini oyun, 18+ ölüm ve Son Söz, Excel ile içerik düzenleme |
-| 3 · Sıradaki | Görseller (71), beyaz/kırmızı kontroller, kafa takıntıları, ses ve titreşim, Capacitor ile uygulama paketi |
+| 3 · Sıradaki | Görseller (309), beyaz/kırmızı kontroller, kafa takıntıları, ses ve titreşim, Capacitor ile uygulama paketi |
 | 3 | Ses, müzik, titreşim; Capacitor paketi; TestFlight ile kapalı test (Apple'ın deneme dağıtımı) |
 | 4 | VI.–X. perdeler, kız yolu, mağaza yayını |
 
