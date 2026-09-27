@@ -161,7 +161,7 @@ function renderEvent() {
     } else {
       var b = needBreakdown(S, e, c);
       sub = DIFF[c.diff].label + " · " + STAT_ICONS[c.stat] + " " + c.stat + (c.mini ? "" : " · Hedef " + b.need + "+");
-      if (b.famBonus) tags.push('<span class="tag fam">🏠 Aile avantajı −' + b.famBonus + "</span>");
+      if (b.famBonus) tags.push('<span class="tag fam">🏠 ' + esc(FAMILIES[S.family].tagLine[e.fam]) + "</span>");
       if (c.mini) { tags.push('<span class="tag mini">🎮 Mini oyun</span>'); chance = '<div class="chance">🎮<small>beceri</small></div>'; }
       else {
         var p = Math.round(successChance(b.need) * 100);

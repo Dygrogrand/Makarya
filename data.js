@@ -24,7 +24,8 @@ var FAMILIES = {
       { name: "Kendini Geri Atar", good: false, desc: "Bazı ortamlarda fazla geri planda kalır.", stats: { "Pişkinlik": -2 } }
     ],
     eff: { home: { "Dayanıklılık": 2, "Vicdan": 1 }, money: { "Dayanıklılık": 2, "Kurnazlık": 2 }, social: { "Vicdan": 2 }, education: { "Dayanıklılık": 2 } },
-    lines: { home: "Bu evde dayanışma önemlidir.", money: "Paranın kıymeti erken öğrenilir.", social: "İdare etmek ve paylaşmak sık duyduğun kelimeler.", education: "Ailen senden elinden geleni yapmanı bekler." }
+    lines: { home: "Bu evde dayanışma önemlidir.", money: "Paranın kıymeti erken öğrenilir.", social: "İdare etmek ve paylaşmak sık duyduğun kelimeler.", education: "Ailen senden elinden geleni yapmanı bekler." },
+    tagLine: { home: "paylaşmayı küçükten öğrendin", money: "kıt kanaat geçinmeyi bilirsin", social: "dayanışma bu ailenin işi", education: "az imkânla çok iş çıkarırsın" }
   },
   "Erdem": {
     slug: "erdem", subtitle: "İki kamu çalışanı; düzen ve eğitim odaklı",
@@ -35,7 +36,8 @@ var FAMILIES = {
       { name: "Otoriteyi Fazla Ciddiye Alır", good: false, desc: "Otorite karşısında çekingenleşebilir.", stats: { "Cesaret": -2 } }
     ],
     eff: { home: { "Vicdan": 2, "Akıl": 1 }, money: { "Akıl": 2, "Vicdan": 1 }, social: { "Vicdan": 1 }, education: { "Akıl": 3, "Vicdan": 2 } },
-    lines: { home: "Bu evde kurallar açıklanır ve takip edilir.", money: "Harcamadan önce düşünmek aile alışkanlığıdır.", social: "Doğru davranış sıkça konuşulur.", education: "Okul ve öğretmen bu evde önemli konudur." }
+    lines: { home: "Bu evde kurallar açıklanır ve takip edilir.", money: "Harcamadan önce düşünmek aile alışkanlığıdır.", social: "Doğru davranış sıkça konuşulur.", education: "Okul ve öğretmen bu evde önemli konudur." },
+    tagLine: { home: "kurallar bu evde nettir", money: "hesap kitap sende var", social: "doğru davranışı bilirsin", education: "ders çalışmak bu evde din gibi" }
   },
   "Keskin": {
     slug: "keskin", subtitle: "Mahalle esnafı; bağlantı ve pratik zekâ güçlü",
@@ -46,7 +48,8 @@ var FAMILIES = {
       { name: "Hemen Çöz", good: false, desc: "Sabır isteyen işlerde çabuk sıkılır.", stats: { "Dayanıklılık": -2 } }
     ],
     eff: { home: { "Sosyal Radar": 2 }, money: { "Çene": 3, "Kurnazlık": 3 }, social: { "Çene": 2, "Sosyal Radar": 2 }, education: { "Kurnazlık": 1 } },
-    lines: { home: "Evde insanları okumak günlük pratiktir.", money: "Fiyat, para üstü ve pazarlık sana yabancı değil.", social: "İnsanlarla konuşup işi çözmek aile refleksi.", education: "Pratik çözüm de en az doğru cevap kadar değerlidir." }
+    lines: { home: "Evde insanları okumak günlük pratiktir.", money: "Fiyat, para üstü ve pazarlık sana yabancı değil.", social: "İnsanlarla konuşup işi çözmek aile refleksi.", education: "Pratik çözüm de en az doğru cevap kadar değerlidir." },
+    tagLine: { home: "insan okumak sende doğal", money: "pazarlık bu ailenin marka işi", social: "çevren geniş, dilin de öyle", education: "pratik çözüm ders kitabını yener" }
   },
   "Tan": {
     slug: "tan", subtitle: "Beyaz yakalı üst-orta sınıf; fırsat ve beklenti yüksek",
@@ -57,7 +60,8 @@ var FAMILIES = {
       { name: "Mükemmeliyet Baskısı", good: false, desc: "Zor işlerde hata korkusu yorabilir.", stats: { "Dayanıklılık": -2 } }
     ],
     eff: { home: { "Çene": 2, "Akıl": 1 }, money: { "Akıl": 1 }, social: { "Sosyal Radar": 2, "Çene": 1 }, education: { "Akıl": 3, "Çene": 2 } },
-    lines: { home: "Kendini doğru ifade etmek beklenir.", money: "Para konuşulmasa da seçimler izlenir.", social: "Nasıl göründüğün de fark edilir.", education: "Başarı beklentisi odadadır." }
+    lines: { home: "Kendini doğru ifade etmek beklenir.", money: "Para konuşulmasa da seçimler izlenir.", social: "Nasıl göründüğün de fark edilir.", education: "Başarı beklentisi odadadır." },
+    tagLine: { home: "kendini iyi ifade edersin", money: "kaynaklar senin lehine işler", social: "görünüşün de hesaba katılır", education: "bu ailede başarı tartışılmaz" }
   },
   "Varlı": {
     slug: "varli", subtitle: "Yeni zengin; özgüven ve statü baskısı birlikte",
@@ -68,7 +72,8 @@ var FAMILIES = {
       { name: "Hayır Duymaya Alışık Değil", good: false, desc: "Reddedilince çabuk bozulabilir.", stats: { "Dayanıklılık": -2 } }
     ],
     eff: { home: { "Pişkinlik": 2, "Cesaret": 1 }, money: { "Pişkinlik": 2, "Çene": 1 }, social: { "Pişkinlik": 3, "Cesaret": 2 }, education: { "Çene": 2 } },
-    lines: { home: "Özgüven eksikliği pek teşvik edilmez.", money: "Para kıt değildir; statü görünürdür.", social: "Çekingenlik aile stiline pek uymaz.", education: "Başarı kadar kendinden emin görünmek de önemlidir." }
+    lines: { home: "Özgüven eksikliği pek teşvik edilmez.", money: "Para kıt değildir; statü görünürdür.", social: "Çekingenlik aile stiline pek uymaz.", education: "Başarı kadar kendinden emin görünmek de önemlidir." },
+    tagLine: { home: "çekingenlik bu evde yabancı", money: "statü gösterişten kaçmaz", social: "kalabalıkta küçülmemeyi bilirsin", education: "kendinden emin görünmek not kadar değerli" }
   },
   "Şen": {
     slug: "sen", subtitle: "Kalabalık aile; sosyal destek ve mahremiyet azlığı",
@@ -79,6 +84,7 @@ var FAMILIES = {
       { name: "Dikkat Dağınıklığı", good: false, desc: "Sessizlik isteyen işlerde zorlanabilir.", stats: { "Akıl": -2 } }
     ],
     eff: { home: { "Sosyal Radar": 3, "Vicdan": 2 }, money: { "Çene": 1 }, social: { "Sosyal Radar": 3, "Çene": 2 }, education: { "Sosyal Radar": 2 } },
-    lines: { home: "Kalabalık evde tepki okumaya alışkınsın.", money: "Paranın kimden gelip kime gittiğini herkes bilir.", social: "Kalabalıkta yer açmak günlük hayattır.", education: "Her konuda fikri olan birkaç akraba mutlaka vardır." }
+    lines: { home: "Kalabalık evde tepki okumaya alışkınsın.", money: "Paranın kimden gelip kime gittiğini herkes bilir.", social: "Kalabalıkta yer açmak günlük hayattır.", education: "Her konuda fikri olan birkaç akraba mutlaka vardır." },
+    tagLine: { home: "bu evde herkes her şeyi bilir", money: "kim kime ne verdi, herkes takipte", social: "kalabalıkta yer açmak refleksin", education: "her konuda fikir veren bir akraba hazır" }
   }
 };
