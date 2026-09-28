@@ -210,7 +210,8 @@ function applyOutcome(S, e, c, outcome, extra) {
     var bg = backgroundDeath(S, e, extra.bgRoll);
     if (bg) { res.death = bg; res.natural = true; S.dead = { cause: bg, age: eventAge(S, e), title: e.title }; }
   }
-  S.log.push({ id: e.id, ch: e.ch, age: e.age, title: e.title, choice: c.t, outcome: outcome, roll: extra.roll || null });
+  var unlock = c.reqFlag ? { type: "flag", key: c.reqFlag } : c.reqVoice ? { type: "voice", key: c.reqVoice } : c.req ? { type: "trait", key: c.req } : null;
+  S.log.push({ id: e.id, ch: e.ch, age: eventAge(S, e), title: e.title, choice: c.t, outcome: outcome, roll: extra.roll || null, unlock: unlock });
   return res;
 }
 
@@ -250,7 +251,7 @@ var PROPHECY = {
   "Sosyal Radar": "Bir odaya girdiğinde, kimin kime kızgın olduğunu herkesten önce bileceksin."
 };
 /* Bazı statlar oyunda daha sık geçtiği için simülasyonla dengelenir (tools/simulasyon.js, 3.000 tam hayat) */
-var ARCH_NORM = {"Akıl":-13,"Çene":52,"Kurnazlık":5,"Cesaret":-34,"Pişkinlik":-17,"Vicdan":4,"Dayanıklılık":13,"Sosyal Radar":-11};
+var ARCH_NORM = {"Akıl":-6,"Çene":42,"Kurnazlık":0,"Cesaret":-28,"Pişkinlik":-16,"Vicdan":3,"Dayanıklılık":15,"Sosyal Radar":-10};
 function archetype(S) {
   var base = S.famStats || S.stats;
   var scored = STATS.map(function (k) { return { k: k, s: S.stats[k] + 2 * (S.stats[k] - base[k]) - (ARCH_NORM[k] || 0) }; })

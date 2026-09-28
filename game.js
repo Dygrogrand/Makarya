@@ -151,7 +151,7 @@ function renderEvent() {
     }
     var tags = [], sub, chance;
     if (c.req) tags.push('<span class="tag trait">⭐ ' + esc(c.req) + "</span>");
-    if (c.reqFlag) tags.push('<span class="tag trait">📜 Geçmişten gelen seçenek</span>');
+    if (c.reqFlag) tags.push('<span class="tag trait">📜 Geçmişten: ' + esc(FLAG_LABELS[c.reqFlag] || "eski bir seçimin") + "</span>");
     if (c.reqVoice) tags.push('<span class="tag voiceTag">💭 ' + esc(VOICE_NAMES[c.reqVoice]) + ' açtı</span>');
     if (c.risk) tags.push('<span class="tag risk">☠️ Ölüm riski %' + Math.round(c.risk.p * 100) + "</span>");
     if (c.trait && S.traits.indexOf(c.trait) < 0) tags.push('<span class="tag trait">🏅 Kazandırır: ' + esc(c.trait) + "</span>");
@@ -281,6 +281,19 @@ function barsHtml() {
     return '<div class="bar"><span>' + STAT_ICONS[k] + " " + k + '</span><div class="track"><div class="fill" style="width:' + Math.round(100 * S.stats[k] / max) + '%"></div></div><b>' + S.stats[k] + "</b></div>";
   }).join("") + "</div>";
 }
+/* Mezar taşı: bu hayatta açılan kapılar ve onları neyin açtığı (açılmayanlar gösterilmez) */
+function unlockReason(u) {
+  if (u.type === "flag") return "📜 " + (FLAG_LABELS[u.key] || "Eski bir seçimin");
+  if (u.type === "voice") return "💭 " + VOICE_NAMES[u.key] + " sesi fısıldadı";
+  return "⭐ " + u.key + " özelliğin sayesinde";
+}
+function doorsHtml() {
+  var doors = S.log.filter(function (l) { return l.unlock; });
+  if (!doors.length) return "";
+  return '<h3 class="sectionTitle" style="font-size:18px">Açılan kapılar</h3><div class="logList">' + doors.map(function (l) {
+    return '<div class="logItem"><small>' + esc(l.age) + " · " + esc(l.title) + " · " + esc(unlockReason(l.unlock)) + "</small>" + esc(l.choice) + "</div>";
+  }).join("") + "</div>";
+}
 function lifeLog() {
   return S.flags.filter(function (f) { return FLAG_LABELS[f]; }).map(function (f) { return '<div class="logItem">📜 ' + esc(FLAG_LABELS[f]) + "</div>"; }).join("") + highlights(null, 4);
 }
@@ -305,6 +318,7 @@ function renderFinal() {
     '<h3 class="sectionTitle" style="font-size:18px">Karakterin</h3>' + barsHtml() +
     '<h3 class="sectionTitle" style="font-size:18px">Özellikler</h3>' +
     (S.traits.length ? '<div class="chips">' + S.traits.map(function (t) { return '<span class="chip">' + (gained.indexOf(t) >= 0 ? "🆕 " : "🏅 ") + esc(t) + "</span>"; }).join("") + "</div>" : '<div class="muted">Hiç özellik açılmadı. Bu da bir tarz.</div>') +
+    doorsHtml() +
     '<h3 class="sectionTitle" style="font-size:18px">Hayat kaydı</h3><div class="logList">' + (lifeLog() || '<div class="muted">Sakin bir çocukluk.</div>') + "</div>" +
     '<h3 class="sectionTitle" style="font-size:18px">Bölüm ' + ROMAN[S.ch] + " gelişimi</h3>" + compareHtml(S.chStart[S.ch] || cloneStats(), cloneStats()) +
     '<button class="secondary" onclick="newLife()">🎲 YENİ HAYAT</button>');
