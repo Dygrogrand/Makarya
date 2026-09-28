@@ -21,22 +21,23 @@ MINI_TYPES = ["timing", "hold", "collect", "race", "memory", "cups", "doors", "r
               "bargain", "swipe", "breath", "balance"]
 PLACES = ["ev", "mutfak", "cocuk-odasi", "okul", "sinif", "okul-bahcesi", "sokak", "park", "bakkal", "market", "carsi",
           "ofis", "dukkan", "devlet-dairesi", "hastane", "dugun-salonu", "kafe", "toplu-tasima", "trafik", "universite",
-          "kisla", "banka", "apartman", "sahil", "huzurevi", "mezarlik", "yazlik", "stadyum", "sahne", "mahkeme"]
+          "kisla", "banka", "apartman", "sahil", "huzurevi", "mezarlik", "yazlik", "stadyum", "sahne", "mahkeme", "karakol", "cezaevi", "koy", "havalimani", "meclis", "studyo"]
 TIERS = ["Borçlu", "Kıt", "Orta", "Rahat", "Varlıklı"]
+DESTEK_TR = ["Küs", "Mesafeli", "Tam"]
 FAMILIES = ["Yalçın", "Erdem", "Keskin", "Tan", "Varlı", "Şen"]
 
 EV_COLS = ["Olay ID", "Bölüm", "Yaş", "Simge", "Başlık", "Olay metni", "Mekân", "Aile türü", "Sabit", "Ağırlık",
            "Gereken hafızalar", "Olmaması gereken hafızalar", "Gereken özellik", "Cinsiyet", "Sadece aileler", "Asgari stat",
-           "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Herhangi biri hafıza"]
+           "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Herhangi biri hafıza", "Hat"]
 # Sonradan eklenen sütunlar: eski Excel dosyalarında yoksa hata verilmez, boş sayılır
 OPTIONAL_COLS = {"Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Aile desteği", "Başarısızlıkta hafıza", "Sonraki bölümde",
-                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi"}
+                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza"}
 CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Stat", "Zorluk", "Kesin etki", "Kesin sonuç metni",
            "Başarı", "Kritik başarı", "Başarısız", "Kritik hata", "Yarım (mini oyun)",
            "Mini oyun", "Mini oyun başlığı", "Mini oyun ipucu", "Mini oyun ayarı",
            "Gereken özellik", "Gereken hafıza", "İç ses açar", "Kazandırdığı özellik",
            "Seçince hafıza", "Başarıda hafıza", "Kritik hatada hafıza", "Silinen hafıza", "Ölüm riski %", "Ölüm sebebi",
-           "Aile desteği", "Başarısızlıkta hafıza", "Gereken varlık", "Kazanç kademesi"]
+           "Aile desteği", "Başarısızlıkta hafıza", "Gereken varlık", "Kazanç kademesi", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza"]
 VO_COLS = ["Olay ID", "Stat", "Zorluk", "İç ses metni", "Başarısızlık metni", "Seçenek açar"]
 RE_COLS = ["Olay ID", "Hafıza", "Geçmişten metni"]
 TR_COLS = ["Özellik", "Açıklama", "Bonus", "Otomatik stat"]
@@ -158,6 +159,7 @@ def write_xlsx(b, path):
         ["   • Ölüm riski yalnızca Bölüm 6 ve sonrası (18+). Yüzde olarak yaz (ör. 3). Oyuncu bu yüzdeyi görür."],
         ["   • Bir seçim birden fazla hafıza yazabilir: virgülle ayır (ör. 'hat-polis, meslek-memur'). Kavşak sonucunda ilk hafızanın etiketi görünür."],
         ["   • Gereken varlık: seçenek yalnızca oyuncunun varlığı bu kademe ya da üstündeyse açılır (Borçlu, Kıt, Orta, Rahat, Varlıklı). Kazanç kademesi: seçim başarılı olursa varlık en az bu kademeye çıkar."],
+        ["   • Bir hafızanın başına eksi koyarsan silinir (ör. '-meslek-memur, hat-koy' hattı değiştirir). 'Hat' sütunu olayı yalnızca o hattaki oyuncuya çıkarır (ör. polis, cete)."],
         ["   • Olaylar sayfasındaki 'Herhangi biri hafıza': yazılan hafızalardan en az biri varsa olay çıkar. Kavşakta, geçmişe bağlı kilitli seçenekler belirsiz bir gerekçeyle görünür."],
         ["İç Sesler: Olayın başında araya giren stat yorumları. 'Seçenek açar' = E ise, 'İç ses açar' sütununda aynı stat yazan seçim ancak bu ses başarılı olursa görünür."],
         ["Geçmişten: Oyuncunun hafızasında o kayıt varsa olayda gösterilen hatırlatma cümlesi."],
@@ -186,7 +188,7 @@ def write_xlsx(b, path):
     for r in guide: ws.append(r)
     ws.column_dimensions["A"].width = 150
     ws["A1"].font = Font(bold=True, size=16)
-    for r in [8, 26, 34]: ws.cell(row=r, column=1).font = Font(bold=True)
+    for r in [8, 27, 35]: ws.cell(row=r, column=1).font = Font(bold=True)
 
     # Olaylar
     rows_ev, rows_ch, rows_vo, rows_re = [], [], [], []
@@ -196,7 +198,7 @@ def write_xlsx(b, path):
                         FAM_TR.get(e.get("fam", ""), ""), "E" if e.get("fixed") else "", e.get("weight", ""),
                         ", ".join(w.get("flags", [])), ", ".join(w.get("notFlags", [])), w.get("trait", ""),
                         {"erkek": "erkek", "kiz": "kız"}.get(w.get("gender", ""), ""), ", ".join(w.get("fam", [])), fmt_stats(w.get("minStat")),
-                        e.get("kavsak", ""), e.get("kavsakGiris", ""), e.get("kavsakKazan", ""), e.get("kavsakKaybet", ""), ", ".join(w.get("anyFlags", []))])
+                        e.get("kavsak", ""), e.get("kavsakGiris", ""), e.get("kavsakKazan", ""), e.get("kavsakKaybet", ""), ", ".join(w.get("anyFlags", [])), ", ".join(w.get("hat", []))])
         for i, c in enumerate(e["choices"], 1):
             r = c.get("r") if isinstance(c.get("r"), dict) else {}
             m = c.get("mini") or {}
@@ -209,7 +211,8 @@ def write_xlsx(b, path):
                             c.get("flag", ""), c.get("flagWin", ""), c.get("flagBad", ""), c.get("unflag", ""),
                             (round(rk["p"] * 100, 2) if rk else ""), rk.get("cause", ""),
                             fmt_destek(c.get("destek")), c.get("flagFail", ""),
-                            TIERS[c["reqVarlik"]] if c.get("reqVarlik") is not None else "", TIERS[c["varlik"]] if c.get("varlik") is not None else ""])
+                            TIERS[c["reqVarlik"]] if c.get("reqVarlik") is not None else "", TIERS[c["varlik"]] if c.get("varlik") is not None else "",
+                            DESTEK_TR[c["reqDestek"]] if c.get("reqDestek") is not None else "", c.get("varlikKayip", ""), c.get("reqNotFlag", "")])
         for v in e.get("voices", []):
             rows_vo.append([e["id"], v["stat"], DIFF_TR[v["diff"]], v["text"], v.get("fail", ""), "E" if v.get("opens") else ""])
         for rc in e.get("recall", []):
@@ -217,7 +220,7 @@ def write_xlsx(b, path):
 
     W = {"Olay ID": 26, "Bölüm": 8, "Yaş": 12, "Simge": 7, "Başlık": 26, "Olay metni": 60, "Mekân": 14, "Aile türü": 10, "Sabit": 7,
          "Ağırlık": 8, "Gereken hafızalar": 20, "Olmaması gereken hafızalar": 20, "Gereken özellik": 18, "Cinsiyet": 9, "Sadece aileler": 14, "Asgari stat": 14,
-         "Kavşak no": 9, "Kavşak girişi": 50, "Kazanırsan": 22, "Kazanamazsan": 22, "Herhangi biri hafıza": 20}
+         "Kavşak no": 9, "Kavşak girişi": 50, "Kazanırsan": 22, "Kazanamazsan": 22, "Herhangi biri hafıza": 20, "Hat": 16}
     ws = sheet("Olaylar", EV_COLS, rows_ev, W, wrap_cols=("Olay metni", "Başlık", "Kavşak girişi"))
     n = len(rows_ev)
     dv(ws, "Bölüm", EV_COLS, [str(i) for i in range(1, 11)], n); dv(ws, "Mekân", EV_COLS, PLACES, n)
@@ -309,6 +312,7 @@ def read_xlsx(path):
         w = {}
         if r["Gereken hafızalar"]: w["flags"] = split_list(r["Gereken hafızalar"])
         if r.get("Herhangi biri hafıza"): w["anyFlags"] = split_list(r["Herhangi biri hafıza"])
+        if r.get("Hat"): w["hat"] = split_list(r["Hat"])
         if r["Olmaması gereken hafızalar"]: w["notFlags"] = split_list(r["Olmaması gereken hafızalar"])
         if r["Gereken özellik"]: w["trait"] = r["Gereken özellik"]
         if r["Cinsiyet"]: w["gender"] = {"erkek": "erkek", "kız": "kiz", "kiz": "kiz"}.get(r["Cinsiyet"], r["Cinsiyet"])
@@ -361,6 +365,14 @@ def read_xlsx(path):
             if r.get(col):
                 if str(r[col]).strip() not in TIERS: errs.append(f"{where}: '{col}' şunlardan biri olmalı: {', '.join(TIERS)}")
                 else: c[key] = TIERS.index(str(r[col]).strip())
+        if r.get("Gereken aile desteği"):
+            v_ = str(r["Gereken aile desteği"]).strip()
+            if v_ not in DESTEK_TR: errs.append(f"{where}: 'Gereken aile desteği' şunlardan biri olmalı: {', '.join(DESTEK_TR)}")
+            else: c["reqDestek"] = DESTEK_TR.index(v_)
+        if r.get("Engelleyen hafıza"): c["reqNotFlag"] = str(r["Engelleyen hafıza"])
+        if r.get("Varlık kaybı") not in ("", None):
+            try: c["varlikKayip"] = int(float(r["Varlık kaybı"]))
+            except ValueError: errs.append(f"{where}: 'Varlık kaybı' sayı olmalı")
         if r["Ölüm riski %"] not in ("", None):
             c["risk"] = {"p": round(float(r["Ölüm riski %"]) / 100, 4), "cause": str(r["Ölüm sebebi"])}
         chs.append((e, int(r["Sıra"] or 99), i, c))

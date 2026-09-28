@@ -21,8 +21,11 @@ function ageMonths(a) {
 EVENTS.forEach(function (e) { e._m = ageMonths(e.age); });
 /* when: { fam: [..], gender: "kiz", trait: "..", flag: "..", notFlag: "..", minStat: {stat: n} } */
 function eligible(S, e) {
+  /* Aynı bölümde aynı numaralı kavşak bir kez yaşanır (hat değiştiren, yeni hattının büyük sınavını aynı yıl tekrar yaşamaz) */
+  if (e.kavsak && (S.kavsakLog || []).some(function (k) { return k.n === e.kavsak && k.ch === e.ch; })) return false;
   var w = e.when; if (!w) return true;
   if (w.flags && w.flags.some(function (f) { return S.flags.indexOf(f) < 0; })) return false;
+  if (w.hat && w.hat.indexOf(primaryHat(S)) < 0) return false;
   if (w.anyFlags && !w.anyFlags.some(function (f) { return S.flags.indexOf(f) >= 0; })) return false;
   if (w.notFlags && w.notFlags.some(function (f) { return S.flags.indexOf(f) >= 0; })) return false;
   if (w.fam && w.fam.indexOf(S.family) < 0) return false;
@@ -35,7 +38,7 @@ function eligible(S, e) {
 }
 function pickEvents(S, ch, n, exclude, minM, rnd) {
   rnd = rnd || Math.random;
-  var pool = EVENTS.filter(function (e) { return e.ch === ch && eligible(S, e) && exclude.indexOf(e.id) < 0 && e._m >= minM; });
+  var pool = EVENTS.filter(function (e) { return e.ch === ch && e.id.indexOf("kriz-") !== 0 && eligible(S, e) && exclude.indexOf(e.id) < 0 && e._m >= minM; });
   var fixed = pool.filter(function (e) { return e.fixed; });
   var rest = pool.filter(function (e) { return !e.fixed; })
     .map(function (e) { return { e: e, k: Math.pow(rnd(), 1 / (e.weight || 1)) }; })
@@ -53,36 +56,53 @@ function buildPlan(S, ch, rnd) {
 /* Hafıza ya da özellik değişince bölümün kalanı yeniden seçilir (ör. meslek seçilince meslek olayları, evlenince evli hattı) */
 function stateSig(S) { return S.flags.join(",") + "|" + S.traits.join(","); }
 function replanRest(S, rnd) {
-  if (S._sig === stateSig(S)) return;
-  S._sig = stateSig(S);
-  var played = S.plan.slice(0, S.pi + 1), cur = EV_BY_ID[S.plan[S.pi]];
-  var rest = pickEvents(S, S.ch, CHAPTERS[S.ch].pick - played.length, played, cur ? cur._m : 0, rnd);
-  S.plan = played.concat(rest);
-  if (S.ch === 10) setEndAge(S, S.plan);
+  if (S._sig !== stateSig(S)) {
+    S._sig = stateSig(S);
+    var played = S.plan.slice(0, S.pi + 1), cur = EV_BY_ID[S.plan[S.pi]];
+    var rest = pickEvents(S, S.ch, CHAPTERS[S.ch].pick - played.length, played, cur ? evM(S, cur) : 0, rnd);
+    S.plan = played.concat(rest);
+    if (S.ch === 10) setEndAge(S, S.plan);
+  }
+  maybeCrisis(S);
 }
+/* Kriz: hattında üst üste 3 başarısızlık bir kriz olayı açar (bölüm başına en fazla bir, hayat boyu en fazla iki) */
+function maybeCrisis(S) {
+  if ((S.failStreak || 0) < 3 || S.ch < 7 || S.ch > 9 || S.flags.indexOf("hapis") >= 0 || !primaryHat(S)) return;
+  S.krizCh = S.krizCh || {};
+  if (S.krizCh[S.ch] || Object.keys(S.krizCh).length >= 2 || S.pi >= S.plan.length - 1) return;
+  var cur = EV_BY_ID[S.plan[S.pi]];
+  var k = EVENTS.filter(function (e) { return e.ch === S.ch && e.id.indexOf("kriz-") === 0 && eligible(S, e); })[0];
+  if (!k) return;
+  S.krizCh[S.ch] = k.id; S.failStreak = 0;
+  S.krizAt = { id: k.id, age: eventAge(S, cur), m: evM(S, cur) };
+  S.plan.splice(S.pi + 1, 0, k.id);
+}
+function evM(S, e) { return S.krizAt && S.krizAt.id === e.id ? S.krizAt.m : e._m; }
 function setEndAge(S, plan) {
   var last = 0;
   plan.forEach(function (id) { if (id !== "son-soz") last = Math.max(last, EV_BY_ID[id]._m); });
   S.endAge = Math.floor(last / 12) + 1 + Math.floor(Math.random() * 5);
 }
-function eventAge(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge + " yaş" : e.age; }
-function ageYears(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge : e._m / 12; }
+function eventAge(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge + " yaş" : S.krizAt && S.krizAt.id === e.id ? S.krizAt.age : e.age; }
+function ageYears(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge : evM(S, e) / 12; }
 function hasChapter(ch) { return !!CHAPTERS[ch] && EVENTS.some(function (e) { return e.ch === ch; }); }
 function curEvent(S) { return EV_BY_ID[S.plan[S.pi]]; }
 
 /* Kavşağın sonucu tek bir yol adıyla: "İyi bir lise", "Okulu bıraktı", "Esnaf oldu" */
 function kavsakPath(e, c, outcome) {
-  var lbl = function (f) { f = flagList(f)[0]; return f && FLAG_LABELS[f] ? FLAG_LABELS[f].replace(/\.$/, "") : ""; };
+  var lbl = function (f) { f = flagList(f).filter(function (x) { return x.charAt(0) !== "-"; })[0]; return f && FLAG_LABELS[f] ? FLAG_LABELS[f].replace(/\.$/, "") : ""; };
   var win = outcome === "crit" || outcome === "win";
   if (outcome === "direct") return lbl(c.flag) || c.t;
   if (e.kavsakKazan) return win ? e.kavsakKazan : (e.kavsakKaybet || c.t);
+  if (!win && c.flagWin && !c.flagFail && !c.flag) return "Olmadı: " + c.t;
   return (win ? lbl(c.flagWin) : lbl(c.flagFail)) || lbl(c.flag) || c.t;
 }
 /* Kendi kazancın: büyük olaylarda (meslek, göç, miras…) varlık kademesi yükselir; aile desteğinden bağımsızdır */
 function gainVarlik(S, c, res) {
-  if (c.varlik == null) return;
+  if (c.varlik == null && !c.varlikKayip) return;
   var v0 = varlikOf(S);
-  S.own = Math.max(S.own || 0, c.varlik);
+  if (c.varlik != null) S.own = Math.max(S.own || 0, c.varlik);
+  if (c.varlikKayip) S.own = Math.max(0, (S.own || 0) - c.varlikKayip);
   if (varlikOf(S) !== v0) res.varlik = varlikOf(S) - v0;
 }
 function destekOf(S) { return S.destek == null ? 2 : S.destek; }
@@ -107,6 +127,8 @@ function hasReq(S, c, e) {
   if (c.req && S.traits.indexOf(c.req) < 0) return false;
   if (c.reqFlag && S.flags.indexOf(c.reqFlag) < 0) return false;
   if (c.reqVarlik != null && varlikOf(S) < c.reqVarlik) return false;
+  if (c.reqDestek != null && destekOf(S) < c.reqDestek) return false;
+  if (c.reqNotFlag && flagList(c.reqNotFlag).some(function (f) { return S.flags.indexOf(f) >= 0; })) return false;
   if (c.reqVoice) {
     var ok = e && eventVoices(S, e).some(function (v) { return v.stat === c.reqVoice && v.pass; });
     if (!ok) return false;
@@ -202,7 +224,19 @@ function gainTrait(S, t, res) {
 }
 /* Bir seçim birden fazla hafıza yazabilir: "hat-polis, meslek-memur" */
 function flagList(f) { return f ? String(f).split(/\s*,\s*/).filter(Boolean) : []; }
-function addFlag(S, f) { flagList(f).forEach(function (x) { if (S.flags.indexOf(x) < 0) S.flags.push(x); }); }
+/* "-evli" gibi eksiyle başlayan hafıza silinir: "-meslek-memur, hat-koy" hattı değiştirir */
+function addFlag(S, f) {
+  flagList(f).forEach(function (x) {
+    if (x.charAt(0) === "-") { x = x.slice(1); S.flags = S.flags.filter(function (y) { return y !== x; }); }
+    else if (S.flags.indexOf(x) < 0) S.flags.push(x);
+  });
+}
+/* Hat: hat-* hafızası varsa o, yoksa meslek-* (memur, beyazyaka, esnaf, serbest) */
+function primaryHat(S) {
+  for (var i = 0; i < S.flags.length; i++) if (S.flags[i].indexOf("hat-") === 0) return S.flags[i].slice(4);
+  for (i = 0; i < S.flags.length; i++) if (S.flags[i].indexOf("meslek-") === 0 && S.flags[i] !== "meslek-lisesi") return S.flags[i].slice(7);
+  return "";
+}
 function addStat(S, k, v, res) {
   if (!v) return;
   S.stats[k] = clamp(S.stats[k] + v, 0, 100);
@@ -214,6 +248,7 @@ function applyOutcome(S, e, c, outcome, extra) {
   var res = { outcome: outcome, deltas: [], traits: [], note: "", text: "" };
   extra = extra || {};
   if (e.kavsak) { S.kavsak = S.kavsak || []; if (S.kavsak.indexOf(e.kavsak) < 0) S.kavsak.push(e.kavsak); }
+  var wasHapis = S.flags.indexOf("hapis") >= 0, v00 = varlikOf(S), d00 = destekOf(S);
   addFlag(S, c.flag);
   if (c.unflag) { var un = flagList(c.unflag); S.flags = S.flags.filter(function (f) { return un.indexOf(f) < 0; }); }
   /* Aile desteği: seçimin kendisi aileyi etkiler (her seçim bir vazgeçiş) */
@@ -238,8 +273,15 @@ function applyOutcome(S, e, c, outcome, extra) {
     }
     if (outcome === "bad") addFlag(S, c.flagBad);
     if (!success) addFlag(S, c.flagFail);
+    if (!c.mini || outcome !== "mid") S.failStreak = success ? 0 : (S.failStreak || 0) + 1;
     var r = c.r || {};
     res.text = r[outcome] || (outcome === "crit" ? r.win : null) || (outcome === "mid" ? r.fail : null) || DEFAULT_TEXT[outcome];
+  }
+  /* Hapse düşmek: birikim sıfırlanır, aile desteği bir kademe düşer */
+  if (!wasHapis && S.flags.indexOf("hapis") >= 0) {
+    S.own = 0; S.destek = Math.max(0, destekOf(S) - 1); S.failStreak = 0;
+    if (varlikOf(S) !== v00) res.varlik = varlikOf(S) - v00;
+    if (destekOf(S) !== d00) res.destek = destekOf(S) - d00;
   }
   if (c.risk && (extra.deathRoll != null ? extra.deathRoll : Math.random()) < c.risk.p) {
     res.death = c.risk.cause;
@@ -248,8 +290,8 @@ function applyOutcome(S, e, c, outcome, extra) {
     var bg = backgroundDeath(S, e, extra.bgRoll);
     if (bg) { res.death = bg; res.natural = true; S.dead = { cause: bg, age: eventAge(S, e), title: e.title }; }
   }
-  var unlock = c.reqFlag ? { type: "flag", key: c.reqFlag } : c.reqVoice ? { type: "voice", key: c.reqVoice } : c.req ? { type: "trait", key: c.req } :
-    c.reqVarlik != null ? { type: "varlik", key: TIERS[c.reqVarlik] } : null;
+  var unlock = c.reqFlag && /^(hat|meslek)-|^evli$/.test(c.reqFlag) ? null : c.reqFlag ? { type: "flag", key: c.reqFlag } : c.reqVoice ? { type: "voice", key: c.reqVoice } : c.req ? { type: "trait", key: c.req } :
+    c.reqVarlik != null ? { type: "varlik", key: TIERS[c.reqVarlik] } : c.reqDestek != null ? { type: "destek", key: DESTEK[c.reqDestek] } : null;
   if (e.kavsak) {
     S.kavsakLog = S.kavsakLog || [];
     S.kavsakLog.push({ n: e.kavsak, ch: e.ch, title: e.title, path: kavsakPath(e, c, outcome), win: outcome === "crit" || outcome === "win" || outcome === "direct" });
@@ -294,7 +336,7 @@ var PROPHECY = {
   "Sosyal Radar": "Bir odaya girdiğinde, kimin kime kızgın olduğunu herkesten önce bileceksin."
 };
 /* Bazı statlar oyunda daha sık geçtiği için simülasyonla dengelenir (tools/simulasyon.js, 3.000 tam hayat) */
-var ARCH_NORM = {"Akıl":-7,"Çene":44,"Kurnazlık":7,"Cesaret":-27,"Pişkinlik":-18,"Vicdan":3,"Dayanıklılık":15,"Sosyal Radar":-16};
+var ARCH_NORM = {"Akıl":-6,"Çene":42,"Kurnazlık":4,"Cesaret":-24,"Pişkinlik":-17,"Vicdan":1,"Dayanıklılık":14,"Sosyal Radar":-14};
 function archetype(S) {
   var base = S.famStats || S.stats;
   var scored = STATS.map(function (k) { return { k: k, s: S.stats[k] + 2 * (S.stats[k] - base[k]) - (ARCH_NORM[k] || 0) }; })

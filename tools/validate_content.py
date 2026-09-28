@@ -10,7 +10,7 @@ VOICE_DIFFS = ["easy", "medium", "hard", "veryHard"]
 FAMS = ["home", "money", "social", "education"]
 PLACES = ["ev", "mutfak", "cocuk-odasi", "okul", "sinif", "okul-bahcesi", "sokak", "park", "bakkal", "market", "carsi",
           "ofis", "dukkan", "devlet-dairesi", "hastane", "dugun-salonu", "kafe", "toplu-tasima", "trafik", "universite",
-          "kisla", "banka", "apartman", "sahil", "huzurevi", "mezarlik", "yazlik", "stadyum", "sahne", "mahkeme"]
+          "kisla", "banka", "apartman", "sahil", "huzurevi", "mezarlik", "yazlik", "stadyum", "sahne", "mahkeme", "karakol", "cezaevi", "koy", "havalimani", "meclis", "studyo"]
 MINIS = {
     "timing": [], "hold": [], "collect": ["piece"], "race": [], "memory": ["items"], "cups": [], "doors": [],
     "rhythm": [], "lanes": ["obstacles"], "simon": ["items"], "poker": ["questions"], "trace": ["shape"],
@@ -61,6 +61,11 @@ def strings(o):
     elif isinstance(o, list):
         for v in o: yield from strings(v)
 
+HATS = ["memur", "beyazyaka", "esnaf", "serbest", "polis", "yargi", "hekim", "politika", "cete", "dolandirici", "sohret", "girisimci", "goc", "koy", "usta"]
+
+def x_neg(val, f):
+    return ("-" + f) in [x.strip() for x in str(val or "").split(",")]
+
 def main(paths):
     errs, warns = [], []
     all_events, traits, flags_set, flags_used, reqs, death = [], set(BASE_TRAITS), set(), set(), [], []
@@ -103,9 +108,11 @@ def main(paths):
         if e.get("place") and e["place"] not in PLACES: errs.append(f"{where}: place geçersiz: {e['place']}")
         w = e.get("when") or {}
         for k in w:
-            if k not in ["flags", "anyFlags", "notFlags", "trait", "gender", "fam", "minStat"]: errs.append(f"{where}: when anahtarı geçersiz: {k}")
+            if k not in ["flags", "anyFlags", "notFlags", "trait", "gender", "fam", "minStat", "hat"]: errs.append(f"{where}: when anahtarı geçersiz: {k}")
         for f in w.get("flags", []) + w.get("anyFlags", []) + w.get("notFlags", []): reqs.append((where, f))
         if w.get("trait"): reqs.append((where, "trait:" + w["trait"]))
+        for h_ in w.get("hat", []):
+            if h_ not in HATS: errs.append(f"{where}: hat geçersiz: {h_} ({', '.join(HATS)})")
         if w.get("gender") and w["gender"] not in ["erkek", "kiz"]: errs.append(f"{where}: gender erkek/kiz")
         for k in (w.get("minStat") or {}):
             if k not in STATS: errs.append(f"{where}: minStat stat geçersiz")
@@ -117,7 +124,8 @@ def main(paths):
             if not r.get("flag") or not r.get("text"): errs.append(f"{where}: recall hatalı")
             reqs.append((where, r.get("flag")))
         chs = e.get("choices", [])
-        mx = 7 if e.get("kavsak") or sum(1 for c in chs if c.get("reqFlag")) >= 3 else 6
+        nrf = sum(1 for c in chs if c.get("reqFlag"))
+        mx = 4 + nrf if nrf >= 3 else 7 if e.get("kavsak") else 6
         if not (2 <= len(chs) <= mx): errs.append(f"{where}: 2-{mx} seçim olmalı")
         for c in chs:
             cw = f"{where} / '{c.get('t')}'"
@@ -151,9 +159,9 @@ def main(paths):
             if c.get("reqVoice") and c["reqVoice"] not in voice_open: errs.append(f"{cw}: reqVoice için 'opens: true' iç ses yok")
             if c.get("trait"): flags_set.add("trait:" + c["trait"])
             for k in ["flag", "flagWin", "flagBad", "flagFail", "unflag"]:
-                for f_ in [x.strip() for x in str(c.get(k) or "").split(",") if x.strip()]:
+                for f_ in [x.strip().lstrip("-") for x in str(c.get(k) or "").split(",") if x.strip()]:
                     if not FLAG.match(f_): errs.append(f"{cw}: {k} biçimi hatalı")
-                    if k != "unflag": flags_set.add(f_)
+                    if k != "unflag" and not x_neg(c.get(k), f_): flags_set.add(f_)
             if c.get("destek") is not None:
                 d_ = c["destek"]
                 if not isinstance(d_, dict) or not d_: errs.append(f"{cw}: aile desteği hatalı")
@@ -161,6 +169,8 @@ def main(paths):
                     for k_, v_ in d_.items():
                         if k_ not in ["*", "Yalçın", "Erdem", "Keskin", "Tan", "Varlı", "Şen"] or not isinstance(v_, int) or abs(v_) > 2:
                             errs.append(f"{cw}: aile desteği hatalı {k_}={v_}")
+            if c.get("reqDestek") is not None and c["reqDestek"] not in range(3): errs.append(f"{cw}: reqDestek 0-2 olmalı")
+            if c.get("varlikKayip") is not None and c["varlikKayip"] not in range(1, 5): errs.append(f"{cw}: varlikKayip 1-4 olmalı")
             for k_ in ["reqVarlik", "varlik"]:
                 if c.get(k_) is not None and c[k_] not in range(5): errs.append(f"{cw}: {k_} 0-4 olmalı")
             if c.get("risk"):

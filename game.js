@@ -139,10 +139,13 @@ function pvChip(cls, html) { return '<span class="pv ' + cls + '">' + html + "</
 function pvRow(label, chips) { return chips.length ? '<div class="pvRow"><span class="pvLbl">' + label + "</span>" + chips.join("") + "</div>" : ""; }
 function choiceCard(e, c, idx) {
   var rib = "";
-  if (c.reqFlag) rib = "📜 Geçmişten açıldı · " + (FLAG_LABELS[c.reqFlag] || "eski bir seçimin");
+  if (c.reqFlag === "evli") rib = "";
+  else if (c.reqFlag && /^(hat|meslek)-/.test(c.reqFlag)) rib = "🧭 Hattından · " + (FLAG_LABELS[c.reqFlag] || "").replace(/\.$/, "");
+  else if (c.reqFlag) rib = "📜 Geçmişten açıldı · " + (FLAG_LABELS[c.reqFlag] || "eski bir seçimin");
   else if (c.reqVoice) rib = "💭 " + VOICE_NAMES[c.reqVoice] + " sesi açtı";
   else if (c.req) rib = "⭐ " + c.req + " sayesinde açık";
   else if (c.reqVarlik >= 2) rib = "💰 Cebin buna yetiyor · " + TIERS[varlikOf(S)];
+  else if (c.reqDestek != null) rib = "🏠 Ailen arkanda";
   var help = [], hurt = [], earn = [], risk = [], sub, chance;
   if (c.direct) {
     sub = "Kesin sonuç, zar yok";
@@ -167,6 +170,7 @@ function choiceCard(e, c, idx) {
   }
   if (c.trait && S.traits.indexOf(c.trait) < 0) earn.push(pvChip("pvEarn", "🏅 " + esc(c.trait)));
   if (c.varlik != null && c.varlik > varlikOf(S)) earn.push(pvChip("pvEarn", "💰 Varlık → " + TIERS[c.varlik]));
+  if (c.varlikKayip && (S.own || 0) > 0) earn.push(pvChip("pvHurt", "💰 Birikim −" + c.varlikKayip));
   if (c.risk) risk.push(pvChip("pvHurt", "☠️ Ölüm riski %" + Math.round(c.risk.p * 100)));
   var dd = destekDelta(S, c), aile = [];
   if (dd && !(dd > 0 && destekOf(S) === 2) && !(dd < 0 && destekOf(S) === 0))
@@ -229,7 +233,7 @@ function renderKavsakResult() {
   var chips = res.deltas.map(function (d) { return pvChip(d[1] < 0 ? "pvHurt" : "pvSure", STAT_ICONS[d[0]] + " " + esc(d[0]) + " <b>" + signed(d[1]) + "</b>"); })
     .concat(res.traits.map(function (t) { return pvChip("pvEarn", "🏅 " + esc(t)); }))
     .concat(res.destek ? [pvChip(res.destek < 0 ? "pvHurt" : "pvHelpD", "🏠 Aile desteği " + (res.destek < 0 ? "↓ " : "↑ ") + DESTEK[destekOf(S)])] : [])
-    .concat(res.varlik ? [pvChip("pvEarn", "💰 Varlık ↑ " + TIERS[varlikOf(S)])] : []);
+    .concat(res.varlik ? [pvChip(res.varlik < 0 ? "pvHurt" : "pvEarn", "💰 Varlık " + (res.varlik < 0 ? "↓ " : "↑ ") + TIERS[varlikOf(S)])] : []);
   app.innerHTML = '<div class="screen">' + topbar("Yol seçildi") + '<div class="kvGate kvDone' + (win || o === "direct" ? "" : " kvLost") + '">' +
     "<div>" + lifelineHtml(e.kavsak) + "</div>" +
     '<div class="kvStamp">YOL SEÇİLDİ</div><h1 class="kvTitle center">' + esc(title) + '</h1><p class="kvText center">' + esc(res.text) + "</p>" + roll +
@@ -263,7 +267,10 @@ function renderEvent() {
 }
 function lockedWhy(S, c, e) {
   if (c.reqVoice) return "";
-  if (c.reqFlag && S.flags.indexOf(c.reqFlag) < 0) return e.kavsak ? "Geçmişinde bu kapıyı açacak bir şey yok." : "";
+  if (c.reqNotFlag && flagList(c.reqNotFlag).some(function (f) { return S.flags.indexOf(f) >= 0; })) return "";
+  /* hat ve meslek hafızaları kimliktir, kapı değil: başka hatların seçenekleri hiç görünmez */
+  if (c.reqFlag && S.flags.indexOf(c.reqFlag) < 0) return e.kavsak && !/^(hat|meslek)-/.test(c.reqFlag) && c.reqFlag !== "evli" ? "Geçmişinde bu kapıyı açacak bir şey yok." : "";
+  if (c.reqDestek != null && destekOf(S) < c.reqDestek) return e.kavsak ? "Ailen bu konuda arkanda değil." : "";
   if (c.reqVarlik != null && varlikOf(S) < c.reqVarlik) return e.kavsak ? "Cebin buna yetmiyor." : "";
   if (c.req && S.traits.indexOf(c.req) < 0) return "Bu seçenek için özellik gerekir: " + c.req;
   return "";
@@ -332,7 +339,7 @@ function renderResult() {
     '<div class="resultHeader"><div class="badge o-' + o + '">' + OUT_LABEL[o] + '</div><div class="resultTitle">' + esc(o === "direct" ? c.t : OUT_TITLE[o]) + "</div>" +
     '<div class="resultText">' + esc(res.text) + "</div>" + (res.note ? '<div class="note">' + esc(res.note) + "</div>" : "") + "</div>" +
     rollCard + gains + traits + (res.destek || res.varlik ? '<div class="pvRow">' + (res.destek ? pvChip(res.destek < 0 ? "pvHurt" : "pvHelp", "🏠 Aile desteği " + (res.destek < 0 ? "↓ " : "↑ ") + DESTEK[destekOf(S)]) : "") +
-      (res.varlik ? pvChip("pvEarn", "💰 Varlık ↑ " + TIERS[varlikOf(S)]) : "") + "</div>" : "") +
+      (res.varlik ? pvChip(res.varlik < 0 ? "pvHurt" : "pvEarn", "💰 Varlık " + (res.varlik < 0 ? "↓ " : "↑ ") + TIERS[varlikOf(S)]) : "") + "</div>" : "") +
     (res.death ? '<div class="deathCard"><div class="l">☠️ HAYAT BURADA SONA ERDİ</div><div class="d">' + esc(res.death) + "</div></div>" +
       '<button class="primary dark" onclick="advance()">🪦 MEZAR TAŞINI GÖR</button>' : '<button class="primary" onclick="advance()">DEVAM ET</button>') + "</div></div>";
 }
@@ -391,6 +398,7 @@ function unlockReason(u) {
   if (u.type === "flag") return "📜 " + (FLAG_LABELS[u.key] || "Eski bir seçimin");
   if (u.type === "voice") return "💭 " + VOICE_NAMES[u.key] + " sesi fısıldadı";
   if (u.type === "varlik") return "💰 Cebin " + u.key + " olduğu için";
+  if (u.type === "destek") return "🏠 Ailen arkanda olduğu için";
   return "⭐ " + u.key + " özelliğin sayesinde";
 }
 function doorsHtml() {
