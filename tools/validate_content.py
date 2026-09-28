@@ -103,8 +103,8 @@ def main(paths):
         if e.get("place") and e["place"] not in PLACES: errs.append(f"{where}: place geçersiz: {e['place']}")
         w = e.get("when") or {}
         for k in w:
-            if k not in ["flags", "notFlags", "trait", "gender", "fam", "minStat"]: errs.append(f"{where}: when anahtarı geçersiz: {k}")
-        for f in w.get("flags", []) + w.get("notFlags", []): reqs.append((where, f))
+            if k not in ["flags", "anyFlags", "notFlags", "trait", "gender", "fam", "minStat"]: errs.append(f"{where}: when anahtarı geçersiz: {k}")
+        for f in w.get("flags", []) + w.get("anyFlags", []) + w.get("notFlags", []): reqs.append((where, f))
         if w.get("trait"): reqs.append((where, "trait:" + w["trait"]))
         if w.get("gender") and w["gender"] not in ["erkek", "kiz"]: errs.append(f"{where}: gender erkek/kiz")
         for k in (w.get("minStat") or {}):
@@ -117,7 +117,8 @@ def main(paths):
             if not r.get("flag") or not r.get("text"): errs.append(f"{where}: recall hatalı")
             reqs.append((where, r.get("flag")))
         chs = e.get("choices", [])
-        if not (2 <= len(chs) <= 6): errs.append(f"{where}: 2-6 seçim olmalı")
+        mx = 7 if e.get("kavsak") or sum(1 for c in chs if c.get("reqFlag")) >= 3 else 6
+        if not (2 <= len(chs) <= mx): errs.append(f"{where}: 2-{mx} seçim olmalı")
         for c in chs:
             cw = f"{where} / '{c.get('t')}'"
             if not c.get("t"): errs.append(f"{cw}: t eksik")
@@ -150,9 +151,9 @@ def main(paths):
             if c.get("reqVoice") and c["reqVoice"] not in voice_open: errs.append(f"{cw}: reqVoice için 'opens: true' iç ses yok")
             if c.get("trait"): flags_set.add("trait:" + c["trait"])
             for k in ["flag", "flagWin", "flagBad", "flagFail", "unflag"]:
-                if c.get(k):
-                    if not FLAG.match(c[k]): errs.append(f"{cw}: {k} biçimi hatalı")
-                    if k != "unflag": flags_set.add(c[k])
+                for f_ in [x.strip() for x in str(c.get(k) or "").split(",") if x.strip()]:
+                    if not FLAG.match(f_): errs.append(f"{cw}: {k} biçimi hatalı")
+                    if k != "unflag": flags_set.add(f_)
             if c.get("destek") is not None:
                 d_ = c["destek"]
                 if not isinstance(d_, dict) or not d_: errs.append(f"{cw}: aile desteği hatalı")
@@ -160,6 +161,8 @@ def main(paths):
                     for k_, v_ in d_.items():
                         if k_ not in ["*", "Yalçın", "Erdem", "Keskin", "Tan", "Varlı", "Şen"] or not isinstance(v_, int) or abs(v_) > 2:
                             errs.append(f"{cw}: aile desteği hatalı {k_}={v_}")
+            for k_ in ["reqVarlik", "varlik"]:
+                if c.get(k_) is not None and c[k_] not in range(5): errs.append(f"{cw}: {k_} 0-4 olmalı")
             if c.get("risk"):
                 rk = c["risk"]
                 if ch < 6: errs.append(f"{cw}: ölüm riski yalnızca 18 yaş ve sonrası (bölüm 6+)")
