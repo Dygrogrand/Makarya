@@ -173,7 +173,9 @@ function choiceCard(e, c, idx) {
 }
 function renderEvent() {
   var e = curEvent(S);
-  var recall = (e.recall || []).filter(function (r) { return S.flags.indexOf(r.flag) >= 0; })
+  /* Aynı hafızayı açan bir seçenek kartta zaten gösteriliyorsa yukarıdaki "Geçmişten" kutusu tekrar etmesin */
+  var shownFlags = e.choices.filter(function (c) { return c.reqFlag && hasReq(S, c, e); }).map(function (c) { return c.reqFlag; });
+  var recall = (e.recall || []).filter(function (r) { return S.flags.indexOf(r.flag) >= 0 && shownFlags.indexOf(r.flag) < 0; })
     .map(function (r) { return '<div class="recall"><b>GEÇMİŞTEN</b>' + esc(r.text) + "</div>"; }).join("");
   var voices = eventVoices(S, e).filter(function (v) { return v.pass || v.fail; }).map(function (v) {
     return '<div class="voice' + (v.pass ? "" : " off") + '" style="--vc:' + VOICE_COLORS[v.stat] + '"><b>' + VOICE_NAMES[v.stat] +
