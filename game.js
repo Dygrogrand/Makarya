@@ -134,6 +134,43 @@ function beginGame() { S.ch = 1; S.plan = buildPlan(S, 1); S.pi = 0; S.chStart[1
 function directSummary(c) {
   return Object.keys(c.direct).map(function (k) { return STAT_ICONS[k] + " " + k + " " + signed(c.direct[k]); }).join(" · ");
 }
+/* Seçim kartı: açan sebep başta; LEHİNE / ALEYHİNE (numarasız) ve BAŞARIRSAN ayrı satırlarda */
+function pvChip(cls, html) { return '<span class="pv ' + cls + '">' + html + "</span>"; }
+function pvRow(label, chips) { return chips.length ? '<div class="pvRow"><span class="pvLbl">' + label + "</span>" + chips.join("") + "</div>" : ""; }
+function choiceCard(e, c, idx) {
+  var rib = "";
+  if (c.reqFlag) rib = "📜 Geçmişten açıldı · " + (FLAG_LABELS[c.reqFlag] || "eski bir seçimin");
+  else if (c.reqVoice) rib = "💭 " + VOICE_NAMES[c.reqVoice] + " sesi açtı";
+  else if (c.req) rib = "⭐ " + c.req + " sayesinde açık";
+  var help = [], hurt = [], earn = [], risk = [], sub, chance;
+  if (c.direct) {
+    sub = "Kesin sonuç, zar yok";
+    chance = '<div class="chance hi">✓<small>kesin</small></div>';
+    Object.keys(c.direct).forEach(function (k) { earn.push(pvChip("pvSure", STAT_ICONS[k] + " " + esc(k) + " <b>" + signed(c.direct[k]) + "</b>")); });
+  } else {
+    var b = needBreakdown(S, e, c), d = DIFF[c.diff], famHelp = false;
+    b.rows.forEach(function (r) {
+      if (r.kind === "family" || (r.kind === "famtrait" && r.val < 0)) famHelp = true;
+      else if (r.kind === "famtrait") hurt.push(pvChip("pvHurt", "⚠️ " + esc(r.label)));
+      else if (r.kind === "trait") help.push(pvChip("pvHelp", "⭐ " + esc(r.label)));
+      else if (r.kind === "stat") (r.val < 0 ? help : hurt).push(pvChip(r.val < 0 ? "pvHelp" : "pvHurt", r.icon + " " + esc(c.stat) + (r.val < 0 ? " güçlü" : " zayıf")));
+    });
+    if (famHelp) help.unshift(pvChip("pvHelp", "🏠 " + esc(e.fam ? FAMILIES[S.family].tagLine[e.fam] : S.family + " ailesi")));
+    sub = d.label + " · " + STAT_ICONS[c.stat] + " " + c.stat + (c.mini ? " · 🎮 Mini oyun" : " · Hedef " + b.need + "+");
+    if (c.mini) chance = '<div class="chance">🎮<small>beceri</small></div>';
+    else {
+      var p = Math.round(successChance(b.need) * 100);
+      chance = '<div class="chance ' + (p >= 65 ? "hi" : p < 40 ? "lo" : "") + '">%' + p + "<small>şans</small></div>";
+    }
+    earn.push(pvChip("pvSure", STAT_ICONS[c.stat] + " " + esc(c.stat) + " <b>+" + d.succ + '</b> <span class="pvDim">(kritik +' + d.crit + ")</span>"));
+  }
+  if (c.trait && S.traits.indexOf(c.trait) < 0) earn.push(pvChip("pvEarn", "🏅 " + esc(c.trait)));
+  if (c.risk) risk.push(pvChip("pvHurt", "☠️ Ölüm riski %" + Math.round(c.risk.p * 100)));
+  return '<button class="choice' + (rib ? " pvPast" : "") + '" onclick="choose(' + idx + ')"><div class="choiceIcon">' + (c.stat ? STAT_ICONS[c.stat] : "✦") +
+    '</div><div class="choiceMain">' + (rib ? '<span class="pvRib">' + esc(rib) + "</span>" : "") + "<b>" + esc(c.t) + "</b><small>" + esc(sub) + "</small>" +
+    pvRow("Lehine", help) + pvRow("Aleyhine", hurt) + pvRow(c.direct ? "Sonuç" : "Başarırsan", earn) + pvRow("Risk", risk) +
+    "</div>" + chance + "</button>";
+}
 function renderEvent() {
   var e = curEvent(S);
   var recall = (e.recall || []).filter(function (r) { return S.flags.indexOf(r.flag) >= 0; })
@@ -149,28 +186,7 @@ function renderEvent() {
       return '<div class="choice locked"><div class="choiceIcon">🔒</div><div class="choiceMain"><b>' + esc(c.t) +
         "</b><small>Bu seçenek için özellik gerekir: " + esc(c.req) + "</small></div></div>";
     }
-    var tags = [], sub, chance;
-    if (c.req) tags.push('<span class="tag trait">⭐ ' + esc(c.req) + "</span>");
-    if (c.reqFlag) tags.push('<span class="tag trait">📜 Geçmişten: ' + esc(FLAG_LABELS[c.reqFlag] || "eski bir seçimin") + "</span>");
-    if (c.reqVoice) tags.push('<span class="tag voiceTag">💭 ' + esc(VOICE_NAMES[c.reqVoice]) + ' açtı</span>');
-    if (c.risk) tags.push('<span class="tag risk">☠️ Ölüm riski %' + Math.round(c.risk.p * 100) + "</span>");
-    if (c.trait && S.traits.indexOf(c.trait) < 0) tags.push('<span class="tag trait">🏅 Kazandırır: ' + esc(c.trait) + "</span>");
-    if (c.direct) {
-      sub = "Kesin sonuç · " + directSummary(c);
-      chance = '<div class="chance hi">✓<small>kesin</small></div>';
-    } else {
-      var b = needBreakdown(S, e, c);
-      sub = DIFF[c.diff].label + " · " + STAT_ICONS[c.stat] + " " + c.stat + (c.mini ? "" : " · Hedef " + b.need + "+");
-      if (b.famBonus) tags.push('<span class="tag fam">🏠 ' + esc(FAMILIES[S.family].tagLine[e.fam]) + "</span>");
-      if (c.mini) { tags.push('<span class="tag mini">🎮 Mini oyun</span>'); chance = '<div class="chance">🎮<small>beceri</small></div>'; }
-      else {
-        var p = Math.round(successChance(b.need) * 100);
-        chance = '<div class="chance ' + (p >= 65 ? "hi" : p < 40 ? "lo" : "") + '">%' + p + "<small>şans</small></div>";
-      }
-    }
-    return '<button class="choice" onclick="choose(' + idx + ')"><div class="choiceIcon">' + (c.stat ? STAT_ICONS[c.stat] : "✦") +
-      '</div><div class="choiceMain"><b>' + esc(c.t) + "</b><small>" + esc(sub) + "</small>" + (tags.length ? '<div class="tags">' + tags.join("") + "</div>" : "") +
-      "</div>" + chance + "</button>";
+    return choiceCard(e, c, idx);
   }).join("");
   shell(chTitle(e.ch), art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + eventAge(S, e), e.title, e.text), recall + voices + famLine + choices);
 }
