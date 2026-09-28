@@ -117,7 +117,7 @@ def main(paths):
             if not r.get("flag") or not r.get("text"): errs.append(f"{where}: recall hatalı")
             reqs.append((where, r.get("flag")))
         chs = e.get("choices", [])
-        if not (2 <= len(chs) <= 5): errs.append(f"{where}: 2-5 seçim olmalı")
+        if not (2 <= len(chs) <= 6): errs.append(f"{where}: 2-6 seçim olmalı")
         for c in chs:
             cw = f"{where} / '{c.get('t')}'"
             if not c.get("t"): errs.append(f"{cw}: t eksik")
@@ -149,10 +149,17 @@ def main(paths):
             if c.get("reqFlag"): reqs.append((cw, c["reqFlag"]))
             if c.get("reqVoice") and c["reqVoice"] not in voice_open: errs.append(f"{cw}: reqVoice için 'opens: true' iç ses yok")
             if c.get("trait"): flags_set.add("trait:" + c["trait"])
-            for k in ["flag", "flagWin", "flagBad", "unflag"]:
+            for k in ["flag", "flagWin", "flagBad", "flagFail", "unflag"]:
                 if c.get(k):
                     if not FLAG.match(c[k]): errs.append(f"{cw}: {k} biçimi hatalı")
                     if k != "unflag": flags_set.add(c[k])
+            if c.get("destek") is not None:
+                d_ = c["destek"]
+                if not isinstance(d_, dict) or not d_: errs.append(f"{cw}: aile desteği hatalı")
+                else:
+                    for k_, v_ in d_.items():
+                        if k_ not in ["*", "Yalçın", "Erdem", "Keskin", "Tan", "Varlı", "Şen"] or not isinstance(v_, int) or abs(v_) > 2:
+                            errs.append(f"{cw}: aile desteği hatalı {k_}={v_}")
             if c.get("risk"):
                 rk = c["risk"]
                 if ch < 6: errs.append(f"{cw}: ölüm riski yalnızca 18 yaş ve sonrası (bölüm 6+)")

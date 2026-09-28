@@ -28,12 +28,13 @@ EV_COLS = ["Olay ID", "Bölüm", "Yaş", "Simge", "Başlık", "Olay metni", "Mek
            "Gereken hafızalar", "Olmaması gereken hafızalar", "Gereken özellik", "Cinsiyet", "Sadece aileler", "Asgari stat",
            "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan"]
 # Sonradan eklenen sütunlar: eski Excel dosyalarında yoksa hata verilmez, boş sayılır
-OPTIONAL_COLS = {"Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan"}
+OPTIONAL_COLS = {"Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Aile desteği", "Başarısızlıkta hafıza"}
 CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Stat", "Zorluk", "Kesin etki", "Kesin sonuç metni",
            "Başarı", "Kritik başarı", "Başarısız", "Kritik hata", "Yarım (mini oyun)",
            "Mini oyun", "Mini oyun başlığı", "Mini oyun ipucu", "Mini oyun ayarı",
            "Gereken özellik", "Gereken hafıza", "İç ses açar", "Kazandırdığı özellik",
-           "Seçince hafıza", "Başarıda hafıza", "Kritik hatada hafıza", "Silinen hafıza", "Ölüm riski %", "Ölüm sebebi"]
+           "Seçince hafıza", "Başarıda hafıza", "Kritik hatada hafıza", "Silinen hafıza", "Ölüm riski %", "Ölüm sebebi",
+           "Aile desteği", "Başarısızlıkta hafıza"]
 VO_COLS = ["Olay ID", "Stat", "Zorluk", "İç ses metni", "Başarısızlık metni", "Seçenek açar"]
 RE_COLS = ["Olay ID", "Hafıza", "Geçmişten metni"]
 TR_COLS = ["Özellik", "Açıklama", "Bonus", "Otomatik stat"]
@@ -43,6 +44,21 @@ BO_COLS = ["Bölüm", "Ad", "Seçilecek olay", "Beklenen stat", "Yaş aralığı
 
 
 # ── yardımcılar ──
+def fmt_destek(d):
+    return ", ".join(f"{'hepsi' if k == '*' else k} {'+' if v > 0 else ''}{v}" for k, v in (d or {}).items())
+
+def parse_destek(s, where):
+    out = {}
+    if not s: return out
+    for part in re.split(r"[;,]", str(s)):
+        part = part.strip()
+        if not part: continue
+        m = re.match(r"^(.+?)\s*([+-]?\s*\d+)$", part)
+        name = m.group(1).strip() if m else ""
+        if not m or (name != "hepsi" and name not in FAMILIES): raise ValueError(f"{where}: aile desteği okunamadı: '{part}' (ör. 'hepsi -1, Keskin +1')")
+        out["*" if name == "hepsi" else name] = int(m.group(2).replace(" ", ""))
+    return out
+
 def fmt_stats(d):
     return ", ".join(f"{k} {'+' if v > 0 else ''}{v}" for k, v in (d or {}).items())
 
@@ -186,7 +202,8 @@ def write_xlsx(b, path):
                             m.get("type", ""), m.get("title", ""), m.get("hint", ""), json.dumps(params, ensure_ascii=False) if params else "",
                             c.get("req", ""), c.get("reqFlag", ""), c.get("reqVoice", ""), c.get("trait", ""),
                             c.get("flag", ""), c.get("flagWin", ""), c.get("flagBad", ""), c.get("unflag", ""),
-                            (round(rk["p"] * 100, 2) if rk else ""), rk.get("cause", "")])
+                            (round(rk["p"] * 100, 2) if rk else ""), rk.get("cause", ""),
+                            fmt_destek(c.get("destek")), c.get("flagFail", "")])
         for v in e.get("voices", []):
             rows_vo.append([e["id"], v["stat"], DIFF_TR[v["diff"]], v["text"], v.get("fail", ""), "E" if v.get("opens") else ""])
         for rc in e.get("recall", []):
@@ -329,6 +346,10 @@ def read_xlsx(path):
         for key, col in [("req", "Gereken özellik"), ("reqFlag", "Gereken hafıza"), ("reqVoice", "İç ses açar"), ("trait", "Kazandırdığı özellik"),
                          ("flag", "Seçince hafıza"), ("flagWin", "Başarıda hafıza"), ("flagBad", "Kritik hatada hafıza"), ("unflag", "Silinen hafıza")]:
             if r[col]: c[key] = str(r[col])
+        if r["Aile desteği"]:
+            try: c["destek"] = parse_destek(r["Aile desteği"], where)
+            except ValueError as ex: errs.append(str(ex))
+        if r["Başarısızlıkta hafıza"]: c["flagFail"] = str(r["Başarısızlıkta hafıza"])
         if r["Ölüm riski %"] not in ("", None):
             c["risk"] = {"p": round(float(r["Ölüm riski %"]) / 100, 4), "cause": str(r["Ölüm sebebi"])}
         chs.append((e, int(r["Sıra"] or 99), i, c))

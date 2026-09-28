@@ -166,9 +166,12 @@ function choiceCard(e, c, idx) {
   }
   if (c.trait && S.traits.indexOf(c.trait) < 0) earn.push(pvChip("pvEarn", "🏅 " + esc(c.trait)));
   if (c.risk) risk.push(pvChip("pvHurt", "☠️ Ölüm riski %" + Math.round(c.risk.p * 100)));
+  var dd = destekDelta(S, c), aile = [];
+  if (dd && !(dd > 0 && destekOf(S) === 2) && !(dd < 0 && destekOf(S) === 0))
+    aile.push(pvChip(dd < 0 ? "pvHurt" : "pvHelp", "🏠 Aile desteği " + (dd < 0 ? "−" : "+") + Math.abs(dd)));
   return '<button class="choice' + (rib ? " pvPast" : "") + '" onclick="choose(' + idx + ')"><div class="choiceIcon">' + (c.stat ? STAT_ICONS[c.stat] : "✦") +
     '</div><div class="choiceMain">' + (rib ? '<span class="pvRib">' + esc(rib) + "</span>" : "") + "<b>" + esc(c.t) + "</b><small>" + esc(sub) + "</small>" +
-    pvRow("Lehine", help) + pvRow("Aleyhine", hurt) + pvRow(c.direct ? "Sonuç" : "Başarırsan", earn) + pvRow("Risk", risk) +
+    pvRow("Lehine", help) + pvRow("Aleyhine", hurt) + pvRow(c.direct ? "Sonuç" : "Başarırsan", earn) + pvRow("Aile", aile) + pvRow("Risk", risk) +
     "</div>" + chance + "</button>";
 }
 /* ── Kavşak: hayatın büyük dönüm noktaları (giriş ekranı, özel başlık, "Yol seçildi") ── */
@@ -223,7 +226,8 @@ function renderKavsakResult() {
   var roll = CUR.roll != null ? '<div class="kvRoll"><div class="kvDie">' + CUR.roll + "</div><span>Hedef " + CUR.b.need + "+<br>" + OUT_LABEL[o] + "</span></div>"
     : CUR.mini != null ? '<div class="kvRoll"><div class="kvDie small">%' + Math.round(CUR.mini * 100) + "</div><span>Mini oyun<br>" + OUT_LABEL[o] + "</span></div>" : "";
   var chips = res.deltas.map(function (d) { return pvChip(d[1] < 0 ? "pvHurt" : "pvSure", STAT_ICONS[d[0]] + " " + esc(d[0]) + " <b>" + signed(d[1]) + "</b>"); })
-    .concat(res.traits.map(function (t) { return pvChip("pvEarn", "🏅 " + esc(t)); }));
+    .concat(res.traits.map(function (t) { return pvChip("pvEarn", "🏅 " + esc(t)); }))
+    .concat(res.destek ? [pvChip(res.destek < 0 ? "pvHurt" : "pvHelpD", "🏠 Aile desteği " + (res.destek < 0 ? "↓ " : "↑ ") + DESTEK[destekOf(S)])] : []);
   app.innerHTML = '<div class="screen">' + topbar("Yol seçildi") + '<div class="kvGate kvDone' + (win || o === "direct" ? "" : " kvLost") + '">' +
     "<div>" + lifelineHtml(e.kavsak) + "</div>" +
     '<div class="kvStamp">YOL SEÇİLDİ</div><h1 class="kvTitle center">' + esc(title) + '</h1><p class="kvText center">' + esc(res.text) + "</p>" + roll +
@@ -316,7 +320,7 @@ function renderResult() {
     '<div class="resultImg"><div class="artIcon">' + e.icon + "</div>" + imgTag(sceneSrcs(e.id)) + "</div>" +
     '<div class="resultHeader"><div class="badge o-' + o + '">' + OUT_LABEL[o] + '</div><div class="resultTitle">' + esc(o === "direct" ? c.t : OUT_TITLE[o]) + "</div>" +
     '<div class="resultText">' + esc(res.text) + "</div>" + (res.note ? '<div class="note">' + esc(res.note) + "</div>" : "") + "</div>" +
-    rollCard + gains + traits +
+    rollCard + gains + traits + (res.destek ? '<div class="pvRow">' + pvChip(res.destek < 0 ? "pvHurt" : "pvHelp", "🏠 Aile desteği " + (res.destek < 0 ? "↓ " : "↑ ") + DESTEK[destekOf(S)]) + "</div>" : "") +
     (res.death ? '<div class="deathCard"><div class="l">☠️ HAYAT BURADA SONA ERDİ</div><div class="d">' + esc(res.death) + "</div></div>" +
       '<button class="primary dark" onclick="advance()">🪦 MEZAR TAŞINI GÖR</button>' : '<button class="primary" onclick="advance()">DEVAM ET</button>') + "</div></div>";
 }
@@ -479,7 +483,10 @@ function showCharacter() {
   var fam = f.traits.map(function (t) { return '<div class="famTrait ' + (t.good ? "good" : "bad") + '"><span>' + esc(t.name) + "<small>" + esc(t.desc) + "</small></span></div>"; }).join("");
   var tr = S.traits.length ? S.traits.map(function (t) { return '<div class="tCard"><b>⭐ ' + esc(t) + "</b><div>" + esc((TRAITS[t] || {}).desc || "") + "</div></div>"; }).join("")
     : '<div class="muted">Henüz kazanılmış özellik yok. Zor seçimler ve kritik başarılar özellik açar.</div>';
+  var d = destekOf(S);
   modal("<h2>Karakterin</h2><p>" + esc(S.family) + " ailesi · " + (S.gender === "kiz" ? "Kız" : "Erkek") + " · " + S.traits.length + " özellik</p>" +
+    '<div class="pvRow">' + pvChip(d === 2 ? "pvHelp" : d === 1 ? "pvSure" : "pvHurt", "🏠 Aile desteği: <b>" + DESTEK[d] + "</b>") +
+    pvChip("pvSure", "💰 Varlık: <b>" + TIERS[varlikOf(S)] + "</b>") + "</div>" +
     barsHtml() + "<h3>Aile özellikleri</h3>" + fam + "<h3>Kazanılan özellikler</h3>" + tr +
     (S.flags.length ? "<h3>Hafıza</h3>" + lifeLog() : ""));
 }

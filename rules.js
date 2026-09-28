@@ -8,7 +8,7 @@ function newState() {
   var stats = {};
   STATS.forEach(function (k) { stats[k] = BASE_STAT; });
   return { v: 5, screen: "start", gender: "erkek", family: null, ch: 1, plan: [], pi: 0, stats: stats, famStats: null,
-    traits: [], flags: [], log: [], chStart: {}, chTraits: {}, last: null, lock: null, dead: null, kavsak: [], gateFor: null };
+    traits: [], flags: [], log: [], chStart: {}, chTraits: {}, last: null, lock: null, dead: null, kavsak: [], gateFor: null, destek: 2 };
 }
 
 /* ── Hayat planı: her perdede sabit dönüm noktaları + havuzdan rastgele olaylar ── */
@@ -68,6 +68,17 @@ function ageYears(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge : e._
 function hasChapter(ch) { return !!CHAPTERS[ch] && EVENTS.some(function (e) { return e.ch === ch; }); }
 function curEvent(S) { return EV_BY_ID[S.plan[S.pi]]; }
 
+function destekOf(S) { return S.destek == null ? 2 : S.destek; }
+function destekDelta(S, c) {
+  if (!c.destek || !S.family) return 0;
+  var d = c.destek[S.family]; if (d == null) d = c.destek["*"];
+  return d || 0;
+}
+/* Görünen varlık: ailenin kademesi desteğe göre (tam = aynı, mesafeli = bir aşağı, küs = hiçbir şey) */
+function varlikOf(S) {
+  var t = S.family ? FAMILIES[S.family].tier : 1, d = destekOf(S);
+  return Math.max(S.own || 0, d === 2 ? t : d === 1 ? t - 1 : 0);
+}
 function applyFamily(S, name) {
   S.family = name;
   var m = FAMILIES[name].mods;
@@ -185,6 +196,9 @@ function applyOutcome(S, e, c, outcome, extra) {
   if (e.kavsak) { S.kavsak = S.kavsak || []; if (S.kavsak.indexOf(e.kavsak) < 0) S.kavsak.push(e.kavsak); }
   addFlag(S, c.flag);
   if (c.unflag) S.flags = S.flags.filter(function (f) { return f !== c.unflag; });
+  /* Aile desteği: seçimin kendisi aileyi etkiler (her seçim bir vazgeçiş) */
+  var dd = destekDelta(S, c);
+  if (dd) { var d0 = destekOf(S); S.destek = clamp(d0 + dd, 0, 2); if (S.destek !== d0) res.destek = S.destek - d0; }
   if (outcome === "direct") {
     for (var k in (c.direct || {})) addStat(S, k, c.direct[k], res);
     gainTrait(S, c.trait, res);
@@ -201,6 +215,7 @@ function applyOutcome(S, e, c, outcome, extra) {
       if (!c.trait && (outcome === "crit" || c.diff === "hard" || c.diff === "veryHard")) gainTrait(S, AUTO_TRAITS[c.stat], res);
     }
     if (outcome === "bad") addFlag(S, c.flagBad);
+    if (!success) addFlag(S, c.flagFail);
     var r = c.r || {};
     res.text = r[outcome] || (outcome === "crit" ? r.win : null) || (outcome === "mid" ? r.fail : null) || DEFAULT_TEXT[outcome];
   }
