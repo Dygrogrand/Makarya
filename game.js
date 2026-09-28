@@ -171,8 +171,69 @@ function choiceCard(e, c, idx) {
     pvRow("Lehine", help) + pvRow("Aleyhine", hurt) + pvRow(c.direct ? "Sonuç" : "Başarırsan", earn) + pvRow("Risk", risk) +
     "</div>" + chance + "</button>";
 }
+/* ── Kavşak: hayatın büyük dönüm noktaları (giriş ekranı, özel başlık, "Yol seçildi") ── */
+var KAVSAK_TOPLAM = 12;
+function lifelineHtml(cur) {
+  var done = S.kavsak || [], h = "";
+  for (var i = 1; i <= KAVSAK_TOPLAM; i++) {
+    if (i > 1) h += '<span class="kvSeg' + (done.indexOf(i) >= 0 || i <= cur ? " on" : "") + '"></span>';
+    h += '<span class="kvDot' + (i === cur && done.indexOf(i) < 0 ? " now" : done.indexOf(i) >= 0 ? " on" + (i === cur ? " last" : "") : "") + '"></span>';
+  }
+  var passed = done.length;
+  return '<div class="kvLine">' + h + '</div><div class="kvLineLbl"><span>Doğum</span><span>' +
+    (passed ? passed + " / " + KAVSAK_TOPLAM + " kavşak geçildi" : "Hayat çizgin · " + KAVSAK_TOPLAM + " kavşak") + "</span><span>Son söz</span></div>";
+}
+function kavsakBring(e) {
+  var chips = [], seen = {};
+  function add(key, html) { if (!seen[key]) { seen[key] = 1; chips.push(html); } }
+  (e.recall || []).forEach(function (r) { if (S.flags.indexOf(r.flag) >= 0 && FLAG_LABELS[r.flag]) add("f" + r.flag, pvChip("pvHelpD", "📜 " + esc(FLAG_LABELS[r.flag].replace(/\.$/, "")))); });
+  e.choices.forEach(function (c) {
+    if (c.reqFlag && S.flags.indexOf(c.reqFlag) >= 0) add("f" + c.reqFlag, pvChip("pvHelpD", "📜 " + esc((FLAG_LABELS[c.reqFlag] || "Geçmişin").replace(/\.$/, ""))));
+    if (c.req && S.traits.indexOf(c.req) >= 0) add("t" + c.req, pvChip("pvHelpD", "⭐ " + esc(c.req)));
+    if (c.stat) {
+      S.traits.forEach(function (t) { if (((TRAITS[t] || {}).bonus || {})[c.stat]) add("t" + t, pvChip("pvHelpD", "⭐ " + esc(t))); });
+      if (familyEventBonus(S, e, c.stat)) add("fam", pvChip("pvHelpD", "🏠 " + esc(S.family) + " ailesi"));
+    }
+  });
+  return chips;
+}
+function renderGate(e) {
+  var fork = e.kavsakKazan ?
+    '<div class="kvFork"><svg viewBox="0 0 340 140" preserveAspectRatio="none"><path d="M0 70 C 70 70, 110 70, 160 20 L 172 20" stroke="#8fd1a8" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M0 70 C 70 70, 110 70, 160 120 L 172 120" stroke="#ef9a8a" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="7 6"/><circle cx="4" cy="70" r="6" fill="#c69a3c"/></svg>' +
+    '<div class="kvWay up"><b>Kazanırsan</b>' + esc(e.kavsakKazan) + '</div><div class="kvWay down"><b>Kazanamazsan</b>' + esc(e.kavsakKaybet || "") + "</div></div>"
+    : '<div class="kvNote">Burada seçtiğin yol, hayatının geri kalanını belirler.</div>';
+  var bring = kavsakBring(e);
+  app.innerHTML = '<div class="screen">' + topbar(chTitle(e.ch)) + '<div class="kvGate">' +
+    "<div>" + lifelineHtml(e.kavsak) + "</div>" +
+    '<div><div class="kvKick">Kavşak ' + e.kavsak + " / " + KAVSAK_TOPLAM + '</div><h1 class="kvTitle">' + esc(e.title) + '</h1><div class="kvAge">' + esc(eventAge(S, e)) + "</div></div>" +
+    '<p class="kvText">' + esc(e.kavsakGiris || e.text) + "</p>" + fork +
+    '<div class="kvBring"><div class="kvBringT">Geçmişinden yanına aldıkların</div>' +
+    (bring.length ? '<div class="pvRow">' + bring.join("") + "</div>" : '<div class="kvMuted">Yanında sadece kendin varsın.</div>') + "</div>" +
+    '<button class="kvBtn" onclick="S.gateFor=\'' + e.id + '\';render()">HAZIRIM</button></div></div>';
+}
+function kavsakHead(e) {
+  var stakes = e.kavsakKazan ? '<div class="kvStakes"><div class="up"><b>↗ Kazanırsan</b>' + esc(e.kavsakKazan) + '</div><div class="dn"><b>↘ Kazanamazsan</b>' + esc(e.kavsakKaybet || "") + "</div></div>" : "";
+  return '<div class="kvHead"><div class="kvHeadRow"><span class="kvKick">Kavşak ' + e.kavsak + " · " + esc(eventAge(S, e)) + '</span><span class="kvStake">Geri dönüş yok</span></div>' +
+    '<h2>' + esc(e.title) + "</h2><p>" + esc(e.text) + "</p>" + stakes + "</div>";
+}
+function renderKavsakResult() {
+  var e = CUR.e, c = CUR.c, res = CUR.res, o = res.outcome, win = o === "crit" || o === "win";
+  var lbl = function (f) { return f && FLAG_LABELS[f] ? FLAG_LABELS[f].replace(/\.$/, "") : ""; };
+  var title = o === "direct" ? (lbl(c.flag) || c.t) : e.kavsakKazan ? (win ? e.kavsakKazan : (e.kavsakKaybet || c.t)) : (lbl(c.flag) || c.t);
+  var roll = CUR.roll != null ? '<div class="kvRoll"><div class="kvDie">' + CUR.roll + "</div><span>Hedef " + CUR.b.need + "+<br>" + OUT_LABEL[o] + "</span></div>"
+    : CUR.mini != null ? '<div class="kvRoll"><div class="kvDie small">%' + Math.round(CUR.mini * 100) + "</div><span>Mini oyun<br>" + OUT_LABEL[o] + "</span></div>" : "";
+  var chips = res.deltas.map(function (d) { return pvChip(d[1] < 0 ? "pvHurt" : "pvSure", STAT_ICONS[d[0]] + " " + esc(d[0]) + " <b>" + signed(d[1]) + "</b>"); })
+    .concat(res.traits.map(function (t) { return pvChip("pvEarn", "🏅 " + esc(t)); }));
+  app.innerHTML = '<div class="screen">' + topbar("Yol seçildi") + '<div class="kvGate kvDone' + (win || o === "direct" ? "" : " kvLost") + '">' +
+    "<div>" + lifelineHtml(e.kavsak) + "</div>" +
+    '<div class="kvStamp">YOL SEÇİLDİ</div><h1 class="kvTitle center">' + esc(title) + '</h1><p class="kvText center">' + esc(res.text) + "</p>" + roll +
+    (chips.length ? '<div class="pvRow center">' + chips.join("") + "</div>" : "") +
+    (res.death ? '<div class="deathCard"><div class="l">☠️ HAYAT BURADA SONA ERDİ</div><div class="d">' + esc(res.death) + "</div></div>" +
+      '<button class="kvBtn" onclick="advance()">🪦 MEZAR TAŞINI GÖR</button>' : '<button class="kvBtn" onclick="advance()">DEVAM ET</button>') + "</div></div>";
+}
 function renderEvent() {
   var e = curEvent(S);
+  if (e.kavsak && S.gateFor !== e.id) return renderGate(e);
   /* Aynı hafızayı açan bir seçenek kartta zaten gösteriliyorsa yukarıdaki "Geçmişten" kutusu tekrar etmesin */
   var shownFlags = e.choices.filter(function (c) { return c.reqFlag && hasReq(S, c, e); }).map(function (c) { return c.reqFlag; });
   var recall = (e.recall || []).filter(function (r) { return S.flags.indexOf(r.flag) >= 0 && shownFlags.indexOf(r.flag) < 0; })
@@ -190,7 +251,7 @@ function renderEvent() {
     }
     return choiceCard(e, c, idx);
   }).join("");
-  shell(chTitle(e.ch), art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + eventAge(S, e), e.title, e.text), recall + voices + famLine + choices);
+  shell(chTitle(e.ch), e.kavsak ? kavsakHead(e) : art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + eventAge(S, e), e.title, e.text), recall + voices + famLine + choices);
 }
 function choose(idx) {
   var e = curEvent(S), c = e.choices[idx];
@@ -239,6 +300,7 @@ var OUT_LABEL = { crit: "Kritik başarı", win: "Başarılı", mid: "Yarım baş
 var OUT_TITLE = { crit: "Mükemmel!", win: "Başarılı!", mid: "Fena Değil", fail: "Olmadı", bad: "Berbat!" };
 function renderResult() {
   if (!CUR && S.last) restoreCur();
+  if (CUR && CUR.e && CUR.e.kavsak) return renderKavsakResult();
   var e = CUR.e, c = CUR.c, res = CUR.res, o = res.outcome;
   var rollCard = "";
   if (CUR.roll != null) rollCard = '<div class="rollCard"><div class="l">Atılan zar</div><div class="v">' + CUR.roll + '</div><div class="t">Hedef ' + CUR.b.need + "+</div></div>";

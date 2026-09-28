@@ -270,3 +270,48 @@ button:disabled{cursor:default}
 .pvEarn{background:transparent;color:#7a560f;border:1.5px dashed #c9a14a}
 .pvSure{background:#f1e8d4;color:#4a3f30;border:1px solid #d9caa9}
 .pvDim{opacity:.7;font-weight:700}
+/* Kavşak ekranları */
+.kvGate{flex:1;min-height:0;overflow:auto;background:radial-gradient(120% 70% at 50% 18%,#2c241b 0%,#17130f 60%);color:#efe4cf;padding:22px 20px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:18px}
+.kvDone{background:radial-gradient(120% 60% at 50% 30%,#23301f 0%,#17130f 62%)}
+.kvDone.kvLost{background:radial-gradient(120% 60% at 50% 30%,#3a2320 0%,#17130f 62%)}
+.kvLine{display:flex;align-items:center;padding:0 4px}
+.kvSeg{flex:1;height:2px;background:#3d342a}.kvSeg.on{background:#c69a3c}
+.kvDot{width:12px;height:12px;flex:0 0 12px;border-radius:50%;border:2px solid #4a4034;background:#17130f}
+.kvDot.on{background:#c69a3c;border-color:#c69a3c}
+.kvDot.last{width:16px;height:16px;flex-basis:16px;box-shadow:0 0 0 5px rgba(198,154,60,.3)}
+.kvDot.now{width:18px;height:18px;flex-basis:18px;border:3px solid #a52f26;background:#fff;box-shadow:0 0 0 6px rgba(165,47,38,.25)}
+.kvLineLbl{display:flex;justify-content:space-between;font-size:10px;font-weight:800;color:#8f8170;letter-spacing:.06em;text-transform:uppercase;margin-top:7px}
+.kvKick{font-size:11.5px;font-weight:900;letter-spacing:.18em;color:#c69a3c;text-transform:uppercase}
+.kvTitle{font-family:var(--serif);font-size:38px;line-height:1.02;font-weight:800;margin:6px 0 4px}
+.kvTitle.center,.kvText.center{text-align:center}
+.kvAge{font-size:14px;font-weight:700;color:#b3a58c}
+.kvText{margin:0;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:#e6d8bf}
+.kvNote{font-size:14px;font-weight:700;color:#e9dcc3;border-left:3px solid #c69a3c;padding-left:10px}
+.kvFork{position:relative;height:140px;flex:0 0 140px}
+.kvFork svg{position:absolute;inset:0;width:100%;height:100%}
+.kvWay{position:absolute;right:0;width:52%;font-size:13px;font-weight:700;line-height:1.35;color:#e9dcc3}
+.kvWay b{display:block;font-size:10.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.kvWay.up{top:0}.kvWay.up b{color:#8fd1a8}.kvWay.down{bottom:0}.kvWay.down b{color:#ef9a8a}
+.kvBring{border:1px solid #3d342a;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,.03)}
+.kvBringT{font-size:10.5px;font-weight:900;letter-spacing:.12em;color:#b3a58c;text-transform:uppercase}
+.kvMuted{font-size:13.5px;color:#b3a58c}
+.pvHelpD{background:rgba(143,209,168,.12);color:#9fe0b7;border:1px solid rgba(143,209,168,.35)}
+.kvBtn{margin-top:auto;min-height:56px;border:0;border-radius:14px;background:#c69a3c;color:#1a130b;font-weight:900;font-size:16px;letter-spacing:.08em;box-shadow:0 4px 0 #7d5e1d;flex:0 0 auto}
+.kvBtn:active{transform:translateY(2px);box-shadow:0 2px 0 #7d5e1d}
+.kvHead{background:#17130f;color:#efe4cf;padding:12px 16px 14px;display:flex;flex-direction:column;gap:7px;border-bottom:3px solid #c69a3c;flex:0 0 auto}
+.kvHeadRow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.kvStake{font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#a52f26;border-radius:6px;padding:3px 7px;white-space:nowrap}
+.kvHead h2{font-family:var(--serif);font-size:26px;line-height:1.05;margin:0}
+.kvHead p{margin:0;font-family:var(--serif);font-size:14.5px;line-height:1.45;color:#e6d8bf}
+.kvStakes{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.kvStakes div{border-radius:9px;padding:6px 8px;font-size:12px;font-weight:700;line-height:1.3}
+.kvStakes b{display:block;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.kvStakes .up{background:rgba(143,209,168,.12);color:#cdeed9}.kvStakes .up b{color:#8fd1a8}
+.kvStakes .dn{background:rgba(239,154,138,.12);color:#f3d3cc}.kvStakes .dn b{color:#ef9a8a}
+.kvStamp{align-self:center;margin-top:6px;border:3px solid #8fd1a8;color:#8fd1a8;border-radius:12px;padding:7px 15px;font-size:13px;font-weight:900;letter-spacing:.2em;transform:rotate(-4deg)}
+.kvLost .kvStamp{border-color:#ef9a8a;color:#ef9a8a}
+.kvRoll{display:flex;justify-content:center;gap:16px;align-items:center}
+.kvDie{width:70px;height:70px;border-radius:16px;background:#fff;color:#1d1915;display:grid;place-items:center;font-size:34px;font-weight:900}
+.kvDie.small{font-size:20px}
+.kvRoll span{font-size:14px;font-weight:700;color:#b3a58c}
+.pvRow.center{justify-content:center}

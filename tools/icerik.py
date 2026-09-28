@@ -25,7 +25,10 @@ PLACES = ["ev", "mutfak", "cocuk-odasi", "okul", "sinif", "okul-bahcesi", "sokak
 FAMILIES = ["Yalçın", "Erdem", "Keskin", "Tan", "Varlı", "Şen"]
 
 EV_COLS = ["Olay ID", "Bölüm", "Yaş", "Simge", "Başlık", "Olay metni", "Mekân", "Aile türü", "Sabit", "Ağırlık",
-           "Gereken hafızalar", "Olmaması gereken hafızalar", "Gereken özellik", "Cinsiyet", "Sadece aileler", "Asgari stat"]
+           "Gereken hafızalar", "Olmaması gereken hafızalar", "Gereken özellik", "Cinsiyet", "Sadece aileler", "Asgari stat",
+           "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan"]
+# Sonradan eklenen sütunlar: eski Excel dosyalarında yoksa hata verilmez, boş sayılır
+OPTIONAL_COLS = {"Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan"}
 CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Stat", "Zorluk", "Kesin etki", "Kesin sonuç metni",
            "Başarı", "Kritik başarı", "Başarısız", "Kritik hata", "Yarım (mini oyun)",
            "Mini oyun", "Mini oyun başlığı", "Mini oyun ipucu", "Mini oyun ayarı",
@@ -171,7 +174,8 @@ def write_xlsx(b, path):
         rows_ev.append([e["id"], e["ch"], e["age"], e.get("icon", ""), e["title"], e["text"], e.get("place", ""),
                         FAM_TR.get(e.get("fam", ""), ""), "E" if e.get("fixed") else "", e.get("weight", ""),
                         ", ".join(w.get("flags", [])), ", ".join(w.get("notFlags", [])), w.get("trait", ""),
-                        {"erkek": "erkek", "kiz": "kız"}.get(w.get("gender", ""), ""), ", ".join(w.get("fam", [])), fmt_stats(w.get("minStat"))])
+                        {"erkek": "erkek", "kiz": "kız"}.get(w.get("gender", ""), ""), ", ".join(w.get("fam", [])), fmt_stats(w.get("minStat")),
+                        e.get("kavsak", ""), e.get("kavsakGiris", ""), e.get("kavsakKazan", ""), e.get("kavsakKaybet", "")])
         for i, c in enumerate(e["choices"], 1):
             r = c.get("r") if isinstance(c.get("r"), dict) else {}
             m = c.get("mini") or {}
@@ -189,11 +193,12 @@ def write_xlsx(b, path):
             rows_re.append([e["id"], rc["flag"], rc["text"]])
 
     W = {"Olay ID": 26, "Bölüm": 8, "Yaş": 12, "Simge": 7, "Başlık": 26, "Olay metni": 60, "Mekân": 14, "Aile türü": 10, "Sabit": 7,
-         "Ağırlık": 8, "Gereken hafızalar": 20, "Olmaması gereken hafızalar": 20, "Gereken özellik": 18, "Cinsiyet": 9, "Sadece aileler": 14, "Asgari stat": 14}
-    ws = sheet("Olaylar", EV_COLS, rows_ev, W, wrap_cols=("Olay metni", "Başlık"))
+         "Ağırlık": 8, "Gereken hafızalar": 20, "Olmaması gereken hafızalar": 20, "Gereken özellik": 18, "Cinsiyet": 9, "Sadece aileler": 14, "Asgari stat": 14,
+         "Kavşak no": 9, "Kavşak girişi": 50, "Kazanırsan": 22, "Kazanamazsan": 22}
+    ws = sheet("Olaylar", EV_COLS, rows_ev, W, wrap_cols=("Olay metni", "Başlık", "Kavşak girişi"))
     n = len(rows_ev)
     dv(ws, "Bölüm", EV_COLS, [str(i) for i in range(1, 11)], n); dv(ws, "Mekân", EV_COLS, PLACES, n)
-    dv(ws, "Aile türü", EV_COLS, list(TR_FAM.keys()), n); dv(ws, "Sabit", EV_COLS, ["E"], n); dv(ws, "Cinsiyet", EV_COLS, ["erkek", "kız"], n)
+    dv(ws, "Aile türü", EV_COLS, list(TR_FAM.keys()), n); dv(ws, "Sabit", EV_COLS, ["E"], n); dv(ws, "Cinsiyet", EV_COLS, ["erkek", "kız"], n); dv(ws, "Kavşak no", EV_COLS, [str(i) for i in range(1, 13)], n)
 
     W = {"Olay ID": 26, "Sıra": 6, "Seçim metni": 34, "Stat": 13, "Zorluk": 10, "Kesin etki": 20, "Kesin sonuç metni": 44,
          "Başarı": 44, "Kritik başarı": 44, "Başarısız": 44, "Kritik hata": 44, "Yarım (mini oyun)": 36, "Mini oyun": 11,
@@ -251,12 +256,16 @@ def read_xlsx(path):
         head = [clean(c.value) for c in ws[1]]
         idx = {}
         for c in cols:
-            if c not in head: errs.append(f"'{name}' sayfasında '{c}' sütunu yok"); continue
+            if c not in head:
+                if c not in OPTIONAL_COLS: errs.append(f"'{name}' sayfasında '{c}' sütunu yok")
+                continue
             idx[c] = head.index(c)
         out = []
         for i, r in enumerate(ws.iter_rows(min_row=2, values_only=True), 2):
             if not any(v not in (None, "") for v in r): continue
-            out.append((i, {c: clean(r[j]) if j < len(r) else "" for c, j in idx.items()}))
+            row = {c: clean(r[j]) if j < len(r) else "" for c, j in idx.items()}
+            for c in OPTIONAL_COLS: row.setdefault(c, "")
+            out.append((i, row))
         return out
 
     b = {"chapters": [], "events": [], "traits": [], "flags": [], "deathCauses": []}
@@ -284,6 +293,15 @@ def read_xlsx(path):
             try: w["minStat"] = parse_stats(r["Asgari stat"], where)
             except ValueError as ex: errs.append(str(ex))
         if w: e["when"] = w
+        if r["Kavşak no"] not in ("", None):
+            try:
+                k = int(r["Kavşak no"])
+                if not 1 <= k <= 12: raise ValueError
+                e["kavsak"] = k
+            except ValueError: errs.append(f"{where}: Kavşak no 1 ile 12 arasında olmalı")
+            if r["Kavşak girişi"]: e["kavsakGiris"] = str(r["Kavşak girişi"])
+            if r["Kazanırsan"]: e["kavsakKazan"] = str(r["Kazanırsan"])
+            if r["Kazanamazsan"]: e["kavsakKaybet"] = str(r["Kazanamazsan"])
         e["choices"], e["voices"], e["recall"] = [], [], []
         if e["id"] in evmap: errs.append(f"{where}: Olay ID '{e['id']}' tekrar ediyor")
         evmap[e["id"]] = e; b["events"].append(e)

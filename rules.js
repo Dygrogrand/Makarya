@@ -8,7 +8,7 @@ function newState() {
   var stats = {};
   STATS.forEach(function (k) { stats[k] = BASE_STAT; });
   return { v: 5, screen: "start", gender: "erkek", family: null, ch: 1, plan: [], pi: 0, stats: stats, famStats: null,
-    traits: [], flags: [], log: [], chStart: {}, chTraits: {}, last: null, lock: null, dead: null };
+    traits: [], flags: [], log: [], chStart: {}, chTraits: {}, last: null, lock: null, dead: null, kavsak: [], gateFor: null };
 }
 
 /* ── Hayat planı: her perdede sabit dönüm noktaları + havuzdan rastgele olaylar ── */
@@ -182,6 +182,7 @@ function addStat(S, k, v, res) {
 function applyOutcome(S, e, c, outcome, extra) {
   var res = { outcome: outcome, deltas: [], traits: [], note: "", text: "" };
   extra = extra || {};
+  if (e.kavsak) { S.kavsak = S.kavsak || []; if (S.kavsak.indexOf(e.kavsak) < 0) S.kavsak.push(e.kavsak); }
   addFlag(S, c.flag);
   if (c.unflag) S.flags = S.flags.filter(function (f) { return f !== c.unflag; });
   if (outcome === "direct") {
