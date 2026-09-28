@@ -8,7 +8,7 @@ function newState() {
   var stats = {};
   STATS.forEach(function (k) { stats[k] = BASE_STAT; });
   return { v: 5, screen: "start", gender: "erkek", family: null, ch: 1, plan: [], pi: 0, stats: stats, famStats: null,
-    traits: [], flags: [], log: [], chStart: {}, chTraits: {}, last: null, lock: null, dead: null, kavsak: [], gateFor: null, destek: 2 };
+    traits: [], flags: [], log: [], chStart: {}, chTraits: {}, last: null, lock: null, dead: null, kavsak: [], kavsakLog: [], chFlags: {}, gateFor: null, destek: 2 };
 }
 
 /* ── Hayat planı: her perdede sabit dönüm noktaları + havuzdan rastgele olaylar ── */
@@ -68,6 +68,14 @@ function ageYears(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge : e._
 function hasChapter(ch) { return !!CHAPTERS[ch] && EVENTS.some(function (e) { return e.ch === ch; }); }
 function curEvent(S) { return EV_BY_ID[S.plan[S.pi]]; }
 
+/* Kavşağın sonucu tek bir yol adıyla: "İyi bir lise", "Okulu bıraktı", "Esnaf oldu" */
+function kavsakPath(e, c, outcome) {
+  var lbl = function (f) { return f && FLAG_LABELS[f] ? FLAG_LABELS[f].replace(/\.$/, "") : ""; };
+  var win = outcome === "crit" || outcome === "win";
+  if (outcome === "direct") return lbl(c.flag) || c.t;
+  if (e.kavsakKazan) return win ? e.kavsakKazan : (e.kavsakKaybet || c.t);
+  return lbl(c.flag) || c.t;
+}
 function destekOf(S) { return S.destek == null ? 2 : S.destek; }
 function destekDelta(S, c) {
   if (!c.destek || !S.family) return 0;
@@ -227,6 +235,10 @@ function applyOutcome(S, e, c, outcome, extra) {
     if (bg) { res.death = bg; res.natural = true; S.dead = { cause: bg, age: eventAge(S, e), title: e.title }; }
   }
   var unlock = c.reqFlag ? { type: "flag", key: c.reqFlag } : c.reqVoice ? { type: "voice", key: c.reqVoice } : c.req ? { type: "trait", key: c.req } : null;
+  if (e.kavsak) {
+    S.kavsakLog = S.kavsakLog || [];
+    S.kavsakLog.push({ n: e.kavsak, ch: e.ch, title: e.title, path: kavsakPath(e, c, outcome), win: outcome === "crit" || outcome === "win" || outcome === "direct" });
+  }
   S.log.push({ id: e.id, ch: e.ch, age: eventAge(S, e), title: e.title, choice: c.t, outcome: outcome, roll: extra.roll || null, unlock: unlock });
   return res;
 }

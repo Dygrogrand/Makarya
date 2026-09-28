@@ -28,7 +28,7 @@ EV_COLS = ["Olay ID", "Bölüm", "Yaş", "Simge", "Başlık", "Olay metni", "Mek
            "Gereken hafızalar", "Olmaması gereken hafızalar", "Gereken özellik", "Cinsiyet", "Sadece aileler", "Asgari stat",
            "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan"]
 # Sonradan eklenen sütunlar: eski Excel dosyalarında yoksa hata verilmez, boş sayılır
-OPTIONAL_COLS = {"Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Aile desteği", "Başarısızlıkta hafıza"}
+OPTIONAL_COLS = {"Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Aile desteği", "Başarısızlıkta hafıza", "Sonraki bölümde"}
 CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Stat", "Zorluk", "Kesin etki", "Kesin sonuç metni",
            "Başarı", "Kritik başarı", "Başarısız", "Kritik hata", "Yarım (mini oyun)",
            "Mini oyun", "Mini oyun başlığı", "Mini oyun ipucu", "Mini oyun ayarı",
@@ -38,7 +38,7 @@ CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Stat", "Zorluk", "Kesin etki", "
 VO_COLS = ["Olay ID", "Stat", "Zorluk", "İç ses metni", "Başarısızlık metni", "Seçenek açar"]
 RE_COLS = ["Olay ID", "Hafıza", "Geçmişten metni"]
 TR_COLS = ["Özellik", "Açıklama", "Bonus", "Otomatik stat"]
-FL_COLS = ["Hafıza", "Final kartı etiketi"]
+FL_COLS = ["Hafıza", "Final kartı etiketi", "Sonraki bölümde"]
 DC_COLS = ["Asgari yaş", "Azami yaş", "Mezar taşı metni", "Gereken hafıza"]
 BO_COLS = ["Bölüm", "Ad", "Seçilecek olay", "Beklenen stat", "Yaş aralığı", "Son görsel (olay ID)", "Son yaş", "Son metin", "Sonraki düğme"]
 
@@ -235,7 +235,7 @@ def write_xlsx(b, path):
     ws = sheet("Özellikler", TR_COLS, [[t["name"], t["desc"], fmt_stats(t["bonus"]), t.get("auto", "")] for t in b["traits"]],
                {"Özellik": 26, "Açıklama": 60, "Bonus": 26, "Otomatik stat": 14}, wrap_cols=("Açıklama",))
     dv(ws, "Otomatik stat", TR_COLS, STATS, len(b["traits"]))
-    sheet("Hafıza", FL_COLS, [[f["flag"], f["label"]] for f in b["flags"]], {"Hafıza": 26, "Final kartı etiketi": 80}, wrap_cols=("Final kartı etiketi",))
+    sheet("Hafıza", FL_COLS, [[f["flag"], f["label"], f.get("next", "")] for f in b["flags"]], {"Hafıza": 26, "Final kartı etiketi": 60, "Sonraki bölümde": 70}, wrap_cols=("Final kartı etiketi", "Sonraki bölümde"))
     sheet("Ölüm Sebepleri", DC_COLS, [[d["min"], d["max"], d["text"], d.get("flag", "")] for d in b["deathCauses"]],
           {"Asgari yaş": 10, "Azami yaş": 10, "Mezar taşı metni": 90, "Gereken hafıza": 18}, wrap_cols=("Mezar taşı metni",))
     sheet("Bölümler", BO_COLS, [[c["ch"], c["name"], c["pick"], c["expected"], c["range"], c["endImg"], c["endAge"], c["endText"], c["next"]] for c in b["chapters"]],
@@ -375,7 +375,10 @@ def read_xlsx(path):
         except ValueError as ex: errs.append(str(ex)); continue
         if r["Otomatik stat"]: t["auto"] = r["Otomatik stat"]
         b["traits"].append(t)
-    for i, r in rows("Hafıza", FL_COLS): b["flags"].append({"flag": str(r["Hafıza"]), "label": str(r["Final kartı etiketi"])})
+    for i, r in rows("Hafıza", FL_COLS):
+        fl = {"flag": str(r["Hafıza"]), "label": str(r["Final kartı etiketi"])}
+        if r["Sonraki bölümde"]: fl["next"] = str(r["Sonraki bölümde"])
+        b["flags"].append(fl)
     for i, r in rows("Ölüm Sebepleri", DC_COLS):
         d = {"min": int(r["Asgari yaş"]), "max": int(r["Azami yaş"]), "text": str(r["Mezar taşı metni"])}
         if r["Gereken hafıza"]: d["flag"] = str(r["Gereken hafıza"])
@@ -391,13 +394,15 @@ def read_xlsx(path):
 def write_js(b, path):
     chapters = {c["ch"]: {k: v for k, v in c.items() if k != "ch"} for c in b["chapters"]}
     traits = {t["name"]: {k: v for k, v in t.items() if k != "name"} for t in b["traits"]}
-    labels = {f["flag"]: f["label"] for f in b["flags"]}
+    labels = {f["flag"]: f["label"] for f in b["flags"] if f.get("label")}
+    nexts = {f["flag"]: f["next"] for f in b["flags"] if f.get("next")}
     J = lambda o: json.dumps(o, ensure_ascii=False, separators=(",", ":"))
     with open(path, "w", encoding="utf-8") as f:
         f.write("/* OTOMATİK ÜRETİLDİ — elle düzenleme. Kaynak: Makarya_Icerik.xlsx · tools/icerik.py xlsx2js */\n")
         f.write("var CHAPTERS = " + J(chapters) + ";\n")
         f.write("var TRAITS = " + J(traits) + ";\n")
         f.write("var FLAG_LABELS = " + J(labels) + ";\n")
+        f.write("var FLAG_NEXT = " + J(nexts) + ";\n")
         f.write("var DEATH_CAUSES = " + J(b["deathCauses"]) + ";\n")
         f.write("var EVENTS = [\n" + ",\n".join(J(e) for e in b["events"]) + "\n];\n")
 

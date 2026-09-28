@@ -128,7 +128,7 @@ function renderFamilyResult() {
     '<div class="statGrid">' + stats + '</div><div class="idCard"><div class="idTitle">AİLEDEN GELEN ÖZELLİKLER</div>' + traits + "</div>" +
     '<button class="primary" onclick="beginGame()">HİKÂYEYE BAŞLA</button>');
 }
-function beginGame() { S.ch = 1; S.plan = buildPlan(S, 1); S.pi = 0; S.chStart[1] = cloneStats(); S.chTraits[1] = S.traits.slice(); S.screen = "event"; render(); }
+function beginGame() { S.ch = 1; S.chFlags = { 1: S.flags.slice() }; S.plan = buildPlan(S, 1); S.pi = 0; S.chStart[1] = cloneStats(); S.chTraits[1] = S.traits.slice(); S.screen = "event"; render(); }
 
 /* ── olay ── */
 function directSummary(c) {
@@ -221,8 +221,7 @@ function kavsakHead(e) {
 }
 function renderKavsakResult() {
   var e = CUR.e, c = CUR.c, res = CUR.res, o = res.outcome, win = o === "crit" || o === "win";
-  var lbl = function (f) { return f && FLAG_LABELS[f] ? FLAG_LABELS[f].replace(/\.$/, "") : ""; };
-  var title = o === "direct" ? (lbl(c.flag) || c.t) : e.kavsakKazan ? (win ? e.kavsakKazan : (e.kavsakKaybet || c.t)) : (lbl(c.flag) || c.t);
+  var title = kavsakPath(e, c, o);
   var roll = CUR.roll != null ? '<div class="kvRoll"><div class="kvDie">' + CUR.roll + "</div><span>Hedef " + CUR.b.need + "+<br>" + OUT_LABEL[o] + "</span></div>"
     : CUR.mini != null ? '<div class="kvRoll"><div class="kvDie small">%' + Math.round(CUR.mini * 100) + "</div><span>Mini oyun<br>" + OUT_LABEL[o] + "</span></div>" : "";
   var chips = res.deltas.map(function (d) { return pvChip(d[1] < 0 ? "pvHurt" : "pvSure", STAT_ICONS[d[0]] + " " + esc(d[0]) + " <b>" + signed(d[1]) + "</b>"); })
@@ -349,15 +348,23 @@ function renderChapterEnd() {
   var ch = S.ch, C = CHAPTERS[ch], ev = EVENTS.filter(function (x) { return x.id === C.endImg; })[0];
   var before = S.chTraits[ch] || [], gained = S.traits.filter(function (t) { return before.indexOf(t) < 0; });
   var hl = highlights(ch, 3);
+  /* Bu bölümün kavşakları ve kavşağa göre sıradaki bölümde bekleyenler */
+  var kv = (S.kavsakLog || []).filter(function (k) { return k.ch === ch; }).map(function (k) {
+    return '<div class="kvSum' + (k.win ? "" : " lost") + '"><span class="kvSumN">Kavşak ' + k.n + '</span><span class="kvSumT">' + esc(k.title) + '</span><b>→ ' + esc(k.path) + "</b></div>";
+  }).join("");
+  var start = (S.chFlags || {})[ch], next = CHAPTERS[ch + 1] && hasChapter(ch + 1) ? CHAPTERS[ch + 1] : null;
+  var waits = start && next ? S.flags.filter(function (f) { return start.indexOf(f) < 0 && FLAG_NEXT[f]; }).map(function (f) { return "<li>" + esc(FLAG_NEXT[f]) + "</li>"; }).join("") : "";
+  var kvHtml = (kv ? '<h3 class="sectionTitle" style="font-size:18px">Bu bölümün ' + (kv.split('class="kvSum').length > 2 ? "kavşakları" : "kavşağı") + "</h3>" + kv : "") +
+    (waits ? '<div class="kvWaits"><div class="kvWaitsT">Sıradaki bölümde seni bekleyenler · ' + esc(next.name) + "</div><ul>" + waits + "</ul></div>" : "");
   shell(chTitle(ch), art(sceneSrcs(C.endImg), ev ? ev.icon : "📖", "BÖLÜM " + ROMAN[ch] + " TAMAMLANDI", C.endAge, C.endText),
     '<div class="sectionTitle">Bölüm ' + ROMAN[ch] + " · Gelişim Özeti</div><div class=\"sectionSub\">" + esc(C.range) + "</div>" +
-    compareHtml(S.chStart[ch] || cloneStats(), cloneStats()) +
+    kvHtml + compareHtml(S.chStart[ch] || cloneStats(), cloneStats()) +
     '<h3 class="sectionTitle" style="font-size:18px">Kazanılan özellikler</h3>' +
     (gained.length ? '<div class="chips">' + gained.map(function (t) { return '<span class="chip">🏅 ' + esc(t) + "</span>"; }).join("") + "</div>" : '<div class="muted">Bu bölümde yeni özellik açılmadı.</div>') +
     (hl ? '<h3 class="sectionTitle" style="font-size:18px">Unutulmayan anlar</h3><div class="logList">' + hl + "</div>" : "") +
     '<button class="primary" onclick="nextChapter()">' + esc(C.next) + "</button>");
 }
-function nextChapter() { var ch = S.ch + 1; S.ch = ch; S.plan = buildPlan(S, ch); S.pi = 0; S.chStart[ch] = cloneStats(); S.chTraits[ch] = S.traits.slice(); S.screen = "event"; render(); }
+function nextChapter() { var ch = S.ch + 1; S.ch = ch; S.chFlags = S.chFlags || {}; S.chFlags[ch] = S.flags.slice(); S.plan = buildPlan(S, ch); S.pi = 0; S.chStart[ch] = cloneStats(); S.chTraits[ch] = S.traits.slice(); S.screen = "event"; render(); }
 
 /* ── final ── */
 function barsHtml() {
