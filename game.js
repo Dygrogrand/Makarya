@@ -194,15 +194,16 @@ function renderCheck() {
   var p = Math.round(successChance(b.need) * 100);
   shell("Zar Kontrolü", art(sceneSrcs(e.id), e.icon, "Zar kontrolü · " + c.stat, c.t, DIFF[c.diff].label + " zorluk · başarı şansı %" + p),
     '<div class="checkFocus"><div class="dieFace" id="die">🎲</div><div class="targetPill">Hedef ' + b.need + "+</div></div>" +
+    '<div class="row">' + (S.lock ? "" : '<button class="secondary" id="backBtn" onclick="S.screen=\'event\';render()">Vazgeç</button>') + '<button class="primary" id="rollBtn" onclick="rollDie()">ZAR AT</button></div>' +
     '<div class="breakdown">' + rows + '<div class="bRow total"><span>Atman gereken en düşük sayı</span><b>' + b.need + "</b></div></div>" +
-    '<div class="muted">20 her zaman kritik başarı, 1 her zaman kritik hata.</div>' +
-    '<div class="row">' + (S.lock ? "" : '<button class="secondary" id="backBtn" onclick="S.screen=\'event\';render()">Vazgeç</button>') + '<button class="primary" id="rollBtn" onclick="rollDie()">ZAR AT</button></div>');
+    '<div class="muted">20 her zaman kritik başarı, 1 her zaman kritik hata.</div>');
 }
 function rollDie() {
   var btn = document.getElementById("rollBtn"); if (!btn || btn.disabled) return;
   btn.disabled = true; var bk = document.getElementById("backBtn"); if (bk) bk.disabled = true;
   if (!S.lock) { S.lock = { idx: CUR.idx, roll: 1 + Math.floor(Math.random() * 20) }; S.screen = "check"; save(); }
   var d = document.getElementById("die"); d.classList.add("spin");
+  try { d.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) { d.scrollIntoView(); }
   var n = 0;
   (function spin() {
     d.textContent = 1 + Math.floor(Math.random() * 20);
@@ -211,7 +212,7 @@ function rollDie() {
     d.textContent = r; d.classList.remove("spin");
     var o = rollOutcome(r, CUR.b.need);
     CUR.roll = r; CUR.res = applyOutcome(S, CUR.e, CUR.c, o, { roll: r }); commit();
-    setTimeout(function () { render(); }, 550);
+    setTimeout(function () { render(); }, 900);
   })();
 }
 
