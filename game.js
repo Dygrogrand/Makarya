@@ -3,7 +3,7 @@ var S = newState();
 var CUR = null;          // o anki seçim: {e, c, idx, b, res, roll, mini}
 var MG = { timers: [], raf: null, done: false };
 var SAVE_KEY = "makarya-kayit-v5", META_KEY = "makarya-meta-v1";
-var VOICE_COLORS = { "Akıl": "#3b6ea5", "Çene": "#b0572b", "Kurnazlık": "#8a6d1c", "Cesaret": "#b3322a", "Pişkinlik": "#8e3f86", "İtibar": "#5f7d6a", "Dayanıklılık": "#6b5a48", "Sosyal Radar": "#2f7f86" };
+var VOICE_COLORS = { "Akıl": "#3b6ea5", "Çene": "#b0572b", "Kurnazlık": "#8a6d1c", "Cesaret": "#b3322a", "Pişkinlik": "#8e3f86", "İtibar": "#5f7d6a", "Gönül": "#b4466e", "Dayanıklılık": "#6b5a48", "Sosyal Radar": "#2f7f86" };
 var GIRL_OPEN = false;  // kız karakter görselleri tamamlanınca true yap
 var ROMAN = { 1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 6: "VI", 7: "VII", 8: "VIII", 9: "IX", 10: "X" };
 var app = document.getElementById("app");
@@ -13,7 +13,7 @@ function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function
 function cloneStats() { return Object.assign({}, S.stats); }
 function signed(v) { return v > 0 ? "+" + v : String(v); }
 function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
-function loadSave() { try { var raw = localStorage.getItem(SAVE_KEY); if (raw && raw.indexOf("Vicdan") >= 0) raw = raw.replace(/"Vicdan"/g, '"İtibar"').replace(/"İç Pusula"/g, '"Sözü Senet"'); var s = JSON.parse(raw); if (s && s.v === 5 && s.family && s.plan && s.plan.length && s.screen !== "final") return s; } catch (e) {} return null; }
+function loadSave() { try { var raw = localStorage.getItem(SAVE_KEY); if (raw && raw.indexOf("Vicdan") >= 0) raw = raw.replace(/"Vicdan"/g, '"İtibar"').replace(/"İç Pusula"/g, '"Sözü Senet"'); var s = JSON.parse(raw); if (s && s.stats && s.stats["Gönül"] == null) { var gv = BASE_STAT + ((FAMILIES[s.family] || {}).mods || {})["Gönül"] || BASE_STAT; [s.stats, s.famStats].concat(Object.values(s.chStart || {})).forEach(function (o) { if (o && o["Gönül"] == null) o["Gönül"] = gv; }); } if (s && s.v === 5 && s.family && s.plan && s.plan.length && s.screen !== "final") return s; } catch (e) {} return null; }
 function loadMeta() { try { var m = JSON.parse(localStorage.getItem(META_KEY)); if (m && m.deaths) return m; } catch (e) {} return { lives: 0, deaths: [], titles: {} }; }
 function saveMeta(m) { try { localStorage.setItem(META_KEY, JSON.stringify(m)); } catch (e) {} }
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
@@ -158,6 +158,7 @@ function choiceCard(e, c, idx) {
       if (r.kind === "family" || (r.kind === "famtrait" && r.val < 0)) famHelp = true;
       else if (r.kind === "famtrait") hurt.push(pvChip("pvHurt", "⚠️ " + esc(r.label)));
       else if (r.kind === "trait") help.push(pvChip("pvHelp", "⭐ " + esc(r.label)));
+      else if (r.kind === "cesaret") help.push(pvChip("pvHelp", "🔥 Güçlü “Cesaret”: yol değiştirme"));
       else if (r.kind === "stat") (r.val < 0 ? help : hurt).push(pvChip(r.val < 0 ? "pvHelp" : "pvHurt", r.icon + " " + (r.val < 0 ? "Güçlü" : "Zayıf") + " “" + esc(c.stat) + "”"));
     });
     if (famHelp) help.unshift(pvChip("pvHelp", "🏠 " + esc(e.fam ? FAMILIES[S.family].tagLine[e.fam] : S.family + " ailesi")));
@@ -274,7 +275,7 @@ function lockedWhy(S, c, e) {
   if (c.reqDestek != null && destekOf(S) < c.reqDestek) return e.kavsak ? "Ailen bu konuda arkanda değil." : "";
   for (var rs in (c.reqStat || {})) if (S.stats[rs] < c.reqStat[rs]) return e.kavsak ? (rs === "İtibar" ? "İtibarın buna yetmiyor." : rs + " yetmiyor.") : "";
   if (c.reqVarlik != null && varlikOf(S) < c.reqVarlik) return e.kavsak ? "Cebin buna yetmiyor." : "";
-  if (c.req && S.traits.indexOf(c.req) < 0) return "Bu seçenek için özellik gerekir: " + c.req;
+  if (c.req && S.traits.indexOf(c.req) < 0) return "Bu seçenek için rozet gerekir: " + c.req;
   return "";
 }
 function choose(idx) {
@@ -330,11 +331,13 @@ function renderResult() {
   if (CUR.roll != null) rollCard = '<div class="rollCard"><div class="l">Atılan zar</div><div class="v">' + CUR.roll + '</div><div class="t">Hedef ' + CUR.b.need + "+</div></div>";
   else if (CUR.mini != null) rollCard = '<div class="rollCard"><div class="l">Mini oyun skoru</div><div class="v">%' + Math.round(CUR.mini * 100) + '</div><div class="t">' + OUT_LABEL[o] + "</div></div>";
   var gains = res.deltas.length ? '<div class="gainGrid">' + res.deltas.map(function (d) {
-    return '<div class="gainCard ' + (d[1] < 0 ? "bad" : "good") + '"><div class="k">' + STAT_ICONS[d[0]] + " " + esc(d[0]) + '</div><div class="v">' + signed(d[1]) + "</div></div>";
-  }).join("") + "</div>" : '<div class="muted">Bu seçim statlarını değiştirmedi.</div>';
+    var to = S.stats[d[0]], from = to - d[1], mx = Math.max(60, to, from);
+    return '<div class="gainCard ' + (d[1] < 0 ? "bad" : "good") + '"><div class="k">' + STAT_ICONS[d[0]] + " " + esc(d[0]) + '</div><div class="v">' + signed(d[1]) + "</div>" +
+      '<div class="gFrom">' + from + " → <b>" + to + '</b></div><div class="gTrack"><i style="--a:' + Math.round(100 * from / mx) + "%;--b:" + Math.round(100 * to / mx) + '%"></i></div></div>';
+  }).join("") + "</div>" : '<div class="muted">Bu seçim özelliklerini değiştirmedi.</div>';
   var traits = res.traits.map(function (t) {
     var bn = TRAITS[t] ? Object.keys(TRAITS[t].bonus).map(function (k) { return k + " kontrollerinde hedef −" + TRAITS[t].bonus[k]; }).join(", ") : "";
-    return '<div class="traitCard"><div class="l">YENİ ÖZELLİK KAZANILDI</div><div class="n">' + esc(t) + '</div><div class="d">' + esc((TRAITS[t] || {}).desc || "") + (bn ? " " + esc(bn) + "." : "") + "</div></div>";
+    return '<div class="traitCard"><div class="l">YENİ ROZET KAZANILDI</div><div class="n">' + esc(t) + '</div><div class="d">' + esc((TRAITS[t] || {}).desc || "") + (bn ? " " + esc(bn) + "." : "") + "</div></div>";
   }).join("");
   app.innerHTML = '<div class="screen">' + topbar("Sonuç") + '<div class="panel">' +
     '<div class="resultImg"><div class="artIcon">' + e.icon + "</div>" + imgTag(sceneSrcs(e.id)) + "</div>" +
@@ -380,11 +383,18 @@ function renderChapterEnd() {
     (waits ? '<div class="kvWaits"><div class="kvWaitsT">Sıradaki bölümde seni bekleyenler · ' + esc(next.name) + "</div><ul>" + waits + "</ul></div>" : "");
   shell(chTitle(ch), art(sceneSrcs(C.endImg), ev ? ev.icon : "📖", "BÖLÜM " + ROMAN[ch] + " TAMAMLANDI", C.endAge, C.endText),
     '<div class="sectionTitle">Bölüm ' + ROMAN[ch] + " · Gelişim Özeti</div><div class=\"sectionSub\">" + esc(C.range) + "</div>" +
-    kvHtml + compareHtml(S.chStart[ch] || cloneStats(), cloneStats()) +
-    '<h3 class="sectionTitle" style="font-size:18px">Kazanılan özellikler</h3>' +
-    (gained.length ? gained.map(traitCardHtml).join("") : '<div class="muted">Bu bölümde yeni özellik açılmadı.</div>') + itibarNoteHtml(ch) +
+    kvHtml + starStatHtml(S.chStart[ch] || cloneStats(), cloneStats()) + compareHtml(S.chStart[ch] || cloneStats(), cloneStats()) +
+    '<h3 class="sectionTitle" style="font-size:18px">Kazanılan rozetler</h3>' +
+    (gained.length ? gained.map(traitCardHtml).join("") : '<div class="muted">Bu bölümde yeni rozet kazanılmadı.</div>') + itibarNoteHtml(ch) +
     (hl ? '<h3 class="sectionTitle" style="font-size:18px">Unutulmayan anlar</h3><div class="logList">' + hl + "</div>" : "") +
     '<button class="primary" onclick="nextChapter()">' + esc(C.next) + "</button>");
+}
+/* Bölümün özelliği: bu bölümde en çok gelişen özellik */
+function starStatHtml(a, b) {
+  var best = null;
+  STATS.forEach(function (k) { var d = b[k] - a[k]; if (d > 0 && (!best || d > best.d)) best = { k: k, d: d }; });
+  if (!best) return "";
+  return '<div class="starStat"><span class="ssL">BU BÖLÜMÜN ÖZELLİĞİ</span><span class="ssI">' + STAT_ICONS[best.k] + '</span><b>' + esc(best.k) + "</b><em>+" + best.d + "</em><small>" + esc(TUT_STATS[best.k] || "") + "</small></div>";
 }
 function traitEffect(t) {
   var b = (TRAITS[t] || {}).bonus || {};
@@ -494,7 +504,7 @@ function shareCard() {
       ctx.fillStyle = "#fff"; ctx.fillText(String(S.stats[k]), x + 400, yy);
     });
     ctx.textAlign = "center"; ctx.fillStyle = "#d8b16a"; ctx.font = "700 28px sans-serif";
-    wrapText(ctx, S.traits.slice(-3).join(" · "), W / 2, Math.min(y + 310, H - 110), 940, 36);
+    wrapText(ctx, S.traits.slice(-3).join(" · "), W / 2, Math.min(y + 370, H - 110), 940, 36);
     ctx.fillStyle = "#8f836f"; ctx.font = "700 26px sans-serif"; ctx.fillText("dygrogrand.github.io/Makarya", W / 2, H - 40);
     cv.toBlob(function (blob) {
       if (!blob) return;
@@ -528,12 +538,12 @@ function showCharacter() {
   var f = FAMILIES[S.family];
   var fam = f.traits.map(function (t) { return '<div class="famTrait ' + (t.good ? "good" : "bad") + '"><span>' + esc(t.name) + "<small>" + esc(t.desc) + "</small></span></div>"; }).join("");
   var tr = S.traits.length ? S.traits.map(traitCardHtml).join("")
-    : '<div class="muted">Henüz kazanılmış özellik yok. Zor seçimler ve kritik başarılar özellik açar.</div>';
+    : '<div class="muted">Henüz kazanılmış rozet yok. Zor seçimler ve kritik başarılar rozet kazandırır.</div>';
   var d = destekOf(S);
-  modal("<h2>Karakterin</h2><p>" + esc(S.family) + " ailesi · " + (S.gender === "kiz" ? "Kız" : "Erkek") + " · " + S.traits.length + " özellik</p>" +
+  modal("<h2>Karakterin</h2><p>" + esc(S.family) + " ailesi · " + (S.gender === "kiz" ? "Kız" : "Erkek") + " · " + S.traits.length + " rozet</p>" +
     '<div class="pvRow">' + pvChip(d === 2 ? "pvHelp" : d === 1 ? "pvSure" : "pvHurt", "🏠 Aile desteği: <b>" + DESTEK[d] + "</b>") +
     pvChip("pvSure", "💰 Varlık: <b>" + TIERS[varlikOf(S)] + "</b>") + "</div>" +
-    barsHtml() + "<h3>Aile özellikleri</h3>" + fam + "<h3>Kazanılan özellikler</h3>" + tr +
+    barsHtml() + "<h3>Ailenden gelenler</h3>" + fam + "<h3>Kazanılan rozetler</h3>" + tr +
     (S.flags.length ? "<h3>Hafıza</h3>" + lifeLog() : ""));
 }
 function showGraveyard() {
@@ -549,9 +559,9 @@ function showRules() {
   modal("<h2>Nasıl oynanır?</h2>" + '<button class="secondary" onclick="showTutorial()">📖 Tanıtımı baştan aç</button>' +
     "<p><b>Seçimler.</b> Her olayda bir seçim yaparsın. Bazıları kesin sonuç verir, bazıları zar ya da mini oyun ister.</p>" +
     "<p><b>Zar.</b> 20 yüzlü zar atılır. Hedef sayıya ya da üstüne atarsan başarırsın. 20 her zaman kritik başarı, 1 her zaman kritik hatadır.</p>" +
-    "<p><b>Hedef nasıl belirlenir?</b> Zorluk, ilgili statın, ailenin etkisi ve kazandığın özellikler hedefi yukarı ya da aşağı çeker. Zar ekranında her kalemi tek tek görürsün.</p>" +
-    "<p><b>Risk ve ödül.</b> Zor seçimler başarılırsa daha fazla stat kazandırır ve özellik açar; kritik başarı en büyük kazancı getirir. Başarısızlık puan kazandırmaz, kritik başarısızlıkta ise puan kaybedersin.</p>" +
-    "<p><b>Özellikler.</b> Kazandığın özellikler hedefleri düşürür ve ileride yeni seçeneklerin kilidini açar (🔒).</p>" +
+    "<p><b>Hedef nasıl belirlenir?</b> Zorluk, ilgili özelliğin, ailenin etkisi ve kazandığın rozetler hedefi yukarı ya da aşağı çeker. Zar ekranında her kalemi tek tek görürsün.</p>" +
+    "<p><b>Risk ve ödül.</b> Zor seçimler başarılırsa daha fazla özellik puanı kazandırır ve rozet açar; kritik başarı en büyük kazancı getirir. Başarısızlık puan kazandırmaz, kritik başarısızlıkta ise puan kaybedersin.</p>" +
+    "<p><b>Özellikler ve rozetler.</b> Dokuz özelliğin (Akıl, Çene, Gönül…) zarı belirler: bir özellik o yaştaki olağan seviyesinin her 4 puan üstündeyse hedef 1 düşer, her 4 puan altındaysa 1 yükselir. Cesaret ayrıca hayatında yol değiştiren zarlarda hedefi 5'e kadar düşürür. Kazandığın rozetler hedefleri ayrıca düşürür ve ileride yeni seçeneklerin kilidini açar (🔒).</p>" +
     "<p><b>Hafıza.</b> Bazı seçimler unutulmaz; yıllar sonra karşına çıkar.</p>" +
     "<p><b>İtibar.</b> Mahallede adının nasıl anıldığı. Yüksek itibar kefil ve referans gerektiren kapıları açar, bölüm sonunda küs ailenle barıştırır, başın belaya girince mahalleyi arkana alır. Düşük itibar aile desteğini aşındırır.</p>" +
     "<p><b>Her hayat farklı.</b> Her bölümde olaylar geniş bir havuzdan seçilir; iki hayat birbirinin aynısı olmaz.</p>" +
@@ -1082,6 +1092,7 @@ var TUT_STATS = {
   "Cesaret": "Risk almak, öne çıkmak, ilk adımı atmak.",
   "Pişkinlik": "Utanmadan sahneye çıkmak; yüzün kızarmaz.",
   "İtibar": "Mahallede adının nasıl anıldığı. Kefil ve referans kapılarını açar, ailenle arandaki bağı etkiler.",
+  "Gönül": "Sevmek, sevilmek, yakın olmak. Aşk, evlilik, çocuk ve dostluk sınavları onda.",
   "Dayanıklılık": "Sabır, yorgunluğa direnmek ve uzun yaşamak.",
   "Sosyal Radar": "İnsanları ve odayı okumak; kim kime kızgın, ilk sen bilirsin."
 };
@@ -1101,16 +1112,16 @@ var TUT_PAGES = [
       "<p><b>Seçimler geri alınmaz.</b> Oyun her adımı kaydeder; zar atıldığı an karar verilmiş olur.</p>" +
       '<div class="tutLine">' + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (i) { return "<span>" + ROMAN[i] + "</span>"; }).join("") + '</div><div class="tutLineL"><span>Doğum</span><span>Son söz</span></div>';
   } },
-  { t: "Sekiz yeteneğin", h: function () {
-    return "<p>Her zar bir yeteneği sınar. Ailen bazılarını baştan güçlü verir; seçimlerin onları büyütür ya da küçültür.</p>" +
+  { t: "Dokuz özelliğin", h: function () {
+    return "<p>Her zar bir özelliği sınar. Ailen bazılarını baştan güçlü verir; seçimlerin onları büyütür ya da küçültür.</p>" +
       '<div class="tutStats">' + STATS.map(function (k) { return '<div><b>' + STAT_ICONS[k] + " " + k + "</b><span>" + TUT_STATS[k] + "</span></div>"; }).join("") + "</div>";
   } },
   { t: "Bir seçenek nasıl okunur?", h: function () {
     return tutMockCard() + '<ol class="tutList">' +
-      "<li><b>Zorluk ve yetenek.</b> Bu seçenek Çene'yi sınar. Zar 11 ya da üstü gelirse başarırsın.</li>" +
-      "<li><b>Lehine.</b> Hedefi düşüren şeyler: güçlü yeteneğin, ailen, özelliklerin.</li>" +
-      "<li><b>Aleyhine.</b> Hedefi yükselten şeyler: zayıf olduğun yetenek, ailenin bir huyu.</li>" +
-      "<li><b>Başarırsan.</b> Kazanacakların: yetenek puanı, bazen bir özellik ya da kalıcı bir hafıza.</li>" +
+      "<li><b>Zorluk ve özellik.</b> Bu seçenek Çene'yi sınar. Zar 11 ya da üstü gelirse başarırsın.</li>" +
+      "<li><b>Lehine.</b> Hedefi düşüren şeyler: güçlü özelliğin, ailen, rozetlerin.</li>" +
+      "<li><b>Aleyhine.</b> Hedefi yükselten şeyler: zayıf olduğun özellik, ailenin bir huyu.</li>" +
+      "<li><b>Başarırsan.</b> Kazanacakların: özellik puanı, bazen bir rozet ya da kalıcı bir hafıza.</li>" +
       "<li><b>Şans.</b> Bu hedefle başarma ihtimalin. Seçmeden önce görürsün.</li></ol>";
   } },
   { t: "Zar atınca ne olur?", h: function () {
@@ -1119,16 +1130,16 @@ var TUT_PAGES = [
       '<div class="o win"><b>11–19 · Başarı</b>Komşu söylene söylene topu verdi. <em>Çene +3</em></div>' +
       '<div class="o fail"><b>2–10 · Başarısız</b>Kapıyı çaldın, kimse açmadı. Puan yok; hikâye devam eder.</div>' +
       '<div class="o bad"><b>1 · Kritik hata</b>Kapıyı çalarken saksıyı devirdin. <em>Çene −1</em></div></div>' +
-      "<p>Zor seçenekler daha çok kazandırır ve özellik açabilir. Kolay ve kesin seçenekler güvenlidir ama az kazandırır.</p>";
+      "<p>Zor seçenekler daha çok kazandırır ve rozet açabilir. Kolay ve kesin seçenekler güvenlidir ama az kazandırır.</p>";
   } },
-  { t: "Hafıza ve özellikler", h: function () {
+  { t: "Hafıza ve rozetler", h: function () {
     return "<p><b>Hafıza.</b> Bazı seçimler unutulmaz. Yıllar sonra karşına yeni bir seçenek olarak çıkar:</p>" +
       '<div class="tutRib"><span class="pvRib">📜 Geçmişten açıldı · Vazo davasında kediyi suçladı.</span></div>' +
-      "<p>Bazen güçlü bir yeteneğin olayın içinde bir şey fark eder ve yeni bir seçenek açar:</p>" +
+      "<p>Bazen güçlü bir özelliğin olayın içinde bir şey fark eder ve yeni bir seçenek açar:</p>" +
       '<div class="tutRib"><span class="pvRib">👀 Bu seçeneği Sosyal Radar açtı</span></div>' +
-      "<p><b>Özellikler.</b> Zor işleri başarınca özellik kazanırsın (🏅). Her özellik bir ya da iki yetenekte hedefini düşürür.</p>" +
+      "<p><b>Rozetler.</b> Zor işleri başarınca rozet kazanırsın (🏅). Her rozet bir ya da iki özellikte hedefini düşürür.</p>" +
       '<div class="tutBar"><span class="topBtn tutGlow">☻</span><span class="tutBarT">Bölüm I · Ev</span><span class="topBtn">?</span></div>' +
-      '<p class="tutPoint">👆 Özelliklerine, aile desteğine, varlığına ve hafızana bakmak için her ekranın sol üstündeki <b>☻</b> düğmesine dokun. Kuralları <b>?</b> düğmesi açar.</p>';
+      '<p class="tutPoint">👆 Özelliklerine, rozetlerine, aile desteğine, varlığına ve hafızana bakmak için her ekranın sol üstündeki <b>☻</b> düğmesine dokun. Kuralları <b>?</b> düğmesi açar.</p>';
   } },
   { t: "Büyük dönüm noktaları", h: function () {
     return "<p><b>Kavşaklar.</b> Hayatında on iki büyük dönüm noktası var. Kavşak ekranı gelince dur ve düşün: burada seçtiğin yol hayatının geri kalanını belirler. <span class=\"tutTag\">GERİ DÖNÜŞ YOK</span></p>" +
@@ -1142,7 +1153,7 @@ var TUT = null;
 function showTutorialAsk() {
   var m = document.createElement("div"); m.className = "tutWrap";
   m.innerHTML = '<div class="tutCard ask"><div class="tutKick">YENİ BİR HAYAT</div><h2>Nasıl oynandığını görmek ister misin?</h2>' +
-    "<p>Altı kısa sayfa: seçenekler, zar, özellikler ve büyük dönüm noktaları. İstediğin an atlayabilirsin.</p>" +
+    "<p>Altı kısa sayfa: seçenekler, zar, özellikler, rozetler ve büyük dönüm noktaları. İstediğin an atlayabilirsin.</p>" +
     '<div class="row"><button class="secondary" id="tutSkip">Atla</button><button class="primary" id="tutGo">GÖSTER</button></div></div>';
   document.getElementById("app").appendChild(m);
   m.querySelector("#tutSkip").onclick = function () { m.remove(); };

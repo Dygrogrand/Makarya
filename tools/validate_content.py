@@ -4,7 +4,7 @@ Kullanım: python3 tools/validate_content.py content/bolum-4.json [diğer dosyal
 Tüm içerik dosyaları birlikte verilirse bölümler arası kontroller de yapılır (özellik ve hafıza tutarlılığı)."""
 import json, re, sys
 
-STATS = ["Akıl", "Çene", "Kurnazlık", "Cesaret", "Pişkinlik", "İtibar", "Dayanıklılık", "Sosyal Radar"]
+STATS = ["Akıl", "Çene", "Kurnazlık", "Cesaret", "Pişkinlik", "İtibar", "Gönül", "Dayanıklılık", "Sosyal Radar"]
 DIFFS = ["veryEasy", "easy", "medium", "hard", "veryHard"]
 VOICE_DIFFS = ["easy", "medium", "hard", "veryHard"]
 FAMS = ["home", "money", "social", "education"]

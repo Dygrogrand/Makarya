@@ -155,7 +155,7 @@ function hasReq(S, c, e) {
 
 /* İç sesler: zar atılmadan, stat yeterliyse araya giren pasif kontroller */
 var PASSIVE = { easy: -3, medium: 1, hard: 5, veryHard: 9 };
-var VOICE_NAMES = { "Akıl": "AKIL", "Çene": "ÇENE", "Kurnazlık": "KURNAZLIK", "Cesaret": "CESARET", "Pişkinlik": "PİŞKİNLİK", "İtibar": "İTİBAR", "Dayanıklılık": "DAYANIKLILIK", "Sosyal Radar": "SOSYAL RADAR" };
+var VOICE_NAMES = { "Akıl": "AKIL", "Çene": "ÇENE", "Kurnazlık": "KURNAZLIK", "Cesaret": "CESARET", "Pişkinlik": "PİŞKİNLİK", "İtibar": "İTİBAR", "Gönül": "GÖNÜL", "Dayanıklılık": "DAYANIKLILIK", "Sosyal Radar": "SOSYAL RADAR" };
 function voicePower(S, stat) {
   var p = S.stats[stat];
   S.traits.forEach(function (t) { p += 2 * (((TRAITS[t] || {}).bonus || {})[stat] || 0); });
@@ -181,13 +181,22 @@ function familyEventBonus(S, e, stat) {
 }
 
 /* Hedef zarın bileşenleri: her satır oyuncuya açıkça gösterilir */
+/* Her özellik kendi olağan seviyesiyle kıyaslanır: az sınanan özellikler (Cesaret, Pişkinlik, Gönül) doğal olarak daha yavaş büyür.
+   Değerler simülasyonla ölçülen tipik oyuncunun bölüm ortancalarından gelir (tools/simulasyon.js). */
+var STAT_OFFSET = { "Akıl": -7, "Çene": 3, "Kurnazlık": -2, "Cesaret": -9, "Pişkinlik": -9, "İtibar": -4, "Gönül": -13, "Dayanıklılık": -4, "Sosyal Radar": -3 };
+function statNorm(stat, ch) { return CHAPTERS[ch].expected + (STAT_OFFSET[stat] || 0); }
 function needBreakdown(S, e, c) {
   var d = DIFF[c.diff], ch = CHAPTERS[e.ch], rows = [];
   var base = d.base + (ch.step || 0);
   rows.push({ icon: "🎯", label: d.label + " zorluk", val: base, kind: "base" });
   var st = S.stats[c.stat];
-  var statAdj = -Math.round((st - ch.expected) / 4);
+  var statAdj = -Math.round((st - statNorm(c.stat, e.ch)) / 4);
   if (statAdj) rows.push({ icon: STAT_ICONS[c.stat], label: c.stat + " " + st + (statAdj < 0 ? " (beklenenin üstünde)" : " (beklenenin altında)"), val: statAdj, kind: "stat" });
+  /* Cesaret: hattı değiştiren zarlarda cesur olana kapı biraz daha açılır (beklenenin her 3 puan üstü −1, en fazla −5) */
+  if (/(^|,\s*)-(meslek|hat)-/.test(c.flagWin || "")) {
+    var cb = clamp(Math.round((S.stats["Cesaret"] - statNorm("Cesaret", e.ch)) / 3), 0, 5);
+    if (cb) rows.push({ icon: "🔥", label: "Cesaret: yol değiştirme cesareti", val: -cb, kind: "cesaret" });
+  }
   var fb = familyEventBonus(S, e, c.stat);
   if (fb) rows.push({ icon: "🏠", label: S.family + " ailesi etkisi", val: -fb, kind: "family" });
   if (S.family) FAMILIES[S.family].traits.forEach(function (t) {
@@ -199,7 +208,7 @@ function needBreakdown(S, e, c) {
     var v = ((TRAITS[t] || {}).bonus || {})[c.stat] || 0;
     if (v) { trows.push({ icon: "⭐", label: t, val: -v, kind: "trait" }); tsum += v; }
   });
-  if (tsum > 3) { trows.push({ icon: "⭐", label: "Özellik tavanı (en fazla −3)", val: tsum - 3, kind: "cap" }); }
+  if (tsum > 3) { trows.push({ icon: "⭐", label: "Rozet tavanı (en fazla −3)", val: tsum - 3, kind: "cap" }); }
   rows = rows.concat(trows);
   var total = rows.reduce(function (s, r) { return s + r.val; }, 0);
   return { rows: rows, need: clamp(total, 2, 20), famBonus: fb };
@@ -343,8 +352,8 @@ function backgroundDeath(S, e, roll) {
 }
 
 /* Final kartı: en güçlü iki stat (mevcut değer + gelişimin iki katı) */
-var ARCH_ADJ = { "Akıl": "Hesaplı", "Çene": "Dili Güçlü", "Kurnazlık": "Kurnaz", "Cesaret": "Gözü Kara", "Pişkinlik": "Pişkin", "İtibar": "Saygın", "Dayanıklılık": "Sabırlı", "Sosyal Radar": "Sezgili" };
-var ARCH_NOUN = { "Akıl": "Mühendis", "Çene": "Diplomat", "Kurnazlık": "Tüccar", "Cesaret": "Kaptan", "Pişkinlik": "Şovmen", "İtibar": "Muhtar", "Dayanıklılık": "Maratoncu", "Sosyal Radar": "Dedektif" };
+var ARCH_ADJ = { "Akıl": "Hesaplı", "Çene": "Dili Güçlü", "Kurnazlık": "Kurnaz", "Cesaret": "Gözü Kara", "Pişkinlik": "Pişkin", "İtibar": "Saygın", "Gönül": "Sevecen", "Dayanıklılık": "Sabırlı", "Sosyal Radar": "Sezgili" };
+var ARCH_NOUN = { "Akıl": "Mühendis", "Çene": "Diplomat", "Kurnazlık": "Tüccar", "Cesaret": "Kaptan", "Pişkinlik": "Şovmen", "İtibar": "Muhtar", "Gönül": "Âşık", "Dayanıklılık": "Maratoncu", "Sosyal Radar": "Dedektif" };
 var PROPHECY = {
   "Akıl": "Makarya'da bir gün bir köprü, bir yazılım ya da en azından bir tablo dosyası senin adını taşıyacak.",
   "Çene": "Ya büyükelçi olacaksın ya da çarşının en iyi pazarlığını yapan kişi.",
@@ -352,11 +361,12 @@ var PROPHECY = {
   "Cesaret": "Makarya'da 'Bunu kim yapar?' sorusunun cevabı genelde sen olacaksın.",
   "Pişkinlik": "Sahneler, kameralar ve aile düğünleri seni bekliyor.",
   "İtibar": "Mahallede adın geçince herkes bir an susar; sonra hep iyi şeyler söyler.",
+  "Gönül": "Bir gün biri senin için bir şarkı yazacak. Muhtemelen kötü, ama içten.",
   "Dayanıklılık": "Makarya trafiğine bile sabredebilecek nadir insanlardan biri olacaksın.",
   "Sosyal Radar": "Bir odaya girdiğinde, kimin kime kızgın olduğunu herkesten önce bileceksin."
 };
 /* Bazı statlar oyunda daha sık geçtiği için simülasyonla dengelenir (tools/simulasyon.js, 3.000 tam hayat) */
-var ARCH_NORM = {"Akıl":-7,"Çene":39,"Kurnazlık":4,"Cesaret":-25,"Pişkinlik":-17,"İtibar":5,"Dayanıklılık":15,"Sosyal Radar":-14};
+var ARCH_NORM = {"Akıl":-5,"Çene":2,"Kurnazlık":-1,"Cesaret":-19,"Pişkinlik":-11,"İtibar":-9,"Gönül":-46,"Dayanıklılık":12,"Sosyal Radar":-17};
 function archetype(S) {
   var base = S.famStats || S.stats;
   var scored = STATS.map(function (k) { return { k: k, s: S.stats[k] + 2 * (S.stats[k] - base[k]) - (ARCH_NORM[k] || 0) }; })

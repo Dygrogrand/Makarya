@@ -1,17 +1,17 @@
 /* Makarya — Hayat Zarı · sabit oyun verisi
    Olaylar, bölümler, hafıza etiketleri ve ölüm sebepleri content.js dosyasındadır.
    content.js elle düzenlenmez: Makarya_Icerik.xlsx'ten tools/excel_to_js.py ile üretilir. */
-var STATS = ["Akıl", "Çene", "Kurnazlık", "Cesaret", "Pişkinlik", "İtibar", "Dayanıklılık", "Sosyal Radar"];
-var STAT_ICONS = { "Akıl": "🧠", "Çene": "🗣️", "Kurnazlık": "🦊", "Cesaret": "🔥", "Pişkinlik": "😏", "İtibar": "🤝", "Dayanıklılık": "🧱", "Sosyal Radar": "👀" };
+var STATS = ["Akıl", "Çene", "Kurnazlık", "Cesaret", "Pişkinlik", "İtibar", "Gönül", "Dayanıklılık", "Sosyal Radar"];
+var STAT_ICONS = { "Akıl": "🧠", "Çene": "🗣️", "Kurnazlık": "🦊", "Cesaret": "🔥", "Pişkinlik": "😏", "İtibar": "🤝", "Gönül": "💗", "Dayanıklılık": "🧱", "Sosyal Radar": "👀" };
 var BASE_STAT = 22;
 
 /* Zorluk tablosu: base = hedef zar, succ/crit = kazanç, loss = kritik hatada kayıp */
 var DIFF = {
   veryEasy: { label: "Çok Kolay", base: 5, succ: 1, crit: 2, loss: 0 },
   easy:     { label: "Kolay",     base: 7, succ: 2, crit: 3, loss: 1 },
-  medium:   { label: "Orta",      base: 10, succ: 3, crit: 5, loss: 1 },
-  hard:     { label: "Zor",       base: 13, succ: 5, crit: 7, loss: 2 },
-  veryHard: { label: "Çok Zor",   base: 16, succ: 8, crit: 11, loss: 3 }
+  medium:   { label: "Orta",      base: 11, succ: 3, crit: 5, loss: 1 },
+  hard:     { label: "Zor",       base: 14, succ: 5, crit: 7, loss: 2 },
+  veryHard: { label: "Çok Zor",   base: 17, succ: 8, crit: 11, loss: 3 }
 };
 
 /* Varlık kademeleri ve aile desteği (aile yalnızca başlangıç kademesini belirler) */
@@ -20,7 +20,7 @@ var DESTEK = ["Küs", "Mesafeli", "Tam"];
 var FAMILIES = {
   "Yalçın": {
     tier: 1, slug: "yalcin", subtitle: "Tek gelirli, dayanışmacı alt-orta sınıf ev",
-    mods: { "Akıl": 1, "Çene": 1, "Kurnazlık": 4, "Cesaret": 1, "Pişkinlik": -4, "İtibar": 7, "Dayanıklılık": 9, "Sosyal Radar": 3 },
+    mods: { "Akıl": 1, "Çene": 1, "Kurnazlık": 4, "Cesaret": 1, "Pişkinlik": -4, "İtibar": 7, "Gönül": 5, "Dayanıklılık": 9, "Sosyal Radar": 3 },
     traits: [
       { name: "Omuz Omuza", good: true, desc: "Zor durumda dayanışma refleksi.", stats: { "İtibar": 1, "Dayanıklılık": 1 } },
       { name: "Yoktan Var Et", good: true, desc: "Kıt kaynakta pratik çözüm üretir.", stats: { "Kurnazlık": 1 } },
@@ -32,7 +32,7 @@ var FAMILIES = {
   },
   "Erdem": {
     tier: 2, slug: "erdem", subtitle: "İki kamu çalışanı; düzen ve eğitim odaklı",
-    mods: { "Akıl": 9, "Çene": 1, "Kurnazlık": 0, "Cesaret": -3, "Pişkinlik": -5, "İtibar": 7, "Dayanıklılık": 4, "Sosyal Radar": 2 },
+    mods: { "Akıl": 9, "Çene": 1, "Kurnazlık": 0, "Cesaret": -3, "Pişkinlik": -5, "İtibar": 7, "Gönül": 1, "Dayanıklılık": 4, "Sosyal Radar": 2 },
     traits: [
       { name: "Düzenli Zihin", good: true, desc: "Plan, okul ve kurallı işlerde güçlü.", stats: { "Akıl": 1 } },
       { name: "Kural Hafızası", good: true, desc: "Doğru prosedürü hızla hatırlar.", stats: { "İtibar": 1 } },
@@ -44,7 +44,7 @@ var FAMILIES = {
   },
   "Keskin": {
     tier: 2, slug: "keskin", subtitle: "Mahalle esnafı; bağlantı ve pratik zekâ güçlü",
-    mods: { "Akıl": 0, "Çene": 9, "Kurnazlık": 8, "Cesaret": 3, "Pişkinlik": 4, "İtibar": 0, "Dayanıklılık": -3, "Sosyal Radar": 7 },
+    mods: { "Akıl": 0, "Çene": 9, "Kurnazlık": 8, "Cesaret": 3, "Pişkinlik": 4, "İtibar": 0, "Gönül": 2, "Dayanıklılık": -3, "Sosyal Radar": 7 },
     traits: [
       { name: "Esnaf Radarı", good: true, desc: "Fiyat, pazarlık ve niyet okumada keskin.", stats: { "Çene": 1, "Kurnazlık": 1 } },
       { name: "Mahalle Networkü", good: true, desc: "İnsan ilişkilerinde kapı açar.", stats: { "Sosyal Radar": 1 } },
@@ -56,7 +56,7 @@ var FAMILIES = {
   },
   "Tan": {
     tier: 3, slug: "tan", subtitle: "Beyaz yakalı üst-orta sınıf; fırsat ve beklenti yüksek",
-    mods: { "Akıl": 9, "Çene": 6, "Kurnazlık": 1, "Cesaret": 1, "Pişkinlik": -2, "İtibar": 3, "Dayanıklılık": 0, "Sosyal Radar": 5 },
+    mods: { "Akıl": 9, "Çene": 6, "Kurnazlık": 1, "Cesaret": 1, "Pişkinlik": -2, "İtibar": 3, "Gönül": 0, "Dayanıklılık": 0, "Sosyal Radar": 5 },
     traits: [
       { name: "Kaynak Erişimi", good: true, desc: "Eğitim ve hazırlıkta daha iyi araçlara ulaşır.", stats: { "Akıl": 1 } },
       { name: "Sunum Yeteneği", good: true, desc: "Kendini düzgün ifade etmeye alışkındır.", stats: { "Çene": 1 } },
@@ -68,7 +68,7 @@ var FAMILIES = {
   },
   "Varlı": {
     tier: 4, slug: "varli", subtitle: "Yeni zengin; özgüven ve statü baskısı birlikte",
-    mods: { "Akıl": 1, "Çene": 5, "Kurnazlık": 3, "Cesaret": 8, "Pişkinlik": 9, "İtibar": -5, "Dayanıklılık": -3, "Sosyal Radar": 6 },
+    mods: { "Akıl": 1, "Çene": 5, "Kurnazlık": 3, "Cesaret": 8, "Pişkinlik": 9, "İtibar": -5, "Gönül": -3, "Dayanıklılık": -3, "Sosyal Radar": 6 },
     traits: [
       { name: "Statü Rahatlığı", good: true, desc: "Kalabalık ve iddialı ortamlarda çekinmez.", stats: { "Pişkinlik": 1, "Cesaret": 1 } },
       { name: "Kapı Açan Network", good: true, desc: "Sosyal temaslarda doğal avantaj yaratır.", stats: { "Sosyal Radar": 1 } },
@@ -80,7 +80,7 @@ var FAMILIES = {
   },
   "Şen": {
     tier: 1, slug: "sen", subtitle: "Kalabalık aile; sosyal destek ve mahremiyet azlığı",
-    mods: { "Akıl": -3, "Çene": 8, "Kurnazlık": 2, "Cesaret": 4, "Pişkinlik": 3, "İtibar": 7, "Dayanıklılık": 3, "Sosyal Radar": 9 },
+    mods: { "Akıl": -3, "Çene": 8, "Kurnazlık": 2, "Cesaret": 4, "Pişkinlik": 3, "İtibar": 7, "Gönül": 7, "Dayanıklılık": 3, "Sosyal Radar": 9 },
     traits: [
       { name: "Kalabalıkta Büyüdü", good: true, desc: "İnsanların duygusunu ve ortamı hızla okur.", stats: { "Sosyal Radar": 1 } },
       { name: "Herkes Birini Tanır", good: true, desc: "Sosyal bağ kurmakta hızlıdır.", stats: { "Çene": 1 } },

@@ -13,7 +13,7 @@ for (var run = 0; run < RUNS; run++) {
   var n = 0, m = 0;
   for (var ch = 1; hasChapter(ch) && !S.dead; ch++) {
     S.ch = ch; S.plan = buildPlan(S, ch); S.pi = 0;
-    var sAvg = STATS.reduce(function (s, k) { return s + S.stats[k]; }, 0) / 8;
+    var sAvg = STATS.reduce(function (s, k) { return s + S.stats[k]; }, 0) / STATS.length;
     (statAt[ch] = statAt[ch] || []).push(sAvg);
     for (; S.pi < S.plan.length && !S.dead; S.pi++) {
       var e = curEvent(S); n++;
