@@ -3,7 +3,7 @@ var S = newState();
 var CUR = null;          // o anki seçim: {e, c, idx, b, res, roll, mini}
 var MG = { timers: [], raf: null, done: false };
 var SAVE_KEY = "makarya-kayit-v5", META_KEY = "makarya-meta-v1";
-var VOICE_COLORS = { "Akıl": "#3b6ea5", "Çene": "#b0572b", "Kurnazlık": "#8a6d1c", "Cesaret": "#b3322a", "Pişkinlik": "#8e3f86", "Vicdan": "#5f7d6a", "Dayanıklılık": "#6b5a48", "Sosyal Radar": "#2f7f86" };
+var VOICE_COLORS = { "Akıl": "#3b6ea5", "Çene": "#b0572b", "Kurnazlık": "#8a6d1c", "Cesaret": "#b3322a", "Pişkinlik": "#8e3f86", "İtibar": "#5f7d6a", "Dayanıklılık": "#6b5a48", "Sosyal Radar": "#2f7f86" };
 var GIRL_OPEN = false;  // kız karakter görselleri tamamlanınca true yap
 var ROMAN = { 1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 6: "VI", 7: "VII", 8: "VIII", 9: "IX", 10: "X" };
 var app = document.getElementById("app");
@@ -13,7 +13,7 @@ function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function
 function cloneStats() { return Object.assign({}, S.stats); }
 function signed(v) { return v > 0 ? "+" + v : String(v); }
 function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
-function loadSave() { try { var s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && s.v === 5 && s.family && s.plan && s.plan.length && s.screen !== "final") return s; } catch (e) {} return null; }
+function loadSave() { try { var raw = localStorage.getItem(SAVE_KEY); if (raw && raw.indexOf("Vicdan") >= 0) raw = raw.replace(/"Vicdan"/g, '"İtibar"').replace(/"İç Pusula"/g, '"Sözü Senet"'); var s = JSON.parse(raw); if (s && s.v === 5 && s.family && s.plan && s.plan.length && s.screen !== "final") return s; } catch (e) {} return null; }
 function loadMeta() { try { var m = JSON.parse(localStorage.getItem(META_KEY)); if (m && m.deaths) return m; } catch (e) {} return { lives: 0, deaths: [], titles: {} }; }
 function saveMeta(m) { try { localStorage.setItem(META_KEY, JSON.stringify(m)); } catch (e) {} }
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
@@ -67,7 +67,7 @@ function renderStart() {
     '<div class="sectionSub">Hayatındaki pek çok şeyi seçemeyeceksin. Ama bu kez bazı cevapları sen vereceksin.</div>' + saveHtml +
     '<div class="genderRow"><button class="genderBtn kiz soon" disabled><span>👧</span> Kız<em>Yakında</em></button>' +
     '<button class="genderBtn erkek" onclick="startGame(\'erkek\')"><span>👦</span> Erkek</button></div>' +
-    '<div class="row"><button class="secondary" onclick="showRules()">Nasıl oynanır?</button>' +
+    '<div class="row"><button class="secondary" onclick="showTutorial()">Nasıl oynanır?</button>' +
     (loadMeta().lives ? '<button class="secondary" onclick="showGraveyard()">🪦 Koleksiyon</button>' : "") + "</div>" +
     '<div class="muted">Kız karakterin hikâyesi hazırlanıyor.</div>');
 }
@@ -90,7 +90,7 @@ function commit() {
   S.last = { idx: CUR.idx, res: CUR.res, roll: CUR.roll == null ? null : CUR.roll, mini: CUR.mini == null ? null : CUR.mini, need: CUR.b ? CUR.b.need : null };
   S.lock = null; S.screen = "result"; save();
 }
-function startGame(g) { if (g === "kiz" && !GIRL_OPEN) return; clearSave(); S = newState(); S.gender = g; S.screen = "family"; render(); }
+function startGame(g) { if (g === "kiz" && !GIRL_OPEN) return; clearSave(); S = newState(); S.gender = g; S.screen = "family"; render(); showTutorialAsk(); }
 
 /* ── aile kurası ── */
 function renderFamily() {
@@ -142,10 +142,11 @@ function choiceCard(e, c, idx) {
   if (c.reqFlag === "evli") rib = "";
   else if (c.reqFlag && /^(hat|meslek)-/.test(c.reqFlag)) rib = "🧭 Hattından · " + (FLAG_LABELS[c.reqFlag] || "").replace(/\.$/, "");
   else if (c.reqFlag) rib = "📜 Geçmişten açıldı · " + (FLAG_LABELS[c.reqFlag] || "eski bir seçimin");
-  else if (c.reqVoice) rib = "💭 " + VOICE_NAMES[c.reqVoice] + " sesi açtı";
+  else if (c.reqVoice) rib = STAT_ICONS[c.reqVoice] + " Bu seçeneği " + c.reqVoice + " açtı";
   else if (c.req) rib = "⭐ " + c.req + " sayesinde açık";
   else if (c.reqVarlik >= 2) rib = "💰 Cebin buna yetiyor · " + TIERS[varlikOf(S)];
   else if (c.reqDestek != null) rib = "🏠 Ailen arkanda";
+  else if (c.reqStat) rib = Object.keys(c.reqStat).map(function (k) { return STAT_ICONS[k] + " " + (k === "İtibar" ? "İtibarın sayesinde açık" : k + " sayesinde açık"); }).join(" · ");
   var help = [], hurt = [], earn = [], risk = [], sub, chance;
   if (c.direct) {
     sub = "Kesin sonuç, zar yok";
@@ -157,7 +158,7 @@ function choiceCard(e, c, idx) {
       if (r.kind === "family" || (r.kind === "famtrait" && r.val < 0)) famHelp = true;
       else if (r.kind === "famtrait") hurt.push(pvChip("pvHurt", "⚠️ " + esc(r.label)));
       else if (r.kind === "trait") help.push(pvChip("pvHelp", "⭐ " + esc(r.label)));
-      else if (r.kind === "stat") (r.val < 0 ? help : hurt).push(pvChip(r.val < 0 ? "pvHelp" : "pvHurt", r.icon + " " + esc(c.stat) + (r.val < 0 ? " güçlü" : " zayıf")));
+      else if (r.kind === "stat") (r.val < 0 ? help : hurt).push(pvChip(r.val < 0 ? "pvHelp" : "pvHurt", r.icon + " " + (r.val < 0 ? "Güçlü" : "Zayıf") + " “" + esc(c.stat) + "”"));
     });
     if (famHelp) help.unshift(pvChip("pvHelp", "🏠 " + esc(e.fam ? FAMILIES[S.family].tagLine[e.fam] : S.family + " ailesi")));
     sub = d.label + " · " + STAT_ICONS[c.stat] + " " + c.stat + (c.mini ? " · 🎮 Mini oyun" : " · Hedef " + b.need + "+");
@@ -271,6 +272,7 @@ function lockedWhy(S, c, e) {
   /* hat ve meslek hafızaları kimliktir, kapı değil: başka hatların seçenekleri hiç görünmez */
   if (c.reqFlag && S.flags.indexOf(c.reqFlag) < 0) return e.kavsak && !/^(hat|meslek)-/.test(c.reqFlag) && c.reqFlag !== "evli" ? "Geçmişinde bu kapıyı açacak bir şey yok." : "";
   if (c.reqDestek != null && destekOf(S) < c.reqDestek) return e.kavsak ? "Ailen bu konuda arkanda değil." : "";
+  for (var rs in (c.reqStat || {})) if (S.stats[rs] < c.reqStat[rs]) return e.kavsak ? (rs === "İtibar" ? "İtibarın buna yetmiyor." : rs + " yetmiyor.") : "";
   if (c.reqVarlik != null && varlikOf(S) < c.reqVarlik) return e.kavsak ? "Cebin buna yetmiyor." : "";
   if (c.req && S.traits.indexOf(c.req) < 0) return "Bu seçenek için özellik gerekir: " + c.req;
   return "";
@@ -348,7 +350,7 @@ function advance() {
   if (S.dead) { S.screen = "final"; render(); return; }
   replanRest(S);
   S.pi++;
-  if (S.pi >= S.plan.length) S.screen = hasChapter(S.ch + 1) ? "chapterEnd" : "final";
+  if (S.pi >= S.plan.length) { S.screen = hasChapter(S.ch + 1) ? "chapterEnd" : "final"; if (S.screen === "chapterEnd") closeChapter(S); }
   else S.screen = "event";
   render();
 }
@@ -380,9 +382,23 @@ function renderChapterEnd() {
     '<div class="sectionTitle">Bölüm ' + ROMAN[ch] + " · Gelişim Özeti</div><div class=\"sectionSub\">" + esc(C.range) + "</div>" +
     kvHtml + compareHtml(S.chStart[ch] || cloneStats(), cloneStats()) +
     '<h3 class="sectionTitle" style="font-size:18px">Kazanılan özellikler</h3>' +
-    (gained.length ? '<div class="chips">' + gained.map(function (t) { return '<span class="chip">🏅 ' + esc(t) + "</span>"; }).join("") + "</div>" : '<div class="muted">Bu bölümde yeni özellik açılmadı.</div>') +
+    (gained.length ? gained.map(traitCardHtml).join("") : '<div class="muted">Bu bölümde yeni özellik açılmadı.</div>') + itibarNoteHtml(ch) +
     (hl ? '<h3 class="sectionTitle" style="font-size:18px">Unutulmayan anlar</h3><div class="logList">' + hl + "</div>" : "") +
     '<button class="primary" onclick="nextChapter()">' + esc(C.next) + "</button>");
+}
+function traitEffect(t) {
+  var b = (TRAITS[t] || {}).bonus || {};
+  return Object.keys(b).map(function (k) { return STAT_ICONS[k] + " “" + k + "” kontrollerinde hedef −" + b[k]; }).join(" · ");
+}
+function traitCardHtml(t) {
+  var fx = traitEffect(t);
+  return '<div class="tCard"><b>🏅 ' + esc(t) + "</b><div>" + esc((TRAITS[t] || {}).desc || "") + "</div>" + (fx ? '<div class="tFx">' + esc(fx) + "</div>" : "") + "</div>";
+}
+function itibarNoteHtml(ch) {
+  var n = (S.itibarNote || {})[ch];
+  if (n === 1) return '<div class="kvWaits"><div class="kvWaitsT">🤝 İtibarın işe yaradı</div>Mahallede adın iyi anılıyor; bu ailenin de kulağına gitti. Aile desteği yükseldi: <b>' + DESTEK[destekOf(S)] + "</b>.</div>";
+  if (n === -1) return '<div class="kvWaits lost"><div class="kvWaitsT">🤝 İtibarın zedelendi</div>Mahallede hakkında konuşulanlar eve kadar geldi. Aile desteği düştü: <b>' + DESTEK[destekOf(S)] + "</b>.</div>";
+  return "";
 }
 function nextChapter() { var ch = S.ch + 1; S.ch = ch; S.chFlags = S.chFlags || {}; S.chFlags[ch] = S.flags.slice(); S.plan = buildPlan(S, ch); S.pi = 0; S.chStart[ch] = cloneStats(); S.chTraits[ch] = S.traits.slice(); S.screen = "event"; render(); }
 
@@ -396,7 +412,8 @@ function barsHtml() {
 /* Mezar taşı: bu hayatta açılan kapılar ve onları neyin açtığı (açılmayanlar gösterilmez) */
 function unlockReason(u) {
   if (u.type === "flag") return "📜 " + (FLAG_LABELS[u.key] || "Eski bir seçimin");
-  if (u.type === "voice") return "💭 " + VOICE_NAMES[u.key] + " sesi fısıldadı";
+  if (u.type === "voice") return STAT_ICONS[u.key] + " Bu seçeneği " + u.key + " açtı";
+  if (u.type === "stat") return STAT_ICONS[u.key] + " " + (u.key === "İtibar" ? "İtibarın sayesinde" : u.key + " sayesinde");
   if (u.type === "varlik") return "💰 Cebin " + u.key + " olduğu için";
   if (u.type === "destek") return "🏠 Ailen arkanda olduğu için";
   return "⭐ " + u.key + " özelliğin sayesinde";
@@ -510,7 +527,7 @@ function showCharacter() {
   if (!S.family) { modal("<h2>Karakterin</h2><p>Önce hayata atılman gerekiyor.</p>"); return; }
   var f = FAMILIES[S.family];
   var fam = f.traits.map(function (t) { return '<div class="famTrait ' + (t.good ? "good" : "bad") + '"><span>' + esc(t.name) + "<small>" + esc(t.desc) + "</small></span></div>"; }).join("");
-  var tr = S.traits.length ? S.traits.map(function (t) { return '<div class="tCard"><b>⭐ ' + esc(t) + "</b><div>" + esc((TRAITS[t] || {}).desc || "") + "</div></div>"; }).join("")
+  var tr = S.traits.length ? S.traits.map(traitCardHtml).join("")
     : '<div class="muted">Henüz kazanılmış özellik yok. Zor seçimler ve kritik başarılar özellik açar.</div>';
   var d = destekOf(S);
   modal("<h2>Karakterin</h2><p>" + esc(S.family) + " ailesi · " + (S.gender === "kiz" ? "Kız" : "Erkek") + " · " + S.traits.length + " özellik</p>" +
@@ -529,13 +546,14 @@ function showGraveyard() {
     (titles.length ? "<h3>🎭 Açılan karakterler</h3><div class=\"chips\">" + titles.map(function (t) { return '<span class="chip">' + esc(t) + (m.titles[t] > 1 ? " ×" + m.titles[t] : "") + "</span>"; }).join("") + "</div>" : ""));
 }
 function showRules() {
-  modal("<h2>Nasıl oynanır?</h2>" +
+  modal("<h2>Nasıl oynanır?</h2>" + '<button class="secondary" onclick="showTutorial()">📖 Tanıtımı baştan aç</button>' +
     "<p><b>Seçimler.</b> Her olayda bir seçim yaparsın. Bazıları kesin sonuç verir, bazıları zar ya da mini oyun ister.</p>" +
     "<p><b>Zar.</b> 20 yüzlü zar atılır. Hedef sayıya ya da üstüne atarsan başarırsın. 20 her zaman kritik başarı, 1 her zaman kritik hatadır.</p>" +
     "<p><b>Hedef nasıl belirlenir?</b> Zorluk, ilgili statın, ailenin etkisi ve kazandığın özellikler hedefi yukarı ya da aşağı çeker. Zar ekranında her kalemi tek tek görürsün.</p>" +
     "<p><b>Risk ve ödül.</b> Zor seçimler başarılırsa daha fazla stat kazandırır ve özellik açar; kritik başarı en büyük kazancı getirir. Başarısızlık puan kazandırmaz, kritik başarısızlıkta ise puan kaybedersin.</p>" +
     "<p><b>Özellikler.</b> Kazandığın özellikler hedefleri düşürür ve ileride yeni seçeneklerin kilidini açar (🔒).</p>" +
     "<p><b>Hafıza.</b> Bazı seçimler unutulmaz; yıllar sonra karşına çıkar.</p>" +
+    "<p><b>İtibar.</b> Mahallede adının nasıl anıldığı. Yüksek itibar kefil ve referans gerektiren kapıları açar, bölüm sonunda küs ailenle barıştırır, başın belaya girince mahalleyi arkana alır. Düşük itibar aile desteğini aşındırır.</p>" +
     "<p><b>Her hayat farklı.</b> Her bölümde olaylar geniş bir havuzdan seçilir; iki hayat birbirinin aynısı olmaz.</p>" +
     "<p><b>Ölüm.</b> 18 yaşından sonra hayat biraz daha kırılgan: ☠️ işaretli seçenekler ölüm riski taşır ve yüzdesi her zaman görünür; yaş ilerledikçe arka planda küçük bir risk de vardır. Sağlıklı alışkanlıklar ve Dayanıklılık bu riski düşürür. Her hayat bir mezar taşıyla biter ve koleksiyona girer.</p>" +
     "<p><b>Hatlar.</b> Meslek, evlilik, çocuk ve geçmiş seçimlerin, önüne çıkacak olayları değiştirir.</p>" +
@@ -1055,3 +1073,96 @@ function mgBalance(st, a, m) {
 }
 
 render();
+
+/* ── Tanıtım: her yeni oyunda sorulur, "?" menüsünden de açılır ── */
+var TUT_STATS = {
+  "Akıl": "Düşünmek, hesaplamak, sınav ve plan.",
+  "Çene": "İkna etmek, pazarlık, laf yetiştirmek.",
+  "Kurnazlık": "Açık bulmak, kestirmeden gitmek.",
+  "Cesaret": "Risk almak, öne çıkmak, ilk adımı atmak.",
+  "Pişkinlik": "Utanmadan sahneye çıkmak; yüzün kızarmaz.",
+  "İtibar": "Mahallede adının nasıl anıldığı. Kefil ve referans kapılarını açar, ailenle arandaki bağı etkiler.",
+  "Dayanıklılık": "Sabır, yorgunluğa direnmek ve uzun yaşamak.",
+  "Sosyal Radar": "İnsanları ve odayı okumak; kim kime kızgın, ilk sen bilirsin."
+};
+function tutMockCard() {
+  return '<div class="tutMock"><div class="tutEv"><small>ÖRNEK OLAY · 9 YAŞ</small><b>Top Komşunun Bahçesinde</b><span>Top, huysuz komşunun bahçesine düştü. Komşu pencerede. Arkadaşların sana bakıyor.</span></div>' +
+    '<div class="choice tutChoice"><div class="choiceIcon">🗣️</div><div class="choiceMain"><b>Kapıyı çal, topu iste</b>' +
+    '<small><i class="tutN">1</i>Orta · 🗣️ Çene · Hedef 11+</small>' +
+    pvRow('<i class="tutN">2</i>Lehine', [pvChip("pvHelp", "🏠 insan okumak sende doğal")]) +
+    pvRow('<i class="tutN">3</i>Aleyhine', [pvChip("pvHurt", "🗣️ Zayıf “Çene”")]) +
+    pvRow('<i class="tutN">4</i>Başarırsan', [pvChip("pvSure", "🗣️ Çene <b>+3</b> <span class=\"pvDim\">(kritik +5)</span>")]) +
+    '</div><div class="chance"><i class="tutN">5</i>%50<small>şans</small></div></div></div>';
+}
+var TUT_PAGES = [
+  { t: "Bir hayat, zarla", h: function () {
+    return "<p>Makarya'da doğuyorsun. Aileni zar seçer; gerisini sen. Doğumdan son sözüne kadar her bölümde karşına olaylar çıkar ve her olayda bir seçim yaparsın.</p>" +
+      "<p>Bazı seçimlerin sonucu <b>kesindir</b> (✓). Bazılarında <b>zar</b> atılır, bazılarında kısa bir <b>mini oyun</b> oynarsın (🎮).</p>" +
+      "<p><b>Seçimler geri alınmaz.</b> Oyun her adımı kaydeder; zar atıldığı an karar verilmiş olur.</p>" +
+      '<div class="tutLine">' + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (i) { return "<span>" + ROMAN[i] + "</span>"; }).join("") + '</div><div class="tutLineL"><span>Doğum</span><span>Son söz</span></div>';
+  } },
+  { t: "Sekiz yeteneğin", h: function () {
+    return "<p>Her zar bir yeteneği sınar. Ailen bazılarını baştan güçlü verir; seçimlerin onları büyütür ya da küçültür.</p>" +
+      '<div class="tutStats">' + STATS.map(function (k) { return '<div><b>' + STAT_ICONS[k] + " " + k + "</b><span>" + TUT_STATS[k] + "</span></div>"; }).join("") + "</div>";
+  } },
+  { t: "Bir seçenek nasıl okunur?", h: function () {
+    return tutMockCard() + '<ol class="tutList">' +
+      "<li><b>Zorluk ve yetenek.</b> Bu seçenek Çene'yi sınar. Zar 11 ya da üstü gelirse başarırsın.</li>" +
+      "<li><b>Lehine.</b> Hedefi düşüren şeyler: güçlü yeteneğin, ailen, özelliklerin.</li>" +
+      "<li><b>Aleyhine.</b> Hedefi yükselten şeyler: zayıf olduğun yetenek, ailenin bir huyu.</li>" +
+      "<li><b>Başarırsan.</b> Kazanacakların: yetenek puanı, bazen bir özellik ya da kalıcı bir hafıza.</li>" +
+      "<li><b>Şans.</b> Bu hedefle başarma ihtimalin. Seçmeden önce görürsün.</li></ol>";
+  } },
+  { t: "Zar atınca ne olur?", h: function () {
+    return "<p>Yukarıdaki seçeneği seçtin ve 20 yüzlü zar atıldı:</p>" +
+      '<div class="tutOut"><div class="o crit"><b>20 · Kritik başarı</b>Komşu topu kendisi getirdi, bir de kurabiye verdi. <em>Çene +5</em></div>' +
+      '<div class="o win"><b>11–19 · Başarı</b>Komşu söylene söylene topu verdi. <em>Çene +3</em></div>' +
+      '<div class="o fail"><b>2–10 · Başarısız</b>Kapıyı çaldın, kimse açmadı. Puan yok; hikâye devam eder.</div>' +
+      '<div class="o bad"><b>1 · Kritik hata</b>Kapıyı çalarken saksıyı devirdin. <em>Çene −1</em></div></div>' +
+      "<p>Zor seçenekler daha çok kazandırır ve özellik açabilir. Kolay ve kesin seçenekler güvenlidir ama az kazandırır.</p>";
+  } },
+  { t: "Hafıza ve özellikler", h: function () {
+    return "<p><b>Hafıza.</b> Bazı seçimler unutulmaz. Yıllar sonra karşına yeni bir seçenek olarak çıkar:</p>" +
+      '<div class="tutRib"><span class="pvRib">📜 Geçmişten açıldı · Vazo davasında kediyi suçladı.</span></div>' +
+      "<p>Bazen güçlü bir yeteneğin olayın içinde bir şey fark eder ve yeni bir seçenek açar:</p>" +
+      '<div class="tutRib"><span class="pvRib">👀 Bu seçeneği Sosyal Radar açtı</span></div>' +
+      "<p><b>Özellikler.</b> Zor işleri başarınca özellik kazanırsın (🏅). Her özellik bir ya da iki yetenekte hedefini düşürür.</p>" +
+      '<div class="tutBar"><span class="topBtn tutGlow">☻</span><span class="tutBarT">Bölüm I · Ev</span><span class="topBtn">?</span></div>' +
+      '<p class="tutPoint">👆 Özelliklerine, aile desteğine, varlığına ve hafızana bakmak için her ekranın sol üstündeki <b>☻</b> düğmesine dokun. Kuralları <b>?</b> düğmesi açar.</p>';
+  } },
+  { t: "Büyük dönüm noktaları", h: function () {
+    return "<p><b>Kavşaklar.</b> Hayatında on iki büyük dönüm noktası var. Kavşak ekranı gelince dur ve düşün: burada seçtiğin yol hayatının geri kalanını belirler. <span class=\"tutTag\">GERİ DÖNÜŞ YOK</span></p>" +
+      "<p><b>Aile desteği.</b> Ailenin senden beklentileri var. Onlara ters düşen seçimler desteği azaltır; destek azalınca ailenin imkânları sana daha az akar. Her seçim bir vazgeçiştir.</p>" +
+      "<p><b>Varlık.</b> Para burada bir sayı değil, bir kademedir: borçlu, kıt, orta, rahat, varlıklı. Yalnızca büyük olaylarda değişir.</p>" +
+      "<p><b>Yolun.</b> Bir gün bir yola girersin. O yolu değiştirmek mümkün ama zordur.</p>" +
+      "<p><b>Ölüm.</b> On sekizinden sonra hayat biraz kırılganlaşır; ☠️ işaretli seçenekler risk taşır ve yüzdesi her zaman görünür. Her hayat bir son sözle ve bir mezar taşıyla biter.</p>";
+  } }
+];
+var TUT = null;
+function showTutorialAsk() {
+  var m = document.createElement("div"); m.className = "tutWrap";
+  m.innerHTML = '<div class="tutCard ask"><div class="tutKick">YENİ BİR HAYAT</div><h2>Nasıl oynandığını görmek ister misin?</h2>' +
+    "<p>Altı kısa sayfa: seçenekler, zar, özellikler ve büyük dönüm noktaları. İstediğin an atlayabilirsin.</p>" +
+    '<div class="row"><button class="secondary" id="tutSkip">Atla</button><button class="primary" id="tutGo">GÖSTER</button></div></div>';
+  document.getElementById("app").appendChild(m);
+  m.querySelector("#tutSkip").onclick = function () { m.remove(); };
+  m.querySelector("#tutGo").onclick = function () { m.remove(); showTutorial(); };
+}
+function showTutorial() {
+  document.querySelectorAll(".modal").forEach(function (x) { x.remove(); });
+  var m = document.createElement("div"); m.className = "tutWrap";
+  document.getElementById("app").appendChild(m);
+  TUT = { el: m, p: 0 };
+  tutRender();
+}
+function tutRender() {
+  var p = TUT.p, pg = TUT_PAGES[p], last = p === TUT_PAGES.length - 1;
+  TUT.el.innerHTML = '<div class="tutCard"><div class="tutTop"><div class="tutKick">NASIL OYNANIR · ' + (p + 1) + " / " + TUT_PAGES.length + '</div><button class="tutX" onclick="tutClose()" aria-label="Kapat">✕</button></div>' +
+    "<h2>" + esc(pg.t) + '</h2><div class="tutBody">' + pg.h() + "</div>" +
+    '<div class="tutDots">' + TUT_PAGES.map(function (_, i) { return '<i class="' + (i === p ? "on" : "") + '"></i>'; }).join("") + "</div>" +
+    '<div class="row">' + (p ? '<button class="secondary" onclick="tutGo(-1)">Geri</button>' : '<button class="secondary" onclick="tutClose()">Atla</button>') +
+    '<button class="primary" onclick="' + (last ? "tutClose()" : "tutGo(1)") + '">' + (last ? "HAYATA BAŞLA" : "İLERİ") + "</button></div></div>";
+  var body = TUT.el.querySelector(".tutBody"); if (body) body.scrollTop = 0;
+}
+function tutGo(d) { TUT.p = Math.max(0, Math.min(TUT_PAGES.length - 1, TUT.p + d)); tutRender(); }
+function tutClose() { if (TUT && TUT.el) TUT.el.remove(); TUT = null; }

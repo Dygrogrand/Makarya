@@ -29,6 +29,7 @@ for (var run = 0; run < RUNS; run++) {
       }
       if (!S.dead) replanRest(S); else S._deathId = e.id;
     }
+    if (!S.dead) closeChapter(S);
   }
   events.push(n); minis.push(m);
   if (S.dead) { var y = parseInt(S.dead.age); deathAges.push(y); if (S._deathId === "son-soz") reachedEnd++; }

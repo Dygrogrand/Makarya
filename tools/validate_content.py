@@ -4,7 +4,7 @@ Kullanım: python3 tools/validate_content.py content/bolum-4.json [diğer dosyal
 Tüm içerik dosyaları birlikte verilirse bölümler arası kontroller de yapılır (özellik ve hafıza tutarlılığı)."""
 import json, re, sys
 
-STATS = ["Akıl", "Çene", "Kurnazlık", "Cesaret", "Pişkinlik", "Vicdan", "Dayanıklılık", "Sosyal Radar"]
+STATS = ["Akıl", "Çene", "Kurnazlık", "Cesaret", "Pişkinlik", "İtibar", "Dayanıklılık", "Sosyal Radar"]
 DIFFS = ["veryEasy", "easy", "medium", "hard", "veryHard"]
 VOICE_DIFFS = ["easy", "medium", "hard", "veryHard"]
 FAMS = ["home", "money", "social", "education"]
@@ -19,7 +19,7 @@ MINIS = {
 BASE_TRAITS = ["Sessiz Gözlemci", "Ses Yükseltince Oluyor", "Erken Ekonomi Bilinci", "Teknoloji Merakı", "Yastık Altı Ekonomisti",
     "Küçük Tüccar", "Sahne Sever", "Para Üstü Radarı", "Kendine Gülebilir", "Organizatör", "İş Modeli Kurar", "Seçim Makinesi",
     "Asist Ustası", "Limonata Baronu", "Kilit Kırıcı", "Analitik Zihin", "Sözünü Geçirir", "Açık Bulur", "Geri Adım Atmaz",
-    "Yüzü Kızarmaz", "İç Pusula", "Kolay Dağılmaz", "Odayı Okur"]
+    "Yüzü Kızarmaz", "Sözü Senet", "Kolay Dağılmaz", "Odayı Okur"]
 CH_AGES = {1: (0, 3), 2: (3, 6), 3: (6, 9), 4: (10, 14), 5: (15, 18), 6: (18, 26), 7: (26, 40), 8: (40, 55), 9: (55, 70), 10: (70, 105)}
 
 FORBIDDEN = [
@@ -124,9 +124,9 @@ def main(paths):
             if not r.get("flag") or not r.get("text"): errs.append(f"{where}: recall hatalı")
             reqs.append((where, r.get("flag")))
         chs = e.get("choices", [])
-        nrf = sum(1 for c in chs if c.get("reqFlag"))
-        mx = 4 + nrf if nrf >= 3 else 7 if e.get("kavsak") else 6
-        if not (2 <= len(chs) <= mx): errs.append(f"{where}: 2-{mx} seçim olmalı")
+        GATE = ("reqFlag", "reqVarlik", "reqDestek", "reqStat", "req", "reqNotFlag", "reqVoice")
+        open_ = sum(1 for c in chs if not any(c.get(g) is not None for g in GATE))
+        if len(chs) < 2 or open_ > (7 if e.get("kavsak") else 6) or len(chs) > 24: errs.append(f"{where}: seçim sayısı uygun değil ({len(chs)} seçim, {open_} koşulsuz)")
         for c in chs:
             cw = f"{where} / '{c.get('t')}'"
             if not c.get("t"): errs.append(f"{cw}: t eksik")
@@ -169,6 +169,8 @@ def main(paths):
                     for k_, v_ in d_.items():
                         if k_ not in ["*", "Yalçın", "Erdem", "Keskin", "Tan", "Varlı", "Şen"] or not isinstance(v_, int) or abs(v_) > 2:
                             errs.append(f"{cw}: aile desteği hatalı {k_}={v_}")
+            for k_, v_ in (c.get("reqStat") or {}).items():
+                if k_ not in STATS or not isinstance(v_, int) or not 0 < v_ <= 100: errs.append(f"{cw}: reqStat hatalı {k_}={v_}")
             if c.get("reqDestek") is not None and c["reqDestek"] not in range(3): errs.append(f"{cw}: reqDestek 0-2 olmalı")
             if c.get("varlikKayip") is not None and c["varlikKayip"] not in range(1, 5): errs.append(f"{cw}: varlikKayip 1-4 olmalı")
             for k_ in ["reqVarlik", "varlik"]:

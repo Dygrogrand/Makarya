@@ -105,6 +105,22 @@ function gainVarlik(S, c, res) {
   if (c.varlikKayip) S.own = Math.max(0, (S.own || 0) - c.varlikKayip);
   if (varlikOf(S) !== v0) res.varlik = varlikOf(S) - v0;
 }
+/* İtibar: bölümün beklenen stat değerine göre yüksek (+1), normal (0) ya da düşük (-1) */
+var ITIBAR_HIGH = 3, ITIBAR_LOW = -10;
+function itibarLevel(S, ch) {
+  var d = S.stats["İtibar"] - CHAPTERS[ch || S.ch].expected;
+  return d >= ITIBAR_HIGH ? 1 : d <= ITIBAR_LOW ? -1 : 0;
+}
+/* Bölüm sonu: yüksek itibar küs aileyle barıştırır, düşük itibar aile desteğini aşındırır (Bölüm III'ten itibaren) */
+function closeChapter(S) {
+  S.itibarNote = S.itibarNote || {};
+  if (S.itibarNote[S.ch] !== undefined || S.ch < 3 || !S.family) return S.itibarNote[S.ch];
+  var lv = itibarLevel(S), d0 = destekOf(S), note = 0;
+  if (lv > 0 && d0 < 2) { S.destek = d0 + 1; note = 1; }
+  else if (lv < 0 && d0 > 0) { S.destek = d0 - 1; note = -1; }
+  S.itibarNote[S.ch] = note;
+  return note;
+}
 function destekOf(S) { return S.destek == null ? 2 : S.destek; }
 function destekDelta(S, c) {
   if (!c.destek || !S.family) return 0;
@@ -128,6 +144,7 @@ function hasReq(S, c, e) {
   if (c.reqFlag && S.flags.indexOf(c.reqFlag) < 0) return false;
   if (c.reqVarlik != null && varlikOf(S) < c.reqVarlik) return false;
   if (c.reqDestek != null && destekOf(S) < c.reqDestek) return false;
+  for (var rs in (c.reqStat || {})) if (S.stats[rs] < c.reqStat[rs]) return false;
   if (c.reqNotFlag && flagList(c.reqNotFlag).some(function (f) { return S.flags.indexOf(f) >= 0; })) return false;
   if (c.reqVoice) {
     var ok = e && eventVoices(S, e).some(function (v) { return v.stat === c.reqVoice && v.pass; });
@@ -138,7 +155,7 @@ function hasReq(S, c, e) {
 
 /* İç sesler: zar atılmadan, stat yeterliyse araya giren pasif kontroller */
 var PASSIVE = { easy: -3, medium: 1, hard: 5, veryHard: 9 };
-var VOICE_NAMES = { "Akıl": "AKIL", "Çene": "ÇENE", "Kurnazlık": "KURNAZLIK", "Cesaret": "CESARET", "Pişkinlik": "PİŞKİNLİK", "Vicdan": "VİCDAN", "Dayanıklılık": "DAYANIKLILIK", "Sosyal Radar": "SOSYAL RADAR" };
+var VOICE_NAMES = { "Akıl": "AKIL", "Çene": "ÇENE", "Kurnazlık": "KURNAZLIK", "Cesaret": "CESARET", "Pişkinlik": "PİŞKİNLİK", "İtibar": "İTİBAR", "Dayanıklılık": "DAYANIKLILIK", "Sosyal Radar": "SOSYAL RADAR" };
 function voicePower(S, stat) {
   var p = S.stats[stat];
   S.traits.forEach(function (t) { p += 2 * (((TRAITS[t] || {}).bonus || {})[stat] || 0); });
@@ -277,9 +294,12 @@ function applyOutcome(S, e, c, outcome, extra) {
     var r = c.r || {};
     res.text = r[outcome] || (outcome === "crit" ? r.win : null) || (outcome === "mid" ? r.fail : null) || DEFAULT_TEXT[outcome];
   }
-  /* Hapse düşmek: birikim sıfırlanır, aile desteği bir kademe düşer */
+  /* Hapse düşmek: birikim sıfırlanır, aile desteği bir kademe düşer.
+     İtibarı yüksek olana mahalle kefil olur: ceza hafifler, aile küsmez, birikimin bir kısmı kalır, tahliye erken gelir. */
   if (!wasHapis && S.flags.indexOf("hapis") >= 0) {
-    S.own = 0; S.destek = Math.max(0, destekOf(S) - 1); S.failStreak = 0;
+    S.failStreak = 0;
+    if (itibarLevel(S, e.ch) > 0) { S.own = Math.max(0, (S.own || 0) - 2); addFlag(S, "ceza-indirimi"); res.note = "Mahallen sana kefil oldu: cezan hafifletildi, ailen arkanda."; }
+    else { S.own = 0; S.destek = Math.max(0, destekOf(S) - 1); }
     if (varlikOf(S) !== v00) res.varlik = varlikOf(S) - v00;
     if (destekOf(S) !== d00) res.destek = destekOf(S) - d00;
   }
@@ -323,20 +343,20 @@ function backgroundDeath(S, e, roll) {
 }
 
 /* Final kartı: en güçlü iki stat (mevcut değer + gelişimin iki katı) */
-var ARCH_ADJ = { "Akıl": "Hesaplı", "Çene": "Dili Güçlü", "Kurnazlık": "Kurnaz", "Cesaret": "Gözü Kara", "Pişkinlik": "Pişkin", "Vicdan": "Vicdanlı", "Dayanıklılık": "Sabırlı", "Sosyal Radar": "Sezgili" };
-var ARCH_NOUN = { "Akıl": "Mühendis", "Çene": "Diplomat", "Kurnazlık": "Tüccar", "Cesaret": "Kaptan", "Pişkinlik": "Şovmen", "Vicdan": "Arabulucu", "Dayanıklılık": "Maratoncu", "Sosyal Radar": "Dedektif" };
+var ARCH_ADJ = { "Akıl": "Hesaplı", "Çene": "Dili Güçlü", "Kurnazlık": "Kurnaz", "Cesaret": "Gözü Kara", "Pişkinlik": "Pişkin", "İtibar": "Saygın", "Dayanıklılık": "Sabırlı", "Sosyal Radar": "Sezgili" };
+var ARCH_NOUN = { "Akıl": "Mühendis", "Çene": "Diplomat", "Kurnazlık": "Tüccar", "Cesaret": "Kaptan", "Pişkinlik": "Şovmen", "İtibar": "Muhtar", "Dayanıklılık": "Maratoncu", "Sosyal Radar": "Dedektif" };
 var PROPHECY = {
   "Akıl": "Makarya'da bir gün bir köprü, bir yazılım ya da en azından bir tablo dosyası senin adını taşıyacak.",
   "Çene": "Ya büyükelçi olacaksın ya da çarşının en iyi pazarlığını yapan kişi.",
   "Kurnazlık": "Makarya Merkez Bankası seni artık izliyor.",
   "Cesaret": "Makarya'da 'Bunu kim yapar?' sorusunun cevabı genelde sen olacaksın.",
   "Pişkinlik": "Sahneler, kameralar ve aile düğünleri seni bekliyor.",
-  "Vicdan": "Makarya'da kavga eden herkes bir gün kapını çalacak.",
+  "İtibar": "Mahallede adın geçince herkes bir an susar; sonra hep iyi şeyler söyler.",
   "Dayanıklılık": "Makarya trafiğine bile sabredebilecek nadir insanlardan biri olacaksın.",
   "Sosyal Radar": "Bir odaya girdiğinde, kimin kime kızgın olduğunu herkesten önce bileceksin."
 };
 /* Bazı statlar oyunda daha sık geçtiği için simülasyonla dengelenir (tools/simulasyon.js, 3.000 tam hayat) */
-var ARCH_NORM = {"Akıl":-6,"Çene":42,"Kurnazlık":4,"Cesaret":-24,"Pişkinlik":-17,"Vicdan":1,"Dayanıklılık":14,"Sosyal Radar":-14};
+var ARCH_NORM = {"Akıl":-7,"Çene":39,"Kurnazlık":4,"Cesaret":-25,"Pişkinlik":-17,"İtibar":5,"Dayanıklılık":15,"Sosyal Radar":-14};
 function archetype(S) {
   var base = S.famStats || S.stats;
   var scored = STATS.map(function (k) { return { k: k, s: S.stats[k] + 2 * (S.stats[k] - base[k]) - (ARCH_NORM[k] || 0) }; })

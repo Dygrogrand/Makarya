@@ -325,3 +325,46 @@ button:disabled{cursor:default}
 .kvWaits{border:1px solid #d8c9ad;background:#f8efd9;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:6px}
 .kvWaitsT{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#8a6212}
 .kvWaits ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:14px;line-height:1.4;color:#3c3226}
+.tCard .tFx{margin-top:6px;font-size:12.5px;font-weight:800;color:#2f6b45}
+.kvWaits.lost{background:#f8e6df;border-color:#e2b9a8}
+.kvWaits.lost .kvWaitsT{color:#9b3a24}
+
+/* Tanıtım */
+.tutWrap{position:absolute;inset:0;z-index:90;background:rgba(10,9,8,.78);display:flex;align-items:center;justify-content:center;padding:14px}
+.tutCard{width:100%;max-height:100%;background:var(--paper);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.tutCard.ask{gap:12px}
+.tutCard h2{font-family:var(--serif);margin:0;font-size:23px;line-height:1.15}
+.tutCard p{margin:0;font-size:14.5px;line-height:1.45}
+.tutTop{display:flex;justify-content:space-between;align-items:center}
+.tutKick{font-size:11px;font-weight:900;letter-spacing:.14em;color:var(--gold)}
+.tutX{border:0;background:none;font-size:18px;color:var(--muted);padding:4px 6px}
+.tutBody{overflow:auto;display:flex;flex-direction:column;gap:10px;min-height:0;flex:1 1 auto;padding-right:2px}
+.tutDots{display:flex;gap:6px;justify-content:center}
+.tutDots i{width:7px;height:7px;border-radius:50%;background:#d8c9ad}.tutDots i.on{background:var(--red);width:18px;border-radius:4px}
+.tutLine{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.tutLine span{background:#2a2622;color:#f4ead7;font-family:var(--serif);font-size:11px;text-align:center;padding:5px 0;border-radius:5px}
+.tutLineL{display:flex;justify-content:space-between;font-size:11px;font-weight:800;color:var(--muted)}
+.tutStats{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.tutStats div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 9px;display:flex;flex-direction:column;gap:2px}
+.tutStats b{font-size:13.5px}.tutStats span{font-size:12px;color:var(--muted);line-height:1.3}
+.tutMock{display:flex;flex-direction:column;gap:8px}
+.tutEv{background:#1d1915;color:#f4ead7;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.tutEv small{font-size:10.5px;letter-spacing:.12em;color:#d2a54a;font-weight:900}.tutEv b{font-family:var(--serif);font-size:18px}.tutEv span{font-size:13px;line-height:1.35;opacity:.9}
+.tutChoice{cursor:default}
+.tutN{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;background:var(--red);color:#fff;font-size:10.5px;font-style:normal;font-weight:900;margin-right:4px;vertical-align:1px}
+.chance .tutN{display:grid;margin:0 0 3px auto}
+.tutList{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.4}
+.tutOut{display:flex;flex-direction:column;gap:6px}
+.tutOut .o{border-radius:10px;padding:8px 10px;font-size:13.5px;line-height:1.35;border:1px solid var(--line);background:var(--card)}
+.tutOut .o b{display:block;font-size:12px;letter-spacing:.04em;margin-bottom:2px}
+.tutOut .o em{font-style:normal;font-weight:900;margin-left:4px}
+.tutOut .crit{background:#e3f0dc;border-color:#b9d6ad}.tutOut .crit b,.tutOut .crit em{color:var(--green)}
+.tutOut .win b,.tutOut .win em{color:var(--green)}
+.tutOut .bad{background:var(--bad-bg);border-color:#e2b9a8}.tutOut .bad b,.tutOut .bad em{color:var(--red)}
+.tutRib{background:var(--card);border:1px solid var(--line);border-left:4px solid #c69a3c;border-radius:10px;padding:8px 10px}
+.tutBar{background:#0f0f0f;border-radius:12px;display:grid;grid-template-columns:40px 1fr 40px;align-items:center;padding:6px 10px;color:#fff}
+.tutBarT{font-family:var(--serif);font-weight:800;text-align:center;font-size:15px}
+.tutGlow{box-shadow:0 0 0 3px var(--gold),0 0 18px 4px rgba(198,154,60,.8);animation:tutPulse 1.4s ease-in-out infinite}
+@keyframes tutPulse{50%{box-shadow:0 0 0 3px var(--gold),0 0 4px 1px rgba(198,154,60,.4)}}
+.tutPoint{font-weight:600}
+.tutTag{display:inline-block;background:var(--red);color:#fff;font-size:10.5px;font-weight:900;letter-spacing:.08em;border-radius:6px;padding:1px 6px;margin-left:2px}

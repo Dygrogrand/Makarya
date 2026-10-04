@@ -12,7 +12,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 XLSX = os.path.join(ROOT, "Makarya_Icerik.xlsx")
 JS = os.path.join(ROOT, "content.js")
 
-STATS = ["Akıl", "Çene", "Kurnazlık", "Cesaret", "Pişkinlik", "Vicdan", "Dayanıklılık", "Sosyal Radar"]
+STATS = ["Akıl", "Çene", "Kurnazlık", "Cesaret", "Pişkinlik", "İtibar", "Dayanıklılık", "Sosyal Radar"]
 DIFF_TR = {"veryEasy": "Çok Kolay", "easy": "Kolay", "medium": "Orta", "hard": "Zor", "veryHard": "Çok Zor"}
 TR_DIFF = {v: k for k, v in DIFF_TR.items()}
 FAM_TR = {"home": "ev", "money": "para", "social": "sosyal", "education": "okul-iş"}
@@ -31,13 +31,13 @@ EV_COLS = ["Olay ID", "Bölüm", "Yaş", "Simge", "Başlık", "Olay metni", "Mek
            "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Herhangi biri hafıza", "Hat"]
 # Sonradan eklenen sütunlar: eski Excel dosyalarında yoksa hata verilmez, boş sayılır
 OPTIONAL_COLS = {"Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Aile desteği", "Başarısızlıkta hafıza", "Sonraki bölümde",
-                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza"}
+                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken stat"}
 CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Stat", "Zorluk", "Kesin etki", "Kesin sonuç metni",
            "Başarı", "Kritik başarı", "Başarısız", "Kritik hata", "Yarım (mini oyun)",
            "Mini oyun", "Mini oyun başlığı", "Mini oyun ipucu", "Mini oyun ayarı",
            "Gereken özellik", "Gereken hafıza", "İç ses açar", "Kazandırdığı özellik",
            "Seçince hafıza", "Başarıda hafıza", "Kritik hatada hafıza", "Silinen hafıza", "Ölüm riski %", "Ölüm sebebi",
-           "Aile desteği", "Başarısızlıkta hafıza", "Gereken varlık", "Kazanç kademesi", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza"]
+           "Aile desteği", "Başarısızlıkta hafıza", "Gereken varlık", "Kazanç kademesi", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken stat"]
 VO_COLS = ["Olay ID", "Stat", "Zorluk", "İç ses metni", "Başarısızlık metni", "Seçenek açar"]
 RE_COLS = ["Olay ID", "Hafıza", "Geçmişten metni"]
 TR_COLS = ["Özellik", "Açıklama", "Bonus", "Otomatik stat"]
@@ -72,7 +72,7 @@ def parse_stats(s, where):
         part = part.strip()
         if not part: continue
         m = re.match(r"^(.+?)\s*([+-]?\s*\d+)$", part)
-        if not m or m.group(1).strip() not in STATS: raise ValueError(f"{where}: stat etkisi okunamadı: '{part}' (ör. 'Vicdan +2, Çene +1')")
+        if not m or m.group(1).strip() not in STATS: raise ValueError(f"{where}: stat etkisi okunamadı: '{part}' (ör. 'İtibar +2, Çene +1')")
         out[m.group(1).strip()] = int(m.group(2).replace(" ", ""))
     return out
 
@@ -153,13 +153,14 @@ def write_xlsx(b, path):
         ["SAYFALAR"],
         ["Olaylar: Her satır bir olay. Olay ID benzersiz olmalı (küçük harf ve tire). Bölüm 1–10. Yaş örn. '12 yaş 6 ay'."],
         ["Seçimler: Her satır bir seçim; Olay ID ile olaya bağlanır, Sıra ile dizilir. Bir olayda 2–5 seçim olur."],
-        ["   • Kesin sonuçlu seçim: 'Kesin etki' (ör. Vicdan +2, Çene +1) ve 'Kesin sonuç metni' doldurulur."],
+        ["   • Kesin sonuçlu seçim: 'Kesin etki' (ör. İtibar +2, Çene +1) ve 'Kesin sonuç metni' doldurulur."],
         ["   • Zarlı seçim: Stat + Zorluk + dört sonuç metni (Başarı, Kritik başarı, Başarısız, Kritik hata)."],
         ["   • Mini oyunlu seçim: zarlı seçim + Mini oyun türü + başlık + ipucu + 'Yarım (mini oyun)' metni."],
         ["   • Ölüm riski yalnızca Bölüm 6 ve sonrası (18+). Yüzde olarak yaz (ör. 3). Oyuncu bu yüzdeyi görür."],
         ["   • Bir seçim birden fazla hafıza yazabilir: virgülle ayır (ör. 'hat-polis, meslek-memur'). Kavşak sonucunda ilk hafızanın etiketi görünür."],
         ["   • Gereken varlık: seçenek yalnızca oyuncunun varlığı bu kademe ya da üstündeyse açılır (Borçlu, Kıt, Orta, Rahat, Varlıklı). Kazanç kademesi: seçim başarılı olursa varlık en az bu kademeye çıkar."],
         ["   • Bir hafızanın başına eksi koyarsan silinir (ör. '-meslek-memur, hat-koy' hattı değiştirir). 'Hat' sütunu olayı yalnızca o hattaki oyuncuya çıkarır (ör. polis, cete)."],
+        ["   • Gereken stat: seçenek yalnızca stat bu değer ya da üstündeyse açılır (ör. 'İtibar 46'). İtibar kapıları kefil ve referans seçenekleri içindir."],
         ["   • Olaylar sayfasındaki 'Herhangi biri hafıza': yazılan hafızalardan en az biri varsa olay çıkar. Kavşakta, geçmişe bağlı kilitli seçenekler belirsiz bir gerekçeyle görünür."],
         ["İç Sesler: Olayın başında araya giren stat yorumları. 'Seçenek açar' = E ise, 'İç ses açar' sütununda aynı stat yazan seçim ancak bu ses başarılı olursa görünür."],
         ["Geçmişten: Oyuncunun hafızasında o kayıt varsa olayda gösterilen hatırlatma cümlesi."],
@@ -188,7 +189,7 @@ def write_xlsx(b, path):
     for r in guide: ws.append(r)
     ws.column_dimensions["A"].width = 150
     ws["A1"].font = Font(bold=True, size=16)
-    for r in [8, 27, 35]: ws.cell(row=r, column=1).font = Font(bold=True)
+    for r in [8, 28, 36]: ws.cell(row=r, column=1).font = Font(bold=True)
 
     # Olaylar
     rows_ev, rows_ch, rows_vo, rows_re = [], [], [], []
@@ -212,7 +213,7 @@ def write_xlsx(b, path):
                             (round(rk["p"] * 100, 2) if rk else ""), rk.get("cause", ""),
                             fmt_destek(c.get("destek")), c.get("flagFail", ""),
                             TIERS[c["reqVarlik"]] if c.get("reqVarlik") is not None else "", TIERS[c["varlik"]] if c.get("varlik") is not None else "",
-                            DESTEK_TR[c["reqDestek"]] if c.get("reqDestek") is not None else "", c.get("varlikKayip", ""), c.get("reqNotFlag", "")])
+                            DESTEK_TR[c["reqDestek"]] if c.get("reqDestek") is not None else "", c.get("varlikKayip", ""), c.get("reqNotFlag", ""), ", ".join(f"{k} {v}" for k, v in (c.get("reqStat") or {}).items())])
         for v in e.get("voices", []):
             rows_vo.append([e["id"], v["stat"], DIFF_TR[v["diff"]], v["text"], v.get("fail", ""), "E" if v.get("opens") else ""])
         for rc in e.get("recall", []):
@@ -370,6 +371,13 @@ def read_xlsx(path):
             if v_ not in DESTEK_TR: errs.append(f"{where}: 'Gereken aile desteği' şunlardan biri olmalı: {', '.join(DESTEK_TR)}")
             else: c["reqDestek"] = DESTEK_TR.index(v_)
         if r.get("Engelleyen hafıza"): c["reqNotFlag"] = str(r["Engelleyen hafıza"])
+        if r.get("Gereken stat"):
+            rs_ = {}
+            for part in str(r["Gereken stat"]).split(","):
+                m_ = re.match(r"^\s*(.+?)\s+(\d+)\s*$", part)
+                if not m_ or m_.group(1) not in STATS: errs.append(f"{where}: 'Gereken stat' okunamadı: '{part}' (ör. 'İtibar 46')")
+                else: rs_[m_.group(1)] = int(m_.group(2))
+            if rs_: c["reqStat"] = rs_
         if r.get("Varlık kaybı") not in ("", None):
             try: c["varlikKayip"] = int(float(r["Varlık kaybı"]))
             except ValueError: errs.append(f"{where}: 'Varlık kaybı' sayı olmalı")
