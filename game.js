@@ -124,8 +124,8 @@ function renderFamilyResult() {
     return '<div class="famTrait ' + (t.good ? "good" : "bad") + '"><span>' + (t.good ? "✓ " : "! ") + esc(t.name) + "<small>" + esc(t.desc) + " " + esc(eff) + "</small></span></div>";
   }).join("");
   shell("Makarya", art(famSrcs(S.family), "🏠", "AİLE BELİRLENDİ", S.family + " Ailesi", f.subtitle),
-    '<div class="sectionTitle">Başlangıç Profilin</div><div class="sectionSub">Ailen karakterini belirgin biçimde şekillendiriyor.</div>' +
-    '<div class="statGrid">' + stats + '</div><div class="idCard"><div class="idTitle">AİLEDEN GELEN ÖZELLİKLER</div>' + traits + "</div>" +
+    '<div class="sectionTitle">Başlangıç Profilin</div><div class="sectionSub">Ailen dokuz özelliğini baştan şekillendiriyor.</div>' +
+    '<div class="statGrid">' + stats + '</div><div class="idCard"><div class="idTitle">AİLEDEN GELEN HUYLAR</div>' + traits + "</div>" +
     '<button class="primary" onclick="beginGame()">HİKÂYEYE BAŞLA</button>');
 }
 function beginGame() { S.ch = 1; S.chFlags = { 1: S.flags.slice() }; S.plan = buildPlan(S, 1); S.pi = 0; S.chStart[1] = cloneStats(); S.chTraits[1] = S.traits.slice(); S.screen = "event"; render(); }
@@ -143,7 +143,7 @@ function choiceCard(e, c, idx) {
   else if (c.reqFlag && /^(hat|meslek)-/.test(c.reqFlag)) rib = "🧭 Hattından · " + (FLAG_LABELS[c.reqFlag] || "").replace(/\.$/, "");
   else if (c.reqFlag) rib = "📜 Geçmişten açıldı · " + (FLAG_LABELS[c.reqFlag] || "eski bir seçimin");
   else if (c.reqVoice) rib = STAT_ICONS[c.reqVoice] + " Bu seçeneği " + c.reqVoice + " açtı";
-  else if (c.req) rib = "⭐ " + c.req + " sayesinde açık";
+  else if (c.req) rib = "🏅 “" + c.req + "” rozeti sayesinde açık";
   else if (c.reqVarlik >= 2) rib = "💰 Cebin buna yetiyor · " + TIERS[varlikOf(S)];
   else if (c.reqDestek != null) rib = "🏠 Ailen arkanda";
   else if (c.reqStat) rib = Object.keys(c.reqStat).map(function (k) { return STAT_ICONS[k] + " " + (k === "İtibar" ? "İtibarın sayesinde açık" : k + " sayesinde açık"); }).join(" · ");
@@ -157,7 +157,7 @@ function choiceCard(e, c, idx) {
     b.rows.forEach(function (r) {
       if (r.kind === "family" || (r.kind === "famtrait" && r.val < 0)) famHelp = true;
       else if (r.kind === "famtrait") hurt.push(pvChip("pvHurt", "⚠️ " + esc(r.label)));
-      else if (r.kind === "trait") help.push(pvChip("pvHelp", "⭐ " + esc(r.label)));
+      else if (r.kind === "trait") help.push(pvChip("pvHelp", "🏅 " + esc(r.label)));
       else if (r.kind === "cesaret") help.push(pvChip("pvHelp", "🔥 Güçlü “Cesaret”: yol değiştirme"));
       else if (r.kind === "stat") (r.val < 0 ? help : hurt).push(pvChip(r.val < 0 ? "pvHelp" : "pvHurt", r.icon + " " + (r.val < 0 ? "Güçlü" : "Zayıf") + " “" + esc(c.stat) + "”"));
     });
@@ -200,9 +200,9 @@ function kavsakBring(e) {
   (e.recall || []).forEach(function (r) { if (S.flags.indexOf(r.flag) >= 0 && FLAG_LABELS[r.flag]) add("f" + r.flag, pvChip("pvHelpD", "📜 " + esc(FLAG_LABELS[r.flag].replace(/\.$/, "")))); });
   e.choices.forEach(function (c) {
     if (c.reqFlag && S.flags.indexOf(c.reqFlag) >= 0) add("f" + c.reqFlag, pvChip("pvHelpD", "📜 " + esc((FLAG_LABELS[c.reqFlag] || "Geçmişin").replace(/\.$/, ""))));
-    if (c.req && S.traits.indexOf(c.req) >= 0) add("t" + c.req, pvChip("pvHelpD", "⭐ " + esc(c.req)));
+    if (c.req && S.traits.indexOf(c.req) >= 0) add("t" + c.req, pvChip("pvHelpD", "🏅 “" + esc(c.req) + "” rozeti"));
     if (c.stat) {
-      S.traits.forEach(function (t) { if (((TRAITS[t] || {}).bonus || {})[c.stat]) add("t" + t, pvChip("pvHelpD", "⭐ " + esc(t))); });
+      S.traits.forEach(function (t) { if (((TRAITS[t] || {}).bonus || {})[c.stat]) add("t" + t, pvChip("pvHelpD", "🏅 “" + esc(t) + "” rozeti")); });
       if (familyEventBonus(S, e, c.stat)) add("fam", pvChip("pvHelpD", "🏠 " + esc(S.family) + " ailesi"));
     }
   });
@@ -383,7 +383,7 @@ function renderChapterEnd() {
     (waits ? '<div class="kvWaits"><div class="kvWaitsT">Sıradaki bölümde seni bekleyenler · ' + esc(next.name) + "</div><ul>" + waits + "</ul></div>" : "");
   shell(chTitle(ch), art(sceneSrcs(C.endImg), ev ? ev.icon : "📖", "BÖLÜM " + ROMAN[ch] + " TAMAMLANDI", C.endAge, C.endText),
     '<div class="sectionTitle">Bölüm ' + ROMAN[ch] + " · Gelişim Özeti</div><div class=\"sectionSub\">" + esc(C.range) + "</div>" +
-    kvHtml + starStatHtml(S.chStart[ch] || cloneStats(), cloneStats()) + compareHtml(S.chStart[ch] || cloneStats(), cloneStats()) +
+    kvHtml + starStatHtml(S.chStart[ch] || cloneStats(), cloneStats()) + '<h3 class="sectionTitle" style="font-size:18px">Özelliklerin</h3>' + compareHtml(S.chStart[ch] || cloneStats(), cloneStats()) +
     '<h3 class="sectionTitle" style="font-size:18px">Kazanılan rozetler</h3>' +
     (gained.length ? gained.map(traitCardHtml).join("") : '<div class="muted">Bu bölümde yeni rozet kazanılmadı.</div>') + itibarNoteHtml(ch) +
     (hl ? '<h3 class="sectionTitle" style="font-size:18px">Unutulmayan anlar</h3><div class="logList">' + hl + "</div>" : "") +
@@ -426,7 +426,7 @@ function unlockReason(u) {
   if (u.type === "stat") return STAT_ICONS[u.key] + " " + (u.key === "İtibar" ? "İtibarın sayesinde" : u.key + " sayesinde");
   if (u.type === "varlik") return "💰 Cebin " + u.key + " olduğu için";
   if (u.type === "destek") return "🏠 Ailen arkanda olduğu için";
-  return "⭐ " + u.key + " özelliğin sayesinde";
+  return "🏅 “" + u.key + "” rozeti sayesinde";
 }
 function doorsHtml() {
   var doors = S.log.filter(function (l) { return l.unlock; });
@@ -456,9 +456,9 @@ function renderFinal() {
   shell(dead ? "Mezar Taşı" : "Hayat Kartı", head,
     '<div class="finalCard' + (dead ? " grave" : "") + '"><div class="k">' + (dead ? "MAKARYA · MEZAR TAŞI" : "MAKARYA · HAYAT KARTI") + "</div><h2>" + esc(a.title) + "</h2><p><b>" + esc(S.family) + " ailesi · " + gender + " · " + esc(lifeAge()) + "</b></p><p>" + esc(dead ? dead.cause : a.prophecy) + "</p></div>" +
     '<button class="primary" onclick="shareCard()">📤 KARTI PAYLAŞ</button>' +
-    '<h3 class="sectionTitle" style="font-size:18px">Karakterin</h3>' + barsHtml() +
-    '<h3 class="sectionTitle" style="font-size:18px">Özellikler</h3>' +
-    (S.traits.length ? '<div class="chips">' + S.traits.map(function (t) { return '<span class="chip">' + (gained.indexOf(t) >= 0 ? "🆕 " : "🏅 ") + esc(t) + "</span>"; }).join("") + "</div>" : '<div class="muted">Hiç özellik açılmadı. Bu da bir tarz.</div>') +
+    '<h3 class="sectionTitle" style="font-size:18px">Özelliklerin</h3>' + barsHtml() +
+    '<h3 class="sectionTitle" style="font-size:18px">Rozetler</h3>' +
+    (S.traits.length ? '<div class="chips">' + S.traits.map(function (t) { return '<span class="chip">' + (gained.indexOf(t) >= 0 ? "🆕 " : "🏅 ") + esc(t) + "</span>"; }).join("") + "</div>" : '<div class="muted">Hiç rozet kazanılmadı. Bu da bir tarz.</div>') +
     doorsHtml() +
     '<h3 class="sectionTitle" style="font-size:18px">Hayat kaydı</h3><div class="logList">' + (lifeLog() || '<div class="muted">Sakin bir çocukluk.</div>') + "</div>" +
     '<h3 class="sectionTitle" style="font-size:18px">Bölüm ' + ROMAN[S.ch] + " gelişimi</h3>" + compareHtml(S.chStart[S.ch] || cloneStats(), cloneStats()) +
@@ -504,7 +504,7 @@ function shareCard() {
       ctx.fillStyle = "#fff"; ctx.fillText(String(S.stats[k]), x + 400, yy);
     });
     ctx.textAlign = "center"; ctx.fillStyle = "#d8b16a"; ctx.font = "700 28px sans-serif";
-    wrapText(ctx, S.traits.slice(-3).join(" · "), W / 2, Math.min(y + 370, H - 110), 940, 36);
+    wrapText(ctx, S.traits.slice(-3).map(function (t) { return "🏅 " + t; }).join("   "), W / 2, Math.min(y + 370, H - 110), 940, 36);
     ctx.fillStyle = "#8f836f"; ctx.font = "700 26px sans-serif"; ctx.fillText("dygrogrand.github.io/Makarya", W / 2, H - 40);
     cv.toBlob(function (blob) {
       if (!blob) return;
@@ -543,7 +543,7 @@ function showCharacter() {
   modal("<h2>Karakterin</h2><p>" + esc(S.family) + " ailesi · " + (S.gender === "kiz" ? "Kız" : "Erkek") + " · " + S.traits.length + " rozet</p>" +
     '<div class="pvRow">' + pvChip(d === 2 ? "pvHelp" : d === 1 ? "pvSure" : "pvHurt", "🏠 Aile desteği: <b>" + DESTEK[d] + "</b>") +
     pvChip("pvSure", "💰 Varlık: <b>" + TIERS[varlikOf(S)] + "</b>") + "</div>" +
-    barsHtml() + "<h3>Ailenden gelenler</h3>" + fam + "<h3>Kazanılan rozetler</h3>" + tr +
+    "<h3>Özelliklerin</h3>" + barsHtml() + "<h3>Ailenden gelen huylar</h3>" + fam + "<h3>Kazanılan rozetler</h3>" + tr +
     (S.flags.length ? "<h3>Hafıza</h3>" + lifeLog() : ""));
 }
 function showGraveyard() {

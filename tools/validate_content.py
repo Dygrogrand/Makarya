@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Makarya içerik doğrulayıcı.
 Kullanım: python3 tools/validate_content.py content/bolum-4.json [diğer dosyalar...]
-Tüm içerik dosyaları birlikte verilirse bölümler arası kontroller de yapılır (özellik ve hafıza tutarlılığı)."""
+Tüm içerik dosyaları birlikte verilirse bölümler arası kontroller de yapılır (rozet ve hafıza tutarlılığı)."""
 import json, re, sys
 
 STATS = ["Akıl", "Çene", "Kurnazlık", "Cesaret", "Pişkinlik", "İtibar", "Gönül", "Dayanıklılık", "Sosyal Radar"]
@@ -72,9 +72,9 @@ def main(paths):
     for p in paths:
         d = json.load(open(p, encoding="utf-8"))
         for t in d.get("traits", []):
-            if not t.get("name") or not t.get("desc") or not isinstance(t.get("bonus"), dict): errs.append(f"{p}: özellik eksik: {t}")
+            if not t.get("name") or not t.get("desc") or not isinstance(t.get("bonus"), dict): errs.append(f"{p}: rozet eksik: {t}")
             for k, v in t.get("bonus", {}).items():
-                if k not in STATS or not (1 <= v <= 2): errs.append(f"{p}: özellik bonusu hatalı: {t.get('name')} {k}={v}")
+                if k not in STATS or not (1 <= v <= 2): errs.append(f"{p}: rozet bonusu hatalı: {t.get('name')} {k}={v}")
             traits.add(t.get("name"))
         for f in d.get("flags", []):
             if not FLAG.match(f.get("flag", "")) or not f.get("label"): errs.append(f"{p}: hafıza tanımı hatalı: {f}")
@@ -115,7 +115,7 @@ def main(paths):
             if h_ not in HATS: errs.append(f"{where}: hat geçersiz: {h_} ({', '.join(HATS)})")
         if w.get("gender") and w["gender"] not in ["erkek", "kiz"]: errs.append(f"{where}: gender erkek/kiz")
         for k in (w.get("minStat") or {}):
-            if k not in STATS: errs.append(f"{where}: minStat stat geçersiz")
+            if k not in STATS: errs.append(f"{where}: minStat özellik adı geçersiz")
         voice_open = set()
         for v in e.get("voices", []):
             if v.get("stat") not in STATS or v.get("diff") not in VOICE_DIFFS or not v.get("text"): errs.append(f"{where}: iç ses hatalı {v}")
@@ -136,7 +136,7 @@ def main(paths):
                     if k not in STATS or not isinstance(v, int) or abs(v) > 3: errs.append(f"{cw}: direct hatalı {k}={v}")
                 if not isinstance(c.get("r"), str) or not c["r"]: errs.append(f"{cw}: kesin sonuç metni (r) eksik")
             else:
-                if c.get("stat") not in STATS: errs.append(f"{cw}: stat geçersiz")
+                if c.get("stat") not in STATS: errs.append(f"{cw}: özellik adı geçersiz")
                 if c.get("diff") not in DIFFS: errs.append(f"{cw}: diff geçersiz")
                 r = c.get("r") or {}
                 need = ["win", "crit", "fail", "bad"] + (["mid"] if c.get("mini") else [])
@@ -182,13 +182,13 @@ def main(paths):
                 p_ = rk.get("p", 0)
                 if not (0 < p_ <= 0.08 or (p_ == 1 and e.get("id") == "son-soz")): errs.append(f"{cw}: risk.p 0-0.08 arası olmalı")
             if c.get("trait") and c["trait"] not in traits and c["trait"] not in BASE_TRAITS: pass
-    # özellik tanımları
+    # rozet tanımları
     for e in all_events:
         for c in e.get("choices", []):
             for k in ["trait", "req"]:
-                if c.get(k) and c[k] not in traits: errs.append(f"{e['_file']}:{e['id']}: tanımsız özellik '{c[k]}' (dosyanın traits listesine ekle)")
+                if c.get(k) and c[k] not in traits: errs.append(f"{e['_file']}:{e['id']}: tanımsız rozet '{c[k]}' (dosyanın traits listesine ekle)")
         t = (e.get("when") or {}).get("trait")
-        if t and t not in traits: errs.append(f"{e['_file']}:{e['id']}: tanımsız özellik '{t}'")
+        if t and t not in traits: errs.append(f"{e['_file']}:{e['id']}: tanımsız rozet '{t}'")
     if len(paths) > 1:
         for where, f in reqs:
             if f.startswith("trait:"): continue

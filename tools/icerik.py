@@ -43,7 +43,7 @@ RE_COLS = ["Olay ID", "Hafıza", "Geçmişten metni"]
 TR_COLS = ["Rozet", "Açıklama", "Bonus", "Otomatik özellik"]
 FL_COLS = ["Hafıza", "Final kartı etiketi", "Sonraki bölümde"]
 DC_COLS = ["Asgari yaş", "Azami yaş", "Mezar taşı metni", "Gereken hafıza"]
-BO_COLS = ["Bölüm", "Ad", "Seçilecek olay", "Beklenen stat", "Yaş aralığı", "Son görsel (olay ID)", "Son yaş", "Son metin", "Sonraki düğme"]
+BO_COLS = ["Bölüm", "Ad", "Seçilecek olay", "Beklenen özellik", "Yaş aralığı", "Son görsel (olay ID)", "Son yaş", "Son metin", "Sonraki düğme"]
 
 
 # Eski Excel adları (stat → özellik, özellik → rozet) okunurken hâlâ kabul edilir
@@ -51,7 +51,7 @@ SHEET_ALIAS = {"Rozetler": "Özellikler"}
 COL_ALIAS = {("Seçimler", "Özellik"): "Stat", ("İç Sesler", "Özellik"): "Stat", ("Rozetler", "Rozet"): "Özellik",
              ("Olaylar", "Gereken rozet"): "Gereken özellik", ("Seçimler", "Gereken rozet"): "Gereken özellik",
              ("Seçimler", "Kazandırdığı rozet"): "Kazandırdığı özellik", ("Olaylar", "Asgari özellik"): "Asgari stat",
-             ("Seçimler", "Gereken özellik değeri"): "Gereken stat", ("Rozetler", "Otomatik özellik"): "Otomatik stat"}
+             ("Seçimler", "Gereken özellik değeri"): "Gereken stat", ("Rozetler", "Otomatik özellik"): "Otomatik stat", ("Bölümler", "Beklenen özellik"): "Beklenen stat"}
 
 # ── yardımcılar ──
 def fmt_destek(d):
@@ -79,7 +79,7 @@ def parse_stats(s, where):
         part = part.strip()
         if not part: continue
         m = re.match(r"^(.+?)\s*([+-]?\s*\d+)$", part)
-        if not m or m.group(1).strip() not in STATS: raise ValueError(f"{where}: stat etkisi okunamadı: '{part}' (ör. 'İtibar +2, Çene +1')")
+        if not m or m.group(1).strip() not in STATS: raise ValueError(f"{where}: özellik etkisi okunamadı: '{part}' (ör. 'İtibar +2, Çene +1')")
         out[m.group(1).strip()] = int(m.group(2).replace(" ", ""))
     return out
 
@@ -157,6 +157,8 @@ def write_xlsx(b, path):
         ["2) GitHub'da depoya yükle (Add file → Upload files) ya da Claude'a gönder."],
         ["3) Dosya oyunun formatına dönüştürülür ve birkaç dakika içinde oyunda görünür."],
         [""],
+        ["ADLANDIRMA: ÖZELLİK = dokuz temel değer (Akıl, Çene, Kurnazlık, Cesaret, Pişkinlik, İtibar, Gönül, Dayanıklılık, Sosyal Radar). ROZET = zor işlerle kazanılan ödüller (Kitap Kurdu, Kantin Ekonomisti…)."],
+        [""],
         ["SAYFALAR"],
         ["Olaylar: Her satır bir olay. Olay ID benzersiz olmalı (küçük harf ve tire). Bölüm 1–10. Yaş örn. '12 yaş 6 ay'."],
         ["Seçimler: Her satır bir seçim; Olay ID ile olaya bağlanır, Sıra ile dizilir. Bir olayda 2–5 seçim olur."],
@@ -174,7 +176,7 @@ def write_xlsx(b, path):
         ["Rozetler: Kazanılabilir rozetler; Bonus ilgili özellik kontrollerinde zar hedefini düşürür (ör. Çene +1, Kurnazlık +1)."],
         ["Hafıza: Seçimlerin yazdığı kayıtlar ve final kartındaki açıklamaları."],
         ["Ölüm Sebepleri: 18 yaş sonrası yaşla artan arka plan riskinden ölünce mezar taşına yazılır."],
-        ["Bölümler: Her bölümde bir hayatta kaç olay görüleceği (Seçilecek olay), zorluk ayarı (Beklenen stat) ve bölüm sonu ekranı."],
+        ["Bölümler: Her bölümde bir hayatta kaç olay görüleceği (Seçilecek olay), zorluk ayarı (Beklenen özellik: o bölümde bir özelliğin olağan değeri) ve bölüm sonu ekranı."],
         ["Özet: Bölüm başına olay, mini oyun ve risk sayıları (otomatik hesaplanır)."],
         [""],
         ["KURALLAR (yazım yönergesinin özeti)"],
@@ -256,7 +258,7 @@ def write_xlsx(b, path):
     sheet("Ölüm Sebepleri", DC_COLS, [[d["min"], d["max"], d["text"], d.get("flag", "")] for d in b["deathCauses"]],
           {"Asgari yaş": 10, "Azami yaş": 10, "Mezar taşı metni": 90, "Gereken hafıza": 18}, wrap_cols=("Mezar taşı metni",))
     sheet("Bölümler", BO_COLS, [[c["ch"], c["name"], c["pick"], c["expected"], c["range"], c["endImg"], c["endAge"], c["endText"], c["next"]] for c in b["chapters"]],
-          {"Bölüm": 8, "Ad": 18, "Seçilecek olay": 10, "Beklenen stat": 10, "Yaş aralığı": 18, "Son görsel (olay ID)": 22, "Son yaş": 10, "Son metin": 60, "Sonraki düğme": 30},
+          {"Bölüm": 8, "Ad": 18, "Seçilecek olay": 10, "Beklenen özellik": 12, "Yaş aralığı": 18, "Son görsel (olay ID)": 22, "Son yaş": 10, "Son metin": 60, "Sonraki düğme": 30},
           wrap_cols=("Son metin",))
 
     # Özet (formüllerle)
@@ -384,7 +386,7 @@ def read_xlsx(path):
             rs_ = {}
             for part in str(r["Gereken özellik değeri"]).split(","):
                 m_ = re.match(r"^\s*(.+?)\s+(\d+)\s*$", part)
-                if not m_ or m_.group(1) not in STATS: errs.append(f"{where}: 'Gereken stat' okunamadı: '{part}' (ör. 'İtibar 46')")
+                if not m_ or m_.group(1) not in STATS: errs.append(f"{where}: 'Gereken özellik değeri' okunamadı: '{part}' (ör. 'İtibar 46')")
                 else: rs_[m_.group(1)] = int(m_.group(2))
             if rs_: c["reqStat"] = rs_
         if r.get("Varlık kaybı") not in ("", None):
@@ -424,7 +426,7 @@ def read_xlsx(path):
         if r["Gereken hafıza"]: d["flag"] = str(r["Gereken hafıza"])
         b["deathCauses"].append(d)
     for i, r in rows("Bölümler", BO_COLS):
-        b["chapters"].append({"ch": int(r["Bölüm"]), "name": str(r["Ad"]), "pick": int(r["Seçilecek olay"]), "expected": int(r["Beklenen stat"]),
+        b["chapters"].append({"ch": int(r["Bölüm"]), "name": str(r["Ad"]), "pick": int(r["Seçilecek olay"]), "expected": int(r["Beklenen özellik"]),
                               "range": str(r["Yaş aralığı"]), "endImg": str(r["Son görsel (olay ID)"] or ""), "endAge": str(r["Son yaş"] or ""),
                               "endText": str(r["Son metin"] or ""), "next": str(r["Sonraki düğme"] or "")})
     return b, errs

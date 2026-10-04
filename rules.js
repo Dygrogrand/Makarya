@@ -206,9 +206,9 @@ function needBreakdown(S, e, c) {
   var tsum = 0, trows = [];
   S.traits.forEach(function (t) {
     var v = ((TRAITS[t] || {}).bonus || {})[c.stat] || 0;
-    if (v) { trows.push({ icon: "⭐", label: t, val: -v, kind: "trait" }); tsum += v; }
+    if (v) { trows.push({ icon: "🏅", label: "“" + t + "” rozeti", val: -v, kind: "trait" }); tsum += v; }
   });
-  if (tsum > 3) { trows.push({ icon: "⭐", label: "Rozet tavanı (en fazla −3)", val: tsum - 3, kind: "cap" }); }
+  if (tsum > 3) { trows.push({ icon: "🏅", label: "Rozet tavanı (en fazla −3)", val: tsum - 3, kind: "cap" }); }
   rows = rows.concat(trows);
   var total = rows.reduce(function (s, r) { return s + r.val; }, 0);
   return { rows: rows, need: clamp(total, 2, 20), famBonus: fb };

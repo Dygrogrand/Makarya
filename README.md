@@ -9,7 +9,7 @@ Doğumdan son söze, seçimlerinle ve 20 yüzlü zarla şekillenen kara mizahlı
 |---|---|
 | `index.html` | Sayfa iskeleti |
 | `style.css` | Tüm görünüm |
-| `Makarya_Icerik.xlsx` | **Bütün içeriğin ana kaynağı**: olaylar, seçimler, iç sesler, özellikler, ölüm sebepleri, bölüm ayarları |
+| `Makarya_Icerik.xlsx` | **Bütün içeriğin ana kaynağı**: olaylar, seçimler, iç sesler, rozetler, ölüm sebepleri, bölüm ayarları |
 | `content.js` | Excel'den otomatik üretilir, elle düzenlenmez |
 | `data.js` | Statlar, zorluk tablosu, aileler |
 | `rules.js` | Zar, hedef hesabı, hayat planı (havuzdan seçim), ölüm, final kartı |
