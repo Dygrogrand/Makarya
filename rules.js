@@ -349,6 +349,7 @@ function applyOutcome(S, e, c, outcome, extra) {
 }
 
 /* 18 yaş sonrası yaşla artan arka plan riski (olay başına) */
+var HAZARD_REF = { 6: 14, 7: 14, 8: 13, 9: 13, 10: 11 };
 function hazard(S, e) {
   var y = ageYears(S, e);
   if (y < 18) return 0;
@@ -356,6 +357,8 @@ function hazard(S, e) {
   if (S.flags.indexOf("sigara") >= 0) h *= 1.6;
   if (S.flags.indexOf("sporcu") >= 0) h *= 0.7;
   h *= clamp(1 - (S.stats["Dayanıklılık"] - CHAPTERS[e.ch].expected) / 60, 0.6, 1.4);
+  /* Risk olay başına uygulanır; bölümdeki olay sayısı azalınca ölüm dağılımı değişmesin diye ölçeklenir (ilk ayar 14/14/13/13/11 olaya göre yapılmıştı) */
+  h *= (HAZARD_REF[e.ch] || CHAPTERS[e.ch].pick) / CHAPTERS[e.ch].pick;
   return h;
 }
 function backgroundDeath(S, e, roll) {
