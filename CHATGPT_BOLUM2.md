@@ -1,7 +1,7 @@
 # Makarya · Bölüm II görsel paketi, kısım 1 (ilk 10 olay, 3–4 yaş)
 
 Kullanım: Bölüm I görsellerinin üretildiği ChatGPT sohbetinde aşağıdaki tek mesajı gönder. Karakter kuralı (CHATGPT_BOLUM1.md) aynen geçerli.
-II-1, II-4, II-5, II-7, II-8 ve II-9 sahneleri, espri ajanının önerdiği yeni olay metinlerine göre yazıldı. Hakem farklı karar verirse ilgili istem güncellenecek.
+II-1, II-4, II-5, II-7, II-8 ve II-9 sahneleri 3. okuma hakem kararlarındaki yeni olay metinleriyle uyumludur (II-9: pasta buzdolabında).
 
 ```
 CHAPTER II PACKAGE, PART 1 (10 images). Ages 3 to 4. Make each image separately and write the file name under each image.
@@ -29,7 +29,7 @@ Rules (all earlier Makarya rules still apply):
 
 8) sahne/en-guzel-oyuncak.png — A cousin's bedroom. On the highest shelf stands a big shiny red fire truck toy. In the doorway the aunt raises a warning finger ("that's new, don't touch it"). Four children stand in a row on the rug staring up at the truck: a chubby blond cousin, a girl with braids, a small boy with straight black hair, and the 4-year-old protagonist, who holds a worn teddy bear with one missing eye and a small toy dump truck.
 
-9) sahne/ilk-gercek-yalan.png — Kitchen. On the counter a guest cake on a cake stand with one chocolate corner clearly missing. The mother stands with one hand pointing at the cake and her eyes narrowed at the 4-year-old boy's face. The boy stands very straight with a perfectly innocent face, a small smear of chocolate at the corner of his mouth. In the background the father sits at the kitchen table with a tea glass, not yet aware he is about to become a suspect.
+9) sahne/ilk-gercek-yalan.png — Kitchen. The fridge door is wide open; on the middle shelf sits a guest cake on a plate with one chocolate corner clearly missing. The mother holds the fridge door with one hand and points at the cake with the other and her eyes narrowed at the 4-year-old boy's face. The boy stands very straight with a perfectly innocent face, a small smear of chocolate at the corner of his mouth. In the background the father sits at the kitchen table with a tea glass, not yet aware he is about to become a suspect.
 
 10) sahne/sokak-mi-ekran-mi.png — Apartment living room with an open window. Through the window, down in the street, neighborhood kids play football and wave up, calling him. On the table a tablet glows (screen only light, not readable), fully charged. The 4-year-old boy stands in the middle of the room torn between the two, one foot toward the window, one hand toward the tablet. A pair of his small shoes by the door (one already on his foot), and a little stool under the window.
 ```
