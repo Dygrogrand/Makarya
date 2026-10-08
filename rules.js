@@ -155,6 +155,18 @@ function hasReq(S, c, e) {
 
 /* İç sesler: zar atılmadan, stat yeterliyse araya giren pasif kontroller */
 var PASSIVE = { easy: -3, medium: 1, hard: 5, veryHard: 9 };
+/* İç seslerin karakteri: kart üstünde özellik adının yanında küçük etiket */
+var VOICE_CHAR = { "Akıl": "ukala öğretmen", "Çene": "pazarcı", "Kurnazlık": "eski tüfek", "Cesaret": "asker dayı", "Pişkinlik": "sunucu", "İtibar": "mahalle muhtarı", "Gönül": "âşık", "Dayanıklılık": "maratoncu komşu", "Sosyal Radar": "dedikoducu teyze" };
+/* Aile desteği ve varlık kademelerinin tek satırlık hali */
+var DESTEK_ALT = { "Küs": "Bayramda aranmadın.", "Mesafeli": "Sadece aile grubunda görüşüyorsunuz.", "Tam": "Pazar yemeği sende." };
+var TIER_ALT = { "Borçlu": "Ay sonu zor.", "Kıt": "İdare eder.", "Orta": "Ne eksik ne fazla.", "Rahat": "Hali vakti yerinde.", "Varlıklı": "Köşeyi dönmüş." };
+/* Bölüm sonu: babaannenin ağzından, bu bölümde açılan hafızalara göre */
+var NINE_SABLON = { kediSuclu: "“İki yaşında kediyi mahkûm ettirdi.”", ilkKelimePara: "“İlk kelimesi ‘para’ oldu; deden cüzdanını o gün çıkardı.”", yalanci: "“Duvara güneş çizdi, suçu kuzenine attı.”", yapiskan: "“Kreş kapısında bacak bırakmadı; bizde de öyleydi.”", kardesli: "“Kardeşi geldi; ilk gün hediyeleri saydı.”", sirVerdi: "“Kreşte bir sır duydu, akşama bütün kreş duydu.”", cesurPark: "“Parktaki koca çocuğa ‘Burası herkesin!’ dedi.”", "mahalle-cocugu": "“Sokaktan eve girmedi.”", "ekran-cocugu": "“Tableti benden iyi kullanır.”", "alcili-kol": "“Tepsiyle kaydı, kolu alçıyla döndü; alçıyı bütün mahalle imzaladı.”", tepsiTekeli: "“Mahallenin bütün tepsileri bir kış onda kaldı.”", baskan: "“Sınıf başkanı oldu; evde de seçim yaptırdı.”", kediGeldi: "“Eve kedi getirdi; kedi hâlâ burada, kendisi gitti.”", camKirildi: "“Komşunun camını kırdı; cam değişti, komşu değişmedi.”", "iyi-lise": "“Sınavı kazandı; mahallede üç gün baklava dağıttık.”", lakapli: "“Ortaokulda taktıkları ad liseye kadar gitti.”", evli: "“Evlendi; takı defterini ben tuttum.”", cocuklu: "“Çocuğu oldu; ilk gece ben uyumadım.”", hapis: "“Bir süre uzaktaydı. Sormayın.”", "askerlik-yapti": "“Askere gitti; mektupları hâlâ bende.”", "ev-sahibi": "“Ev aldı; ilk pazar yemeğini orada yedik.”" };
+var NINE_VARSAYILAN = "“Uslu çocuktu, ne diyeyim. Biraz da sessiz.”";
+/* Mezar taşı: İtibar farkına göre taziye cümlesi */
+var TAZIYE = [[-10, "Cenazeye dört kişi geldi; ikisi yanlış cenazedeydi, kaldılar."], [-3, "Taziye evinde çay bir gün yetti. İkinci gün kimse gelmedi; çay da."], [4, "Taziye evinde üç gün çay bitmedi. Herkes bir anını anlattı; yarısı doğruydu."], [11, "Mahalle kahvesi o gün kepenk indirdi. Bakkal adını veresiye defterinden sildi; borç yoktu, saygıdan."], [999, "Kalabalık sokağa sığmadı; trafik yarım saat durdu. Kimse kornaya basmadı."]];
+function taziyeText(S) { var d = S.stats["İtibar"] - statNorm("İtibar", S.ch); for (var i = 0; i < TAZIYE.length; i++) if (d <= TAZIYE[i][0]) return TAZIYE[i][1]; return TAZIYE[TAZIYE.length - 1][1]; }
+function nineText(S, ch) { var start = (S.chFlags || {})[ch] || [], got = S.flags.filter(function (f) { return start.indexOf(f) < 0 && NINE_SABLON[f]; }).slice(0, 2); return got.length ? got.map(function (f) { return NINE_SABLON[f]; }).join(" ") : NINE_VARSAYILAN; }
 var VOICE_NAMES = { "Akıl": "AKIL", "Çene": "ÇENE", "Kurnazlık": "KURNAZLIK", "Cesaret": "CESARET", "Pişkinlik": "PİŞKİNLİK", "İtibar": "İTİBAR", "Gönül": "GÖNÜL", "Dayanıklılık": "DAYANIKLILIK", "Sosyal Radar": "SOSYAL RADAR" };
 function voicePower(S, stat) {
   var p = S.stats[stat];
@@ -298,6 +310,8 @@ function applyOutcome(S, e, c, outcome, extra) {
       if (!c.trait && (outcome === "crit" || c.diff === "hard" || c.diff === "veryHard")) gainTrait(S, AUTO_TRAITS[c.stat], res);
     }
     if (outcome === "bad") addFlag(S, c.flagBad);
+    /* Kritik hata lakabı: mahalle bir ad takar; bölüm sonunda ve mezar taşında görünür */
+    if (outcome === "bad" && c.lakap) { S.lakaplar = S.lakaplar || []; if (!S.lakaplar.some(function (l) { return l.n === c.lakap; })) { S.lakaplar.push({ n: c.lakap, ch: e.ch }); res.lakap = c.lakap; } }
     if (!success) addFlag(S, c.flagFail);
     if (!c.mini || outcome !== "mid") S.failStreak = success ? 0 : (S.failStreak || 0) + 1;
     var r = c.r || {};

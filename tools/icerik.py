@@ -31,13 +31,13 @@ EV_COLS = ["Olay ID", "Bölüm", "Yaş", "Simge", "Başlık", "Olay metni", "Mek
            "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Herhangi biri hafıza", "Hat"]
 # Sonradan eklenen sütunlar: eski Excel dosyalarında yoksa hata verilmez, boş sayılır
 OPTIONAL_COLS = {"Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Aile desteği", "Başarısızlıkta hafıza", "Sonraki bölümde",
-                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri"}
+                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap"}
 CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Özellik", "Zorluk", "Kesin etki", "Kesin sonuç metni",
            "Başarı", "Kritik başarı", "Başarısız", "Kritik hata", "Yarım (mini oyun)",
            "Mini oyun", "Mini oyun başlığı", "Mini oyun ipucu", "Mini oyun ayarı",
            "Gereken rozet", "Gereken hafıza", "İç ses açar", "Kazandırdığı rozet",
            "Seçince hafıza", "Başarıda hafıza", "Kritik hatada hafıza", "Silinen hafıza", "Ölüm riski %", "Ölüm sebebi",
-           "Aile desteği", "Başarısızlıkta hafıza", "Gereken varlık", "Kazanç kademesi", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri"]
+           "Aile desteği", "Başarısızlıkta hafıza", "Gereken varlık", "Kazanç kademesi", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap"]
 VO_COLS = ["Olay ID", "Özellik", "Zorluk", "İç ses metni", "Başarısızlık metni", "Seçenek açar"]
 RE_COLS = ["Olay ID", "Hafıza", "Geçmişten metni"]
 TR_COLS = ["Rozet", "Açıklama", "Bonus", "Otomatik özellik"]
@@ -169,6 +169,7 @@ def write_xlsx(b, path):
         ["   • Bir seçim birden fazla hafıza yazabilir: virgülle ayır (ör. 'hat-polis, meslek-memur'). Kavşak sonucunda ilk hafızanın etiketi görünür."],
         ["   • Gereken varlık: seçenek yalnızca oyuncunun varlığı bu kademe ya da üstündeyse açılır (Borçlu, Kıt, Orta, Rahat, Varlıklı). Kazanç kademesi: seçim başarılı olursa varlık en az bu kademeye çıkar."],
         ["   • Bir hafızanın başına eksi koyarsan silinir (ör. '-meslek-memur, hat-koy' hattı değiştirir). 'Hat' sütunu olayı yalnızca o hattaki oyuncuya çıkarır (ör. polis, cete)."],
+        ["   • Lakap: seçim kritik hatayla biterse mahallenin karaktere taktığı ad (ör. 'Hıçkırık'). Bölüm sonunda ve mezar taşında görünür."],
         ["   • Gereken özellik değeri: seçenek yalnızca özellik bu değer ya da üstündeyse açılır (ör. 'İtibar 46'). İtibar kapıları kefil ve referans seçenekleri içindir."],
         ["   • Olaylar sayfasındaki 'Herhangi biri hafıza': yazılan hafızalardan en az biri varsa olay çıkar. Kavşakta, geçmişe bağlı kilitli seçenekler belirsiz bir gerekçeyle görünür."],
         ["İç Sesler: Olayın başında araya giren özellik yorumları. 'Seçenek açar' = E ise, 'İç ses açar' sütununda aynı özelliği yazan seçim ancak bu ses başarılı olursa görünür."],
@@ -222,7 +223,7 @@ def write_xlsx(b, path):
                             (round(rk["p"] * 100, 2) if rk else ""), rk.get("cause", ""),
                             fmt_destek(c.get("destek")), c.get("flagFail", ""),
                             TIERS[c["reqVarlik"]] if c.get("reqVarlik") is not None else "", TIERS[c["varlik"]] if c.get("varlik") is not None else "",
-                            DESTEK_TR[c["reqDestek"]] if c.get("reqDestek") is not None else "", c.get("varlikKayip", ""), c.get("reqNotFlag", ""), ", ".join(f"{k} {v}" for k, v in (c.get("reqStat") or {}).items())])
+                            DESTEK_TR[c["reqDestek"]] if c.get("reqDestek") is not None else "", c.get("varlikKayip", ""), c.get("reqNotFlag", ""), ", ".join(f"{k} {v}" for k, v in (c.get("reqStat") or {}).items()), c.get("lakap", "")])
         for v in e.get("voices", []):
             rows_vo.append([e["id"], v["stat"], DIFF_TR[v["diff"]], v["text"], v.get("fail", ""), "E" if v.get("opens") else ""])
         for rc in e.get("recall", []):
@@ -382,6 +383,7 @@ def read_xlsx(path):
             if v_ not in DESTEK_TR: errs.append(f"{where}: 'Gereken aile desteği' şunlardan biri olmalı: {', '.join(DESTEK_TR)}")
             else: c["reqDestek"] = DESTEK_TR.index(v_)
         if r.get("Engelleyen hafıza"): c["reqNotFlag"] = str(r["Engelleyen hafıza"])
+        if r.get("Lakap"): c["lakap"] = str(r["Lakap"]).strip()
         if r.get("Gereken özellik değeri"):
             rs_ = {}
             for part in str(r["Gereken özellik değeri"]).split(","):

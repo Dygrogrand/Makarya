@@ -11,7 +11,7 @@ var DIFF = {
   easy:     { label: "Kolay",     base: 7, succ: 2, crit: 3, loss: 1 },
   medium:   { label: "Orta",      base: 11, succ: 3, crit: 5, loss: 1 },
   hard:     { label: "Zor",       base: 14, succ: 5, crit: 7, loss: 2 },
-  veryHard: { label: "Çok Zor",   base: 17, succ: 8, crit: 11, loss: 3 }
+  veryHard: { label: "Çok Zor",   base: 17, succ: 10, crit: 13, loss: 3 }
 };
 
 /* Varlık kademeleri ve aile desteği (aile yalnızca başlangıç kademesini belirler) */
