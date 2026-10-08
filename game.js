@@ -392,7 +392,7 @@ function renderChapterEnd() {
 /* Babaannen anlatıyor: bu bölümde açılan hafızalardan en fazla ikisi + bu bölümde takılan lakap */
 function nineHtml(ch) {
   var lk = (S.lakaplar || []).filter(function (l) { return l.ch === ch; }).map(function (l) { return l.n; });
-  return '<div class="nine"><div class="nineT">👵 Babaannen bu bölümü şöyle anlatıyor:</div><div class="nineQ">' + esc(nineText(S, ch)) + "</div>" +
+  return '<div class="nine"><div class="nineT">' + nineTeller(ch) + ' bu bölümü şöyle anlatıyor:</div><div class="nineQ">' + esc(nineText(S, ch)) + "</div>" +
     (lk.length ? '<div class="nineL">Mahallenin taktığı ad: <b>' + esc(lk.join(", ")) + "</b></div>" : "") + "</div>";
 }
 /* Bölümün özelliği: bu bölümde en çok gelişen özellik */

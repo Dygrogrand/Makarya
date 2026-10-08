@@ -30,7 +30,7 @@ EV_COLS = ["Olay ID", "Bölüm", "Yaş", "Simge", "Başlık", "Olay metni", "Mek
            "Gereken hafızalar", "Olmaması gereken hafızalar", "Gereken rozet", "Cinsiyet", "Sadece aileler", "Asgari özellik",
            "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Herhangi biri hafıza", "Hat"]
 # Sonradan eklenen sütunlar: eski Excel dosyalarında yoksa hata verilmez, boş sayılır
-OPTIONAL_COLS = {"Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Aile desteği", "Başarısızlıkta hafıza", "Sonraki bölümde",
+OPTIONAL_COLS = {"Bölüm sonu cümlesi", "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Aile desteği", "Başarısızlıkta hafıza", "Sonraki bölümde",
                  "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap"}
 CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Özellik", "Zorluk", "Kesin etki", "Kesin sonuç metni",
            "Başarı", "Kritik başarı", "Başarısız", "Kritik hata", "Yarım (mini oyun)",
@@ -41,7 +41,7 @@ CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Özellik", "Zorluk", "Kesin etki
 VO_COLS = ["Olay ID", "Özellik", "Zorluk", "İç ses metni", "Başarısızlık metni", "Seçenek açar"]
 RE_COLS = ["Olay ID", "Hafıza", "Geçmişten metni"]
 TR_COLS = ["Rozet", "Açıklama", "Bonus", "Otomatik özellik"]
-FL_COLS = ["Hafıza", "Final kartı etiketi", "Sonraki bölümde"]
+FL_COLS = ["Hafıza", "Final kartı etiketi", "Sonraki bölümde", "Bölüm sonu cümlesi"]
 DC_COLS = ["Asgari yaş", "Azami yaş", "Mezar taşı metni", "Gereken hafıza"]
 BO_COLS = ["Bölüm", "Ad", "Seçilecek olay", "Beklenen özellik", "Yaş aralığı", "Son görsel (olay ID)", "Son yaş", "Son metin", "Sonraki düğme"]
 
@@ -175,7 +175,7 @@ def write_xlsx(b, path):
         ["İç Sesler: Olayın başında araya giren özellik yorumları. 'Seçenek açar' = E ise, 'İç ses açar' sütununda aynı özelliği yazan seçim ancak bu ses başarılı olursa görünür."],
         ["Geçmişten: Oyuncunun hafızasında o kayıt varsa olayda gösterilen hatırlatma cümlesi."],
         ["Rozetler: Kazanılabilir rozetler; Bonus ilgili özellik kontrollerinde zar hedefini düşürür (ör. Çene +1, Kurnazlık +1)."],
-        ["Hafıza: Seçimlerin yazdığı kayıtlar ve final kartındaki açıklamaları."],
+        ["Hafıza: Seçimlerin yazdığı kayıtlar ve final kartındaki açıklamaları. 'Bölüm sonu cümlesi': bu hafıza o bölümde açılırsa bölüm sonunda aile büyüğünün ağzından anlatılan cümle (tırnak içinde)."],
         ["Ölüm Sebepleri: 18 yaş sonrası yaşla artan arka plan riskinden ölünce mezar taşına yazılır."],
         ["Bölümler: Her bölümde bir hayatta kaç olay görüleceği (Seçilecek olay), zorluk ayarı (Beklenen özellik: o bölümde bir özelliğin olağan değeri) ve bölüm sonu ekranı."],
         ["Özet: Bölüm başına olay, mini oyun ve risk sayıları (otomatik hesaplanır)."],
@@ -255,7 +255,7 @@ def write_xlsx(b, path):
     ws = sheet("Rozetler", TR_COLS, [[t["name"], t["desc"], fmt_stats(t["bonus"]), t.get("auto", "")] for t in b["traits"]],
                {"Rozet": 26, "Açıklama": 60, "Bonus": 26, "Otomatik özellik": 14}, wrap_cols=("Açıklama",))
     dv(ws, "Otomatik özellik", TR_COLS, STATS, len(b["traits"]))
-    sheet("Hafıza", FL_COLS, [[f["flag"], f["label"], f.get("next", "")] for f in b["flags"]], {"Hafıza": 26, "Final kartı etiketi": 60, "Sonraki bölümde": 70}, wrap_cols=("Final kartı etiketi", "Sonraki bölümde"))
+    sheet("Hafıza", FL_COLS, [[f["flag"], f["label"], f.get("next", ""), f.get("nine", "")] for f in b["flags"]], {"Hafıza": 26, "Final kartı etiketi": 60, "Sonraki bölümde": 70, "Bölüm sonu cümlesi": 60}, wrap_cols=("Final kartı etiketi", "Sonraki bölümde", "Bölüm sonu cümlesi"))
     sheet("Ölüm Sebepleri", DC_COLS, [[d["min"], d["max"], d["text"], d.get("flag", "")] for d in b["deathCauses"]],
           {"Asgari yaş": 10, "Azami yaş": 10, "Mezar taşı metni": 90, "Gereken hafıza": 18}, wrap_cols=("Mezar taşı metni",))
     sheet("Bölümler", BO_COLS, [[c["ch"], c["name"], c["pick"], c["expected"], c["range"], c["endImg"], c["endAge"], c["endText"], c["next"]] for c in b["chapters"]],
@@ -422,6 +422,7 @@ def read_xlsx(path):
     for i, r in rows("Hafıza", FL_COLS):
         fl = {"flag": str(r["Hafıza"]), "label": str(r["Final kartı etiketi"])}
         if r["Sonraki bölümde"]: fl["next"] = str(r["Sonraki bölümde"])
+        if r.get("Bölüm sonu cümlesi"): fl["nine"] = str(r["Bölüm sonu cümlesi"])
         b["flags"].append(fl)
     for i, r in rows("Ölüm Sebepleri", DC_COLS):
         d = {"min": int(r["Asgari yaş"]), "max": int(r["Azami yaş"]), "text": str(r["Mezar taşı metni"])}
@@ -440,6 +441,7 @@ def write_js(b, path):
     traits = {t["name"]: {k: v for k, v in t.items() if k != "name"} for t in b["traits"]}
     labels = {f["flag"]: f["label"] for f in b["flags"] if f.get("label")}
     nexts = {f["flag"]: f["next"] for f in b["flags"] if f.get("next")}
+    nines = {f["flag"]: f["nine"] for f in b["flags"] if f.get("nine")}
     J = lambda o: json.dumps(o, ensure_ascii=False, separators=(",", ":"))
     with open(path, "w", encoding="utf-8") as f:
         f.write("/* OTOMATİK ÜRETİLDİ — elle düzenleme. Kaynak: Makarya_Icerik.xlsx · tools/icerik.py xlsx2js */\n")
@@ -447,6 +449,7 @@ def write_js(b, path):
         f.write("var TRAITS = " + J(traits) + ";\n")
         f.write("var FLAG_LABELS = " + J(labels) + ";\n")
         f.write("var FLAG_NEXT = " + J(nexts) + ";\n")
+        f.write("var FLAG_NINE = " + J(nines) + ";\n")
         f.write("var DEATH_CAUSES = " + J(b["deathCauses"]) + ";\n")
         f.write("var EVENTS = [\n" + ",\n".join(J(e) for e in b["events"]) + "\n];\n")
 

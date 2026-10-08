@@ -166,7 +166,12 @@ var NINE_VARSAYILAN = "“Uslu çocuktu, ne diyeyim. Biraz da sessiz.”";
 /* Mezar taşı: İtibar farkına göre taziye cümlesi */
 var TAZIYE = [[-10, "Cenazeye dört kişi geldi; ikisi yanlış cenazedeydi, kaldılar."], [-3, "Taziye evinde çay bir gün yetti. İkinci gün kimse gelmedi; çay da."], [4, "Taziye evinde üç gün çay bitmedi. Herkes bir anını anlattı; yarısı doğruydu."], [11, "Mahalle kahvesi o gün kepenk indirdi. Bakkal adını veresiye defterinden sildi; borç yoktu, saygıdan."], [999, "Kalabalık sokağa sığmadı; trafik yarım saat durdu. Kimse kornaya basmadı."]];
 function taziyeText(S) { var d = S.stats["İtibar"] - statNorm("İtibar", S.ch); for (var i = 0; i < TAZIYE.length; i++) if (d <= TAZIYE[i][0]) return TAZIYE[i][1]; return TAZIYE[TAZIYE.length - 1][1]; }
-function nineText(S, ch) { var start = (S.chFlags || {})[ch] || [], got = S.flags.filter(function (f) { return start.indexOf(f) < 0 && NINE_SABLON[f]; }).slice(0, 2); return got.length ? got.map(function (f) { return NINE_SABLON[f]; }).join(" ") : NINE_VARSAYILAN; }
+/* Bölüm sonu cümleleri Excel'deki Hafıza sayfasından gelir (FLAG_NINE); eski şablonlar yedek */
+function nineOf(f) { return (typeof FLAG_NINE !== "undefined" && FLAG_NINE[f]) || NINE_SABLON[f]; }
+/* Anlatıcı yaşa göre değişir: çocuklukta babaanne, gençlikte anne, ileri yaşta mahallenin en yaşlısı */
+function nineTeller(ch) { return ch <= 4 ? "👵 Babaannen" : ch <= 7 ? "👩 Annen" : "🧓 Mahallenin en yaşlısı"; }
+var NINE_VARS = { 1: NINE_VARSAYILAN, 2: NINE_VARSAYILAN, 3: "“Okula gitti geldi; çantası hep ağırdı.”", 4: "“Sesi değişti, kapısı kapandı. Bu yaşta hepsi öyle.”", 5: "“Sınavdı, dersaneydi derken bir baktık büyümüş.”", 6: "“Kendi ayakları üstünde durmaya çalıştı; arada bir de bize uğradı.”", 7: "“Koşturdu durdu; pazar günleri bile telefonu elindeydi.”", 8: "“Saçına ak düştü, inadı aynı.”", 9: "“Emekli oldu ama mahallenin işi bitmedi.”", 10: "“Hâlâ her sabah balkonda; kim geçti, ne dedi, hepsini bilir.”" };
+function nineText(S, ch) { var start = (S.chFlags || {})[ch] || [], got = S.flags.filter(function (f) { return start.indexOf(f) < 0 && nineOf(f); }).slice(-2); return got.length ? got.map(nineOf).join(" ") : (NINE_VARS[ch] || NINE_VARSAYILAN); }
 var VOICE_NAMES = { "Akıl": "AKIL", "Çene": "ÇENE", "Kurnazlık": "KURNAZLIK", "Cesaret": "CESARET", "Pişkinlik": "PİŞKİNLİK", "İtibar": "İTİBAR", "Gönül": "GÖNÜL", "Dayanıklılık": "DAYANIKLILIK", "Sosyal Radar": "SOSYAL RADAR" };
 function voicePower(S, stat) {
   var p = S.stats[stat];
