@@ -3,7 +3,26 @@
 Bölüm I'in 15 görselinden 14'ü yenilenecek, 1'i (Misafir Geldi) yeni. Vazo Kırıldı görseli kalıyor.
 Neden: mevcut görsellerin çoğunda pencereden gerçek bir şehre benzeyen siluet ve büyük cami kubbe/minareleri görünüyor (din ön planda, gerçek yer çağrışımı), Yabancı Krizi'nde okunabilir yazılar var, bazıları da yeni metinle uyuşmuyor (Kim Yaptı? vazo sahnesini gösteriyor, Doğum Günü Pastası kendi doğum günü, Oyuncak Krizi kum havuzu değil, Yasak Nesne kristal şekerlik değil, İlk Harçlık'ta çocuk 5 yaşında).
 
+**İstem kuralı:** Her istem, olaydaki seçeneklerin gerektirdiği nesneleri içermeli (ör. "Gözlüğüne saldır" → teyzede gözlük; "Mobilyaya tutun" → yakında koltuk; "Kediyi suçla" → kedi görünür).
+
 **Kullanım:** Makarya görsellerinin üretildiği mevcut ChatGPT sohbetinde önce Mesaj A'yı, sonra Mesaj B ve C'yi gönder. Görsel adları ChatGPT'nin altına yazacağı dosya adlarıdır; küçültme ve oyuna ekleme bende.
+
+---
+
+## Karakter kuralı (8 Ekim, Murat onayı) — her pakette geçerli
+
+Kahraman, onaylı karakter setindeki çocuktur (`karakter/kahraman-seti.png`): koyu kahve **dalgalı** saç ve tepede yukarı kalkan **tek tutam**, sıcak kahve gözler, kalın koyu kaşlar; bebekken mavi-beyaz çizgili tulum ve gri tavşan oyuncak. Her görselde **yalnızca bir kez** görünür. Hiçbir arka plan karakteri ona ya da setteki yetişkin hâline benzemez. Anne-baba saçta hafifçe andırabilir ama aynısı olamaz.
+
+```
+PERMANENT CHARACTER RULE for all remaining Makarya images (this overrides any earlier family description):
+THE PROTAGONIST = the boy from the character sheet I approved earlier in this chat (the age line-up with the cowlick). His signature: dark brown WAVY hair (not tight curls) with ONE tuft sticking straight up at the crown, warm brown eyes, thick dark eyebrows, light olive skin. As a baby/toddler he often wears a blue-and-white striped onesie and carries a small grey bunny plush. He appears EXACTLY ONCE per image, at the age given.
+NOBODY ELSE may look like him or like his adult/teen versions from the sheet: no other character with dark wavy hair plus a crown tuft, no young man with his face.
+FATHER: short neat dark hair (no tuft, not wavy), full trimmed beard, rounder face, broader and heavier build, small rectangular glasses for reading only.
+MOTHER: long straight dark-brown hair usually in a low ponytail, oval face, freckles, slim; never the same curly mop as the boy.
+GRANDMOTHER: silver hair in a bun, round glasses, patterned cardigan. GRANDFATHER: bald with white mustache, knitted vest.
+ALL OTHER characters (relatives, children, neighbors, nurses, teachers) must be clearly different TYPES: blond, red-haired, straight black hair, bald, braids, glasses, chubby, very tall and thin, different skin tones. Never a second dark-haired wavy boy.
+Reply "Tamam" and wait.
+```
 
 ---
 
@@ -13,7 +32,7 @@ Neden: mevcut görsellerin çoğunda pencereden gerçek bir şehre benzeyen silu
 New package for Chapter I (birth to age 3). All earlier Makarya rules still apply. Additional rules for THIS package, stricter than before:
 - NO domes, NO minarets, NO towers of worship anywhere, not even far away on the skyline. Windows show only: generic low hills, rooftops with terracotta tiles, trees, laundry lines, sky, a generic sea glimpse. Nothing that resembles any real city.
 - NO text of any kind (no speech bubbles, no book titles, no signs, no labels, no screens with readable content).
-- Keep the SAME family as in your earlier Makarya images: the curly dark-brown-haired baby/toddler boy with big brown eyes and rosy cheeks; his father with curly dark hair and a short beard; his mother with curly brown hair in a messy bun; the grandmother (babaanne) with grey hair in a bun, round glasses and a patterned cardigan; the grandfather with a white mustache and a knitted vest; the family's black-and-white tuxedo cat.
+- Characters: follow the PERMANENT CHARACTER RULE (protagonist with the crown tuft appears once; nobody else resembles him).
 - Landscape 3:2, the boy's face clearly visible in the upper two-thirds; the bottom quarter visually quiet (a caption covers it).
 Reply "Hazırım".
 ```
@@ -27,7 +46,7 @@ CHAPTER I PACKAGE, PART 1 of 2 (8 images). Make each image separately, and write
 
 2) sahne/gece-vardiyasi.png — 3 a.m. in a small living room, a wall clock (no numbers, just hands at three). The mother half-asleep on the sofa holding a feeding bottle upside down; the father half-awake in the doorway in pajamas with one sock; the 3-month-old boy wide awake in his crib, bright-eyed and ready for his "night shift". The cat asleep on the father's slipper. Night window with plain rooftops and a crescent moon.
 
-3) sahne/yabanci-krizi.png — Living room. An unknown cheerful aunt with big jewelry and bright lipstick rushes in, both hands reaching for the 8-month-old boy's cheeks, as if saying "I could eat you up!". The boy, in his mother's arms, leans back with a deeply suspicious face. Tea glasses and biscuits on the coffee table. No speech bubbles, no books with titles, no signs.
+3) sahne/yabanci-krizi.png — Living room. An unknown cheerful aunt with BIG round glasses on a beaded chain (the baby can grab them), big jewelry and bright lipstick rushes in, both hands reaching for the 8-month-old boy's cheeks, as if saying "I could eat you up!". The boy, in his mother's arms, leans back with a deeply suspicious face. Tea glasses and biscuits on the coffee table. No speech bubbles, no books with titles, no signs.
 
 4) sahne/yasak-nesne.png — Living room, the coffee table has a sparkling crystal candy dish with a lid, the kind taken out of the glass display cabinet only for guests; the open display cabinet in the background. The 10-month-old boy crawls toward it, one hand reaching, eyes locked on the shining crystal. The mother in the background mid-gasp, frozen with a tea tray.
 
