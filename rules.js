@@ -362,11 +362,22 @@ function hazard(S, e) {
   h *= (HAZARD_REF[e.ch] || CHAPTERS[e.ch].pick) / CHAPTERS[e.ch].pick;
   return h;
 }
+/* Arka plan ölümünün nedeni olayın geçtiği yere uymalı: mekân → neden grubu */
+var PLACE_GRP = { ev: "ev", mutfak: "ev", "cocuk-odasi": "ev", apartman: "ev", yazlik: "ev",
+  sokak: "yol", trafik: "yol", park: "yol", "toplu-tasima": "yol", sahil: "yol", havalimani: "yol",
+  ofis: "is", dukkan: "is", banka: "is", carsi: "is", market: "is", bakkal: "is", "devlet-dairesi": "is", studyo: "is",
+  hastane: "saglik",
+  kafe: "sosyal", "dugun-salonu": "sosyal", sahne: "sosyal", stadyum: "sosyal",
+  okul: "kurum", sinif: "kurum", "okul-bahcesi": "kurum", universite: "kurum", kisla: "kurum", karakol: "kurum", cezaevi: "kurum", mahkeme: "kurum", meclis: "kurum", koy: "kurum", huzurevi: "kurum", mezarlik: "kurum" };
 function backgroundDeath(S, e, roll) {
   if (e.id === "son-soz") return null;
+  if (e.kavsak) return null; /* kavşakta ölüm yalnızca seçimin kendi riskinden gelir */
   if ((roll != null ? roll : Math.random()) >= hazard(S, e)) return null;
   var y = ageYears(S, e);
-  var pool = DEATH_CAUSES.filter(function (d) { return y >= d.min && y <= d.max && (!d.flag || S.flags.indexOf(d.flag) >= 0); });
+  var grp = PLACE_GRP[e.place] || "ev";
+  var all = DEATH_CAUSES.filter(function (d) { return y >= d.min && y <= d.max && (!d.flag || S.flags.indexOf(d.flag) >= 0); });
+  var pool = all.filter(function (d) { return d.grp === grp; });
+  if (!pool.length) pool = all.filter(function (d) { return !d.grp || d.grp === "ev"; });
   if (!pool.length) return "Bir salı öğleden sonrası, hiç beklenmedik bir anda. Salılar zaten hep tuhaftır.";
   var wsum = 0; pool.forEach(function (d) { wsum += d.flag ? 3 : 1; });
   var r = Math.random() * wsum;

@@ -31,7 +31,7 @@ EV_COLS = ["Olay ID", "Bölüm", "Yaş", "Simge", "Başlık", "Olay metni", "Mek
            "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Herhangi biri hafıza", "Hat"]
 # Sonradan eklenen sütunlar: eski Excel dosyalarında yoksa hata verilmez, boş sayılır
 OPTIONAL_COLS = {"Bölüm sonu cümlesi", "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Aile desteği", "Başarısızlıkta hafıza", "Sonraki bölümde",
-                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap", "Cinsiyet"}
+                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap", "Cinsiyet", "Mekân grubu"}
 CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Özellik", "Zorluk", "Kesin etki", "Kesin sonuç metni",
            "Başarı", "Kritik başarı", "Başarısız", "Kritik hata", "Yarım (mini oyun)",
            "Mini oyun", "Mini oyun başlığı", "Mini oyun ipucu", "Mini oyun ayarı",
@@ -42,7 +42,7 @@ VO_COLS = ["Olay ID", "Özellik", "Zorluk", "İç ses metni", "Başarısızlık 
 RE_COLS = ["Olay ID", "Hafıza", "Geçmişten metni"]
 TR_COLS = ["Rozet", "Açıklama", "Bonus", "Otomatik özellik"]
 FL_COLS = ["Hafıza", "Final kartı etiketi", "Sonraki bölümde", "Bölüm sonu cümlesi"]
-DC_COLS = ["Asgari yaş", "Azami yaş", "Mezar taşı metni", "Gereken hafıza"]
+DC_COLS = ["Asgari yaş", "Azami yaş", "Mezar taşı metni", "Gereken hafıza", "Mekân grubu"]
 BO_COLS = ["Bölüm", "Ad", "Seçilecek olay", "Beklenen özellik", "Yaş aralığı", "Son görsel (olay ID)", "Son yaş", "Son metin", "Sonraki düğme"]
 
 
@@ -176,7 +176,7 @@ def write_xlsx(b, path):
         ["Geçmişten: Oyuncunun hafızasında o kayıt varsa olayda gösterilen hatırlatma cümlesi."],
         ["Rozetler: Kazanılabilir rozetler; Bonus ilgili özellik kontrollerinde zar hedefini düşürür (ör. Çene +1, Kurnazlık +1)."],
         ["Hafıza: Seçimlerin yazdığı kayıtlar ve final kartındaki açıklamaları. 'Bölüm sonu cümlesi': bu hafıza o bölümde açılırsa bölüm sonunda aile büyüğünün ağzından anlatılan cümle (tırnak içinde)."],
-        ["Ölüm Sebepleri: 18 yaş sonrası yaşla artan arka plan riskinden ölünce mezar taşına yazılır."],
+        ["Ölüm Sebepleri: 18 yaş sonrası yaşla artan arka plan riskinden ölünce mezar taşına yazılır. Mekân grubu (ev, yol, is, saglik, sosyal, kurum): neden, olayın geçtiği yere uyan gruptan seçilir; kavşak olaylarında arka plan ölümü yoktur, ölüm yalnızca seçimin kendi riskinden gelir."],
         ["Bölümler: Her bölümde bir hayatta kaç olay görüleceği (Seçilecek olay), zorluk ayarı (Beklenen özellik: o bölümde bir özelliğin olağan değeri) ve bölüm sonu ekranı."],
         ["Özet: Bölüm başına olay, mini oyun ve risk sayıları (otomatik hesaplanır)."],
         [""],
@@ -256,8 +256,8 @@ def write_xlsx(b, path):
                {"Rozet": 26, "Açıklama": 60, "Bonus": 26, "Otomatik özellik": 14}, wrap_cols=("Açıklama",))
     dv(ws, "Otomatik özellik", TR_COLS, STATS, len(b["traits"]))
     sheet("Hafıza", FL_COLS, [[f["flag"], f["label"], f.get("next", ""), f.get("nine", "")] for f in b["flags"]], {"Hafıza": 26, "Final kartı etiketi": 60, "Sonraki bölümde": 70, "Bölüm sonu cümlesi": 60}, wrap_cols=("Final kartı etiketi", "Sonraki bölümde", "Bölüm sonu cümlesi"))
-    sheet("Ölüm Sebepleri", DC_COLS, [[d["min"], d["max"], d["text"], d.get("flag", "")] for d in b["deathCauses"]],
-          {"Asgari yaş": 10, "Azami yaş": 10, "Mezar taşı metni": 90, "Gereken hafıza": 18}, wrap_cols=("Mezar taşı metni",))
+    sheet("Ölüm Sebepleri", DC_COLS, [[d["min"], d["max"], d["text"], d.get("flag", ""), d.get("grp", "")] for d in b["deathCauses"]],
+          {"Asgari yaş": 10, "Azami yaş": 10, "Mezar taşı metni": 90, "Gereken hafıza": 18, "Mekân grubu": 14}, wrap_cols=("Mezar taşı metni",))
     sheet("Bölümler", BO_COLS, [[c["ch"], c["name"], c["pick"], c["expected"], c["range"], c["endImg"], c["endAge"], c["endText"], c["next"]] for c in b["chapters"]],
           {"Bölüm": 8, "Ad": 18, "Seçilecek olay": 10, "Beklenen özellik": 12, "Yaş aralığı": 18, "Son görsel (olay ID)": 22, "Son yaş": 10, "Son metin": 60, "Sonraki düğme": 30},
           wrap_cols=("Son metin",))
@@ -428,6 +428,7 @@ def read_xlsx(path):
     for i, r in rows("Ölüm Sebepleri", DC_COLS):
         d = {"min": int(r["Asgari yaş"]), "max": int(r["Azami yaş"]), "text": str(r["Mezar taşı metni"])}
         if r["Gereken hafıza"]: d["flag"] = str(r["Gereken hafıza"])
+        if r.get("Mekân grubu"): d["grp"] = str(r["Mekân grubu"])
         b["deathCauses"].append(d)
     for i, r in rows("Bölümler", BO_COLS):
         b["chapters"].append({"ch": int(r["Bölüm"]), "name": str(r["Ad"]), "pick": int(r["Seçilecek olay"]), "expected": int(r["Beklenen özellik"]),
