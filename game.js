@@ -18,7 +18,7 @@ function loadMeta() { try { var m = JSON.parse(localStorage.getItem(META_KEY)); 
 function saveMeta(m) { try { localStorage.setItem(META_KEY, JSON.stringify(m)); } catch (e) {} }
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
 
-var IMG_Q = "?i=20261009"; /* görseller değişince artır: tarayıcı önbelleği eski resmi göstermesin */
+var IMG_Q = "?i=20261009b"; /* görseller değişince artır: tarayıcı önbelleği eski resmi göstermesin */
 function withExt(base) { return [base + ".webp" + IMG_Q, base + ".png" + IMG_Q, base + ".jpg" + IMG_Q]; }
 function sceneSrcs(id) {
   var e = EV_BY_ID[id], out = withExt((S.gender === "kiz" ? "img/kiz/sahne/" : "img/sahne/") + id);
@@ -191,8 +191,9 @@ function choiceCard(e, c, idx) {
 var KAVSAK_TOPLAM = 12;
 function lifelineHtml(cur) {
   var done = S.kavsak || [], h = "";
+  h += '<span class="kvDot org"></span>';
   for (var i = 1; i <= KAVSAK_TOPLAM; i++) {
-    if (i > 1) h += '<span class="kvSeg' + (done.indexOf(i) >= 0 || i <= cur ? " on" : "") + '"></span>';
+    h += '<span class="kvSeg' + (done.indexOf(i) >= 0 || i <= cur ? " on" : "") + '"></span>';
     h += '<span class="kvDot' + (i === cur && done.indexOf(i) < 0 ? " now" : done.indexOf(i) >= 0 ? " on" + (i === cur ? " last" : "") : "") + '"></span>';
   }
   var passed = done.length;

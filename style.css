@@ -278,6 +278,7 @@ button:disabled{cursor:default}
 .kvSeg{flex:1;height:2px;background:#3d342a}.kvSeg.on{background:#c69a3c}
 .kvDot{width:12px;height:12px;flex:0 0 12px;border-radius:50%;border:2px solid #4a4034;background:#17130f}
 .kvDot.on{background:#c69a3c;border-color:#c69a3c}
+.kvDot.org{width:8px;height:8px;flex-basis:8px;border-width:2px;background:#17130f;border-color:#6b5d4b}
 .kvDot.last{width:16px;height:16px;flex-basis:16px;box-shadow:0 0 0 5px rgba(198,154,60,.3)}
 .kvDot.now{width:18px;height:18px;flex-basis:18px;border:3px solid #a52f26;background:#fff;box-shadow:0 0 0 6px rgba(165,47,38,.25)}
 .kvLineLbl{display:flex;justify-content:space-between;font-size:10px;font-weight:800;color:#8f8170;letter-spacing:.06em;text-transform:uppercase;margin-top:7px}
