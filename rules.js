@@ -141,6 +141,7 @@ function applyFamily(S, name) {
 
 function hasReq(S, c, e) {
   if (c.req && S.traits.indexOf(c.req) < 0) return false;
+  if (c.reqGender && c.reqGender !== S.gender) return false;
   if (c.reqFlag && S.flags.indexOf(c.reqFlag) < 0) return false;
   if (c.reqVarlik != null && varlikOf(S) < c.reqVarlik) return false;
   if (c.reqDestek != null && destekOf(S) < c.reqDestek) return false;

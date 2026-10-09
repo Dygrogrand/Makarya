@@ -59,7 +59,7 @@ function renderStart() {
   var sv = loadSave(), saveHtml = "";
   if (sv) {
     var e = EV_BY_ID[sv.plan[Math.min(sv.pi, sv.plan.length - 1)]];
-    saveHtml = '<div class="saveCard"><div><b>Kaldığın yer</b><small>' + esc(sv.family) + " ailesi · " + esc(e.age) + " · " + esc(e.title) +
+    saveHtml = '<div class="saveCard"><div><b>Kaldığın yer</b><small>' + esc(sv.family) + " ailesi · " + esc(eventAge(sv, e)) + " · " + esc(e.title) +
       '</small></div><button onclick="resume()">DEVAM ET</button></div>';
   }
   shell("Makarya", art(["img/baslangic.webp"], "🌇", "HAYAT ZARI", "Makarya", "Aynı şehir, birbirinden çok farklı hayatlar.", true),
@@ -174,6 +174,10 @@ function choiceCard(e, c, idx) {
   if (c.varlik != null && c.varlik > varlikOf(S)) earn.push(pvChip("pvEarn", "💰 Varlık → " + TIERS[c.varlik]));
   if (c.varlikKayip && (S.own || 0) > 0) earn.push(pvChip("pvHurt", "💰 Birikim −" + c.varlikKayip));
   if (c.risk) risk.push(pvChip("pvHurt", "☠️ Ölüm riski %" + Math.round(c.risk.p * 100)));
+  var hapisIn = function (k) { return c[k] && flagList(c[k]).indexOf("hapis") >= 0; };
+  if (hapisIn("flag")) risk.push(pvChip("pvHurt", "⛓️ Hapis"));
+  else if (hapisIn("flagFail")) risk.push(pvChip("pvHurt", "⛓️ Başarısızlıkta hapis"));
+  else if (hapisIn("flagBad")) risk.push(pvChip("pvHurt", "⛓️ Kritik hatada hapis"));
   var dd = destekDelta(S, c), aile = [];
   if (dd && !(dd > 0 && destekOf(S) === 2) && !(dd < 0 && destekOf(S) === 0))
     aile.push(pvChip(dd < 0 ? "pvHurt" : "pvHelp", "🏠 Aile desteği " + (dd < 0 ? "−" : "+") + Math.abs(dd)));
@@ -268,6 +272,7 @@ function renderEvent() {
   shell(chTitle(e.ch), e.kavsak ? kavsakHead(e) : art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + eventAge(S, e), e.title, e.text), recall + voices + famLine + choices);
 }
 function lockedWhy(S, c, e) {
+  if (c.reqGender && c.reqGender !== S.gender) return "";
   if (c.reqVoice) return "";
   if (c.reqNotFlag && flagList(c.reqNotFlag).some(function (f) { return S.flags.indexOf(f) >= 0; })) return "";
   /* hat ve meslek hafızaları kimliktir, kapı değil: başka hatların seçenekleri hiç görünmez */
@@ -444,7 +449,7 @@ function doorsHtml() {
 function lifeLog() {
   return S.flags.filter(function (f) { return FLAG_LABELS[f]; }).map(function (f) { return '<div class="logItem">📜 ' + esc(FLAG_LABELS[f]) + "</div>"; }).join("") + highlights(null, 4);
 }
-function lifeAge() { return S.dead ? S.dead.age : CHAPTERS[S.ch].endAge.toLowerCase(); }
+function lifeAge() { return S.dead ? S.dead.age : S.ch === 10 && S.endAge ? S.endAge + " yaş" : CHAPTERS[S.ch].endAge.toLowerCase(); }
 function recordLife() {
   if (S.recorded) return; S.recorded = true;
   var m = loadMeta(), a = archetype(S);
