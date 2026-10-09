@@ -33,3 +33,50 @@ Rules (all earlier Makarya rules still apply):
 
 10) sahne/sokak-mi-ekran-mi.png — Apartment living room with an open window. Through the window, down in the street, neighborhood kids play football and wave up, calling him. On the table a tablet glows (screen only light, not readable), fully charged. The 4-year-old boy stands in the middle of the room torn between the two, one foot toward the window, one hand toward the tablet. A pair of his small shoes by the door (one already on his foot), and a little stool under the window.
 ```
+
+---
+
+# Kısım 2 (kalan 12 olay, 4–6 yaş)
+
+Not: Kısım 1'de ChatGPT görselleri birleşik bir hikâye gibi kurdu (ör. kreş öğretmeni ev sahnesinde akraba olarak göründü). Bu istem her görselin bağımsız olduğunu açıkça söylüyor.
+
+```
+CHAPTER II PACKAGE, PART 2 (12 images). Ages 4 to 6. Make each image separately and write the file name under each image.
+
+VERY IMPORTANT — EVERY IMAGE IS A STANDALONE SCENE, NOT A CONTINUING STORY:
+- Do NOT carry supporting characters from one image to another. Each image has its own fresh cast as described in that image only.
+- The ONLY characters that may repeat are the protagonist and his core family (mother, father, grandmother, grandfather) and only when the image text mentions them.
+- The red-haired kindergarten teacher from Part 1 appears ONLY in images 14 and 15 (the kindergarten scenes). She must NOT appear in any home, street, shop or school scene.
+- No baby sibling in any of these images.
+- Do not repeat the same side character type twice in the package (no second red-haired woman with glasses, no second bearded young man).
+
+All earlier rules still apply:
+- PERMANENT CHARACTER RULE: the protagonist is the boy from the approved character sheet (dark brown WAVY hair, ONE tuft standing up at the crown, warm brown eyes, thick dark eyebrows, light olive skin), at the age given. He appears EXACTLY ONCE per image. Nobody else has dark wavy hair with a crown tuft, and no young man looks like an adult version of him. Mother: long straight dark-brown hair in a low ponytail, freckles, slim. Father: short neat dark hair, full trimmed beard, heavier build. Grandmother: silver bun, round glasses, patterned cardigan. Grandfather: bald, white mustache, knitted vest.
+- NO text anywhere (no letters, numbers, signs, labels, logos, brand-like packaging, readable screens or notebooks; any writing is shown as unreadable squiggles). NO domes, minarets, flags or real-city skylines; windows show only rooftops, trees, hills or sky.
+- No injuries, no blood, nobody hurt.
+- Landscape 3:2, same warm illustrated style as Part 1. The boy's face clearly visible in the upper two-thirds; the bottom quarter visually quiet (a caption covers it).
+
+11) sahne/mahalle-bakkali.png — A tiny corner grocery at the bottom of an apartment building. The 4-year-old boy stands at the counter on tiptoe, a small folded paper list in one hand and a few coins in the other. The grocer, a bald man with a big grey mustache, reading glasses on the tip of his nose and a beige shop coat, leans over the counter with a knowing look. On the counter: an open thick hardback ledger notebook (unreadable squiggles), a bread basket, jars of candy. Three neighbor women with shopping bags watch from the side. Through the open shop door, the boy's mother is visible up on a first-floor balcony, watching.
+
+12) sahne/kaybolan-bozuk-para.png — Neighborhood park. A shiny coin lies on the path right at the 4-year-old boy's feet; he stares down at it, frozen, hands half reaching. He wears sneakers with velcro straps. Far behind him, on a bench, his mother chats with a neighbor woman (short grey permed hair, cardigan), both pouring tea from a big thermos into small tulip tea glasses, not looking his way. Trees, a few pigeons.
+
+13) sahne/b2-bayram-sabahi.png — Holiday morning in the family living room, full of relatives sitting along sofas and chairs (aunts, uncles, cousins — all different types: a chubby uncle in a suit, a tall thin aunt, a red-cheeked great-aunt). The 4-year-old boy in his best clothes and a little vest is bending to kiss an elderly great-aunt's hand respectfully while his eyes slide toward her handbag. On the coffee table: a plain cologne bottle (no label) and a crystal bowl of wrapped candies. One uncle holds a small envelope just out of sight behind his back. The mother stands at the doorway with a warning finger. The cat sleeps on the carpet.
+
+14) sahne/sana-guluyorlar.png — Kindergarten, children sitting in a circle on a rug. The 4-year-old boy stands in the middle with both hands curled like cat paws next to his face, completely serious, as if saying "a cat!". Three children (a girl with two puffs, a boy with a bowl cut, a chubby boy) are laughing so hard they fall sideways. The red-haired kindergarten teacher with green round glasses hides her smile behind a clipboard. Paper animal shapes on the wall (no letters).
+
+15) sahne/ilk-kucuk-sir.png — Kindergarten snack table. A classmate (round-faced boy with a buzz cut and lots of freckles) cups his hand to whisper into the 5-year-old protagonist's ear. Our boy's eyes are huge with shock, both hands over his mouth, as if he just heard the biggest secret in the world. A glass of water stands on the table in front of them. In the background the red-haired teacher pours juice for other kids, not noticing.
+
+16) sahne/aileler-kiyasliyor.png — Family living room at tea time. A neighbor woman (big blond-highlighted hair, many gold bangles) sits proudly next to her son (5, neat side-parted hair, little round glasses, holding a picture book like a trophy). The boy's mother has stopped mid-air with the sugar bowl in her hand, smiling a bit too wide as she tells a white lie. The 5-year-old protagonist sits on the rug with his toy cars and looks up at his mother, mouth open: this is news to him too. Tea glasses on a tray.
+
+17) sahne/kirilan-oyuncak.png — The boy's room. The 5-year-old boy holds a toy robot's detached arm in one hand; the robot lies on the rug, its eye lights fading. His face: pure guilt. Next to him on the floor is his father's open metal toolbox (screwdrivers, tape roll), and a toy shelf behind him has an empty spot where the robot used to stand. The door is half open; the father's slippers are visible in the hallway, coming.
+
+18) sahne/mahalle-turnuvasi.png — A narrow street between apartment buildings. A chalk start line by an apartment door; five kids of different types crouched at it. The biggest kid (about 8, gap-toothed, cap on backwards) stands on the step with arms raised, loudly changing the rules. At the far end of the street, the grocer sits on a wooden chair in front of his shop as the finish line. Between two buildings, a narrow muddy shortcut passage is visible. The 5-year-old protagonist crouches at the start line with a determined face. Mothers lean out from balconies.
+
+19) sahne/harclik-pazarligi.png — Sunday evening in the living room. The father sits on the sofa with his wallet open, the TV remote on the armrest. The 5-year-old boy stands in front of him holding two coins in his open palm, looking from the coins to the fat wallet with calculating, negotiating eyes, one finger raised as if about to make a counteroffer. The mother in the background, at the dining table with a pen and a small notepad (unreadable), raises an eyebrow, already writing a chore list.
+
+20) sahne/okul-hazirligi.png — The boy's room in autumn (falling leaves outside the window). The mother irons a small school smock on an ironing board for the third time. A brand-new backpack on the floor is absurdly overstuffed: toy cars, a teddy bear, a jar of coins and a can of cat food sticking out. The 5-year-old boy sits at a little desk drawing big wobbly shapes on paper (unreadable squiggles) with his tongue out in concentration. A tablet lies on the bed, screen glowing (no readable content).
+
+21) sahne/tepsiyle-kayak.png — Winter. A steep neighborhood street covered in snow, closed to cars (a parked car buried in snow). Children slide down the slope sitting on round metal kitchen trays, laughing. The 5-year-old protagonist stands at the top in a puffy jacket, hat and boots, clutching a big round baklava tray, eyes shining. The building doorman (tall thin man, wool cap, mustache) shovels snow nearby, shaking his head. Up on a balcony the boy's mother points at the tray in alarm. A half-finished snowman at the side.
+
+22) sahne/ilkokul-kapisi.png — First day of primary school, at the school gate (big generic building, no signs, no flags). The 6-year-old boy stands in a brand-new school uniform smock with a white collar, a small blue evil-eye bead pinned at his collar, a new backpack on his shoulders, looking up at the big building with a brave but nervous face. Behind him at the gate the parents cry: the mother wipes her eyes with a tissue, the father pretends to look at the sky. Other parents and kids around (all different types). A new teacher (a tall thin woman with a short grey bob and a long cardigan — NOT the kindergarten teacher) waits at the door with open arms.
+```
