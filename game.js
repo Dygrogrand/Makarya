@@ -18,7 +18,7 @@ function loadMeta() { try { var m = JSON.parse(localStorage.getItem(META_KEY)); 
 function saveMeta(m) { try { localStorage.setItem(META_KEY, JSON.stringify(m)); } catch (e) {} }
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
 
-var IMG_Q = "?i=20261009f"; /* görseller değişince artır: tarayıcı önbelleği eski resmi göstermesin */
+var IMG_Q = "?i=20261011a"; /* görseller değişince artır: tarayıcı önbelleği eski resmi göstermesin */
 function withExt(base) { return [base + ".webp" + IMG_Q, base + ".png" + IMG_Q, base + ".jpg" + IMG_Q]; }
 function sceneSrcs(id) {
   var e = EV_BY_ID[id], out = withExt((S.gender === "kiz" ? "img/kiz/sahne/" : "img/sahne/") + id);
