@@ -215,6 +215,7 @@ function needBreakdown(S, e, c) {
     var cb = clamp(Math.round((S.stats["Cesaret"] - statNorm("Cesaret", e.ch)) / 3), 0, 5);
     if (cb) rows.push({ icon: "🔥", label: "Cesaret: yol değiştirme cesareti", val: -cb, kind: "cesaret" });
   }
+  if (e.id === "karne-gunu" && S.karne && S.karne.g !== "orta") rows.push({ icon: "📜", label: S.karne.g === "iyi" ? "Karne iyi" : "Karne kötü", val: S.karne.g === "iyi" ? -3 : 3, kind: "karne" });
   var fb = familyEventBonus(S, e, c.stat);
   if (fb) rows.push({ icon: "🏠", label: S.family + " ailesi etkisi", val: -fb, kind: "family" });
   if (S.family) FAMILIES[S.family].traits.forEach(function (t) {
@@ -410,3 +411,16 @@ function archetype(S) {
 }
 
 if (typeof module !== "undefined") module.exports = {};
+
+/* Karne Günü: şimdiye kadarki seçimler (Akıl, Dayanıklılık, hafızalar) + bir zar. Sonuç olayın zorluğunu ve metnini belirler. */
+var KARNE_FLAGS = { baskan: 1, "teneffus-tuccari": 0, "ekran-cocugu": -1, "mahalle-cocugu": 0, yalanci: -1, tepsiTekeli: -1, "alcili-kol": -1, sirVerdi: 0, kardesli: -1 };
+function karneOf(S) {
+  if (S.karne) return S.karne;
+  var pts = Math.round(((S.stats["Akıl"] - statNorm("Akıl", 3)) * 0.6 + (S.stats["Dayanıklılık"] - statNorm("Dayanıklılık", 3)) * 0.4) / 2);
+  var fl = 0; S.flags.forEach(function (f) { fl += KARNE_FLAGS[f] || 0; });
+  var roll = 1 + Math.floor(Math.random() * 20), t = roll + pts + fl;
+  var g = t >= 14 ? "iyi" : t <= 7 ? "kotu" : "orta";
+  S.karne = { g: g, roll: roll, pts: pts + fl };
+  addFlag(S, "karne-" + g);
+  return S.karne;
+}

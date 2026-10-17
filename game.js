@@ -139,15 +139,15 @@ function directSummary(c) {
 function pvChip(cls, html) { return '<span class="pv ' + cls + '">' + html + "</span>"; }
 function pvRow(label, chips) { return chips.length ? '<div class="pvRow"><span class="pvLbl">' + label + "</span>" + chips.join("") + "</div>" : ""; }
 function choiceCard(e, c, idx) {
-  var rib = "";
+  var rib = "", ribK = "";
   if (c.reqFlag === "evli") rib = "";
-  else if (c.reqFlag && /^(hat|meslek)-/.test(c.reqFlag)) rib = "🧭 Hattından · " + (FLAG_LABELS[c.reqFlag] || "").replace(/\.$/, "");
-  else if (c.reqFlag) rib = "📜 Geçmişten açıldı · " + (FLAG_LABELS[c.reqFlag] || "eski bir seçimin");
-  else if (c.reqVoice) rib = STAT_ICONS[c.reqVoice] + " Bu seçeneği " + c.reqVoice + " açtı";
-  else if (c.req) rib = "🏅 “" + c.req + "” rozeti sayesinde açık";
-  else if (c.reqVarlik >= 2) rib = "💰 Cebin buna yetiyor · " + TIERS[varlikOf(S)];
-  else if (c.reqDestek != null) rib = "🏠 Ailen arkanda";
-  else if (c.reqStat) rib = Object.keys(c.reqStat).map(function (k) { return STAT_ICONS[k] + " " + (k === "İtibar" ? "İtibarın sayesinde açık" : k + " sayesinde açık"); }).join(" · ");
+  else if (c.reqFlag && /^(hat|meslek)-/.test(c.reqFlag)) { ribK = "hat"; rib = "🧭 Hattından · " + (FLAG_LABELS[c.reqFlag] || "").replace(/\.$/, ""); }
+  else if (c.reqFlag) { ribK = "past"; rib = "📜 Geçmişten açıldı · " + (FLAG_LABELS[c.reqFlag] || "eski bir seçimin"); }
+  else if (c.reqVoice) { ribK = "voice"; rib = STAT_ICONS[c.reqVoice] + " Bu seçeneği " + c.reqVoice + " açtı"; }
+  else if (c.req) { ribK = "badge"; rib = "🏅 “" + c.req + "” rozeti sayesinde açık"; }
+  else if (c.reqVarlik >= 2) { ribK = "money"; rib = "💰 Cebin buna yetiyor · " + TIERS[varlikOf(S)]; }
+  else if (c.reqDestek != null) { ribK = "family"; rib = "🏠 Ailen arkanda"; }
+  else if (c.reqStat) { ribK = "stat"; rib = Object.keys(c.reqStat).map(function (k) { return STAT_ICONS[k] + " " + (k === "İtibar" ? "İtibarın sayesinde açık" : k + " sayesinde açık"); }).join(" · "); }
   var help = [], hurt = [], earn = [], risk = [], sub, chance;
   if (c.direct) {
     sub = "Kesin sonuç, zar yok";
@@ -182,8 +182,8 @@ function choiceCard(e, c, idx) {
   var dd = destekDelta(S, c), aile = [];
   if (dd && !(dd > 0 && destekOf(S) === 2) && !(dd < 0 && destekOf(S) === 0))
     aile.push(pvChip(dd < 0 ? "pvHurt" : "pvHelp", "🏠 Aile desteği " + (dd < 0 ? "−" : "+") + Math.abs(dd)));
-  return '<button class="choice' + (rib ? " pvPast" : "") + '" onclick="choose(' + idx + ')"><div class="choiceIcon">' + (c.stat ? STAT_ICONS[c.stat] : "✦") +
-    '</div><div class="choiceMain">' + (rib ? '<span class="pvRib">' + esc(rib) + "</span>" : "") + "<b>" + esc(c.t) + "</b><small>" + esc(sub) + "</small>" +
+  return '<button class="choice' + (rib ? " pvPast pvK-" + ribK : "") + '" onclick="choose(' + idx + ')"><div class="choiceIcon">' + (c.stat ? STAT_ICONS[c.stat] : "✦") +
+    '</div><div class="choiceMain">' + (rib ? '<span class="pvRib pvRib-' + ribK + '">' + esc(rib) + "</span>" : "") + "<b>" + esc(c.t) + "</b><small>" + esc(sub) + "</small>" +
     pvRow("Lehine", help) + pvRow("Aleyhine", hurt) + pvRow(c.direct ? "Sonuç" : "Başarırsan", earn) + pvRow("Aile", aile) + pvRow("Risk", risk) +
     "</div>" + chance + "</button>";
 }
@@ -260,6 +260,13 @@ function renderEvent() {
     return '<div class="voice' + (v.pass ? "" : " off") + '" style="--vc:' + VOICE_COLORS[v.stat] + '"><b>' + VOICE_NAMES[v.stat] + ' <em class="vChar">' + esc(VOICE_CHAR[v.stat] || "") + '</em>' +
       ' <i>[' + DIFF[v.diff].label + " · " + (v.pass ? "Başarılı" : "Başarısız") + "]</i></b>" + esc(v.pass ? v.text : v.fail) + "</div>";
   }).join("");
+  var karne = "";
+  if (e.id === "karne-gunu") {
+    var K = karneOf(S); save();
+    var KT = { iyi: ["⭐", "Karne iyi", "Pekiyiler ve iyiler ağır basıyor."], orta: ["📄", "Karne ortada", "Birkaç iyi, birkaç eh; zayıf yok ama övünç de yok."], kotu: ["⚠️", "Karne kötü", "Zayıf notlar var ve imza bekliyor."] }[K.g];
+    karne = '<div class="recall karneBox karne-' + K.g + '"><b>' + KT[0] + " " + KT[1].toUpperCase() + " · ZAR " + K.roll + (K.pts ? (K.pts > 0 ? " +" : " ") + K.pts : "") + "</b>" + KT[2] + " Bu, şimdiye kadarki seçimlerin ve zarın sonucu.</div>";
+  }
+  var bond = bondLine(e, recall);
   var famLine = e.fam && S.family ? '<div class="famLine"><span>🏠</span><span>' + esc(FAMILIES[S.family].lines[e.fam]) + "</span></div>" : "";
   var choices = e.choices.map(function (c, idx) {
     if (!hasReq(S, c, e)) {
@@ -271,7 +278,25 @@ function renderEvent() {
     }
     return choiceCard(e, c, idx);
   }).join("");
-  shell(chTitle(e.ch), e.kavsak ? kavsakHead(e) : art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + eventAge(S, e), e.title, e.text), recall + voices + famLine + choices);
+  shell(chTitle(e.ch), e.kavsak ? kavsakHead(e) : art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + eventAge(S, e), e.title, e.text), karne + recall + bond + voices + famLine + choices);
+}
+/* Karakter bağı: olayın türüne uyan, daha önce yaşanmış bir hafızayı kısa bir satırla hatırlatır (aynı hafıza hayatta en çok iki kez). */
+var BOND = {
+  home: ["kediSuclu", "kediGeldi", "yapiskan", "kardesli", "alcili-kol", "kendi-odasi", "karne-iyi", "karne-kotu"],
+  money: ["ilkKelimePara", "teneffus-tuccari", "tepsiTekeli", "oyun-faturasi", "borclu", "taki-defteri", "dijital-paraci"],
+  social: ["baskan", "cesurPark", "sirVerdi", "lakapli", "camKirildi", "sokak-yasagi", "mahalle-cocugu", "takim-oyuncusu", "yuruyus-grubu"],
+  education: ["fuar-birincisi", "yz-odevci", "dershaneli", "iyi-lise", "karne-iyi", "karne-kotu", "ai-kopyaci", "kariyer-degisti"]
+};
+function bondLine(e, recallHtml) {
+  if (!e.fam || recallHtml || e.kavsak || e.ch < 2 || e.id === "karne-gunu") return "";
+  S.bondN = S.bondN || {}; S.bondAt = S.bondAt || {};
+  if (S.bondAt[e.id]) return S.bondAt[e.id] === "-" ? "" : S.bondAt[e.id];
+  var out = "-", pool = (BOND[e.fam] || []).filter(function (f) { return S.flags.indexOf(f) >= 0 && (S.bondN[f] || 0) < 2 && FLAG_LABELS[f]; });
+  var lk = (S.lakaplar || []).filter(function (l) { return l.ch < e.ch; });
+  if (lk.length && e.fam === "social" && (S.bondN.lakap || 0) < 3) { var L = lk[lk.length - 1]; S.bondN.lakap = (S.bondN.lakap || 0) + 1; out = '<div class="recall bondLine"><b>HATIRLANAN</b>Mahalle seni hâlâ “' + esc(L.n) + '” diye anıyor.</div>'; }
+  else if (pool.length) { var f = pool[(e._i || 0) % pool.length]; S.bondN[f] = (S.bondN[f] || 0) + 1; out = '<div class="recall bondLine"><b>HATIRLANAN</b>' + esc(FLAG_LABELS[f].replace(/\.$/, "")) + ".</div>"; }
+  S.bondAt[e.id] = out; save();
+  return out === "-" ? "" : out;
 }
 function lockedWhy(S, c, e) {
   if (c.reqGender && c.reqGender !== S.gender) return "";
@@ -692,7 +717,7 @@ function mgTiming(st, a, m) {
   function finish() {
     var avg = results.reduce(function (s, v) { return s + v; }, 0) / results.length;
     var allHit = results.every(function (v) { return v >= 0.68; });
-    finishMini(allHit ? Math.max(avg, 0.93) : avg);
+    finishMini(allHit ? 1 : avg);
   }
   playRound();
 }
@@ -731,7 +756,7 @@ function mgCollect(st, a, m) {
     b.style.left = px + "%"; b.style.top = py + "%";
     b.onclick = function () {
       this.remove(); got++;
-      if (got === n) { var t = (performance.now() - t0) / limit; finishMini(t < 0.4 ? 0.95 : t < 0.6 ? 0.8 : t < 0.85 ? 0.6 : 0.5); }
+      if (got === n) { var t = (performance.now() - t0) / limit; finishMini(t < 0.4 ? 1 : t < 0.6 ? 0.8 : t < 0.85 ? 0.6 : 0.5); }
     };
     field.appendChild(b);
   }
@@ -773,7 +798,7 @@ function mgMemory(st, a, m) {
     Array.prototype.forEach.call(document.querySelectorAll("#kids button"), function (b) {
       b.onclick = function () {
         var r = pool[+b.getAttribute("data-i")].r, ms = performance.now() - t0;
-        finishMini(r === 5 ? (ms < 1800 ? 0.95 : 0.82) : r === 4 ? 0.55 : r === 3 ? 0.4 : r === 2 ? 0.3 : 0.15);
+        finishMini(r === 5 ? (ms < 1800 ? 1 : 0.9) : r === 4 ? 0.55 : r === 3 ? 0.4 : r === 2 ? 0.3 : 0.15);
       };
     });
   }, 1600 + a * 1800);
@@ -803,7 +828,7 @@ function mgCups(st, a, m) {
               cups.forEach(function (x) { x.disabled = true; });
               coinEl.style.left = L(pos[coin]); coinEl.style.opacity = 1; b.classList.add("lift");
               var ms = performance.now() - t0;
-              finishMini(i === coin ? (ms < 1500 ? 0.95 : 0.82) : 0.3);
+              finishMini(i === coin ? (ms < 1500 ? 1 : 0.9) : 0.3);
             };
           });
           return;
@@ -837,7 +862,7 @@ function mgDoors(st, a, m) {
     Array.prototype.forEach.call(dEl.querySelectorAll("button"), function (b) {
       b.onclick = function () {
         var d = doors[+b.getAttribute("data-i")], ms = performance.now() - t0;
-        finishMini(d === target ? (ms < 2500 ? 0.95 : 0.82) : (d === sameShape || d === sameColor) ? 0.5 : 0.3);
+        finishMini(d === target ? (ms < 2500 ? 1 : 0.9) : (d === sameShape || d === sameColor) ? 0.5 : 0.3);
       };
     });
   }, 1800 + a * 3000);
@@ -925,7 +950,7 @@ function mgSimon(st, a, m) {
         if (i !== seq[pos]) { finishMini(pos / len * 0.66); return; }
         pos++;
         document.getElementById("ss").textContent = pos + " / " + len;
-        if (pos === len) finishMini(performance.now() - t0 < len * 900 ? 0.95 : 0.85);
+        if (pos === len) finishMini(1);
       };
     });
   }, 700 + len * show + 200);

@@ -259,8 +259,10 @@ button:disabled{cursor:default}
 /* Panel içindeki kutular küçülüp içeriğini kırpmasın; sığmazsa panel kaydırılır */
 .panel > *{flex-shrink:0}
 /* Seçim kartı: lehine / aleyhine / başarırsan */
-.choice.pvPast{box-shadow:inset 4px 0 0 #b8892a}
-.pvRib{display:block;font-size:11.5px;font-weight:800;color:#8a6212;margin-bottom:2px;line-height:1.3}
+.choice.pvPast{box-shadow:inset 5px 0 0 var(--rk,#b8892a)}
+.pvRib{display:inline-block;font-size:11.5px;font-weight:800;color:#fff;background:var(--rk,#8a6212);padding:2px 8px;border-radius:999px;margin-bottom:5px;line-height:1.35}
+.pvK-past{--rk:#6d3fb0}.pvK-hat{--rk:#1f6f8b}.pvK-badge{--rk:#c2410c}.pvK-voice{--rk:#a3237a}
+.pvK-money{--rk:#1f7a45}.pvK-family{--rk:#b4233a}.pvK-stat{--rk:#2f5fc4}
 .pvRow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:5px}
 .pvLbl{font-size:9.5px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:#8b7c66;margin-right:1px}
 .pv{display:inline-flex;align-items:center;gap:3px;border-radius:999px;padding:2px 8px;font-size:11.5px;font-weight:800;line-height:1.35}
@@ -399,3 +401,6 @@ button:disabled{cursor:default}
 .gainGrid.o-win .gainCard,.gainGrid.o-direct .gainCard,.pvRow.o-win .pv,.pvRow.o-direct .pv{animation:chipPop .45s cubic-bezier(.2,.8,.3,1.2) both}
 .gainGrid.o-crit .gainCard,.pvRow.o-crit .pv{animation:chipPop .45s cubic-bezier(.2,.8,.3,1.2) both;box-shadow:0 0 0 2px #e4c272 inset}
 .gainGrid.o-bad .gainCard,.pvRow.o-bad .pv{animation:chipShake .45s ease both}
+
+.karneBox{border-left-width:5px}
+.karne-iyi{border-color:#2b7a4f!important}.karne-kotu{border-color:#a52f26!important}.karne-orta{border-color:#b8892a!important}
