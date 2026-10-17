@@ -12,9 +12,8 @@ PLACES = ["ev", "mutfak", "cocuk-odasi", "okul", "sinif", "okul-bahcesi", "sokak
           "ofis", "dukkan", "devlet-dairesi", "hastane", "dugun-salonu", "kafe", "toplu-tasima", "trafik", "universite",
           "kisla", "banka", "apartman", "sahil", "huzurevi", "mezarlik", "yazlik", "stadyum", "sahne", "mahkeme", "karakol", "cezaevi", "koy", "havalimani", "meclis", "studyo"]
 MINIS = {
-    "timing": [], "hold": [], "collect": ["piece"], "race": [], "memory": ["items"], "cups": [], "doors": [],
-    "rhythm": [], "lanes": ["obstacles"], "simon": ["items"], "poker": ["questions"], "trace": ["shape"],
-    "bargain": ["item", "mode"], "swipe": ["left", "right", "items"], "breath": [], "balance": ["item"],
+    "timing": [], "collect": ["piece"], "simon": ["items"], "trace": ["shape"],
+    "duel": [], "lie": ["facts", "qs"], "diff": ["set"], "fight": [], "hidden": ["target", "decoys"], "tower": ["item"],
 }
 BASE_TRAITS = ["Sessiz Gözlemci", "Ses Yükseltince Oluyor", "Erken Ekonomi Bilinci", "Teknoloji Merakı", "Yastık Altı Ekonomisti",
     "Küçük Tüccar", "Sahne Sever", "Para Üstü Radarı", "Kendine Gülebilir", "Organizatör", "İş Modeli Kurar", "Seçim Makinesi",

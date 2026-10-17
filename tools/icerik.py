@@ -17,8 +17,7 @@ DIFF_TR = {"veryEasy": "Çok Kolay", "easy": "Kolay", "medium": "Orta", "hard": 
 TR_DIFF = {v: k for k, v in DIFF_TR.items()}
 FAM_TR = {"home": "ev", "money": "para", "social": "sosyal", "education": "okul-iş"}
 TR_FAM = {v: k for k, v in FAM_TR.items()}
-MINI_TYPES = ["timing", "hold", "collect", "race", "memory", "cups", "doors", "rhythm", "lanes", "simon", "poker", "trace",
-              "bargain", "swipe", "breath", "balance"]
+MINI_TYPES = ["timing", "collect", "simon", "trace", "duel", "lie", "diff", "fight", "hidden", "tower"]
 PLACES = ["ev", "mutfak", "cocuk-odasi", "okul", "sinif", "okul-bahcesi", "sokak", "park", "bakkal", "market", "carsi",
           "ofis", "dukkan", "devlet-dairesi", "hastane", "dugun-salonu", "kafe", "toplu-tasima", "trafik", "universite",
           "kisla", "banka", "apartman", "sahil", "huzurevi", "mezarlik", "yazlik", "stadyum", "sahne", "mahkeme", "karakol", "cezaevi", "koy", "havalimani", "meclis", "studyo"]

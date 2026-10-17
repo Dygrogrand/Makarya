@@ -664,9 +664,8 @@ function startMini() {
   if (!S.lock) { S.lock = { idx: CUR.idx }; S.screen = "minigame"; save(); }
   var m = CUR.c.mini, st = document.getElementById("mg");
   var back = st.parentNode.querySelector(".secondary"); if (back) back.remove();
-  ({ timing: mgTiming, hold: mgHold, collect: mgCollect, race: mgRace, memory: mgMemory, cups: mgCups, doors: mgDoors,
-     rhythm: mgRhythm, lanes: mgLanes, simon: mgSimon, poker: mgPoker, trace: mgTrace,
-     bargain: mgBargain, swipe: mgSwipe, breath: mgBreath, balance: mgBalance })[m.type](st, MG.assist, m);
+  ({ timing: mgTiming, collect: mgCollect, simon: mgSimon, trace: mgTrace, duel: mgDuel, lie: mgLie, diff: mgDiff,
+     fight: mgFight, hidden: mgHidden, tower: mgTower }[m.type] || mgTiming)(st, MG.assist, m);
 }
 /* Zamanlama: 5 turluk seri, her tur biraz hızlanır/daralır; art arda tutturmak kombo katar */
 function mgTiming(st, a, m) {
@@ -721,28 +720,6 @@ function mgTiming(st, a, m) {
   }
   playRound();
 }
-function mgHold(st, a, m) {
-  var width = 16 + a * 40, center = 62, left = center - width / 2;
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgPower"><div class="mgFill" id="fill"></div><div class="mgZone" style="left:' + left + "%;width:" + width +
-    '%"></div></div><div class="mgStatus" id="hs">Basılı tut…</div><button class="mgBig" id="holdBtn" style="touch-action:none">BASILI TUT</button>';
-  var btn = document.getElementById("holdBtn"), val = 0, holding = false, started = false, last = performance.now();
-  btn.oncontextmenu = function (ev) { ev.preventDefault(); };
-  btn.onpointerdown = function (ev) { ev.preventDefault(); holding = true; started = true; btn.textContent = "BIRAK!"; try { btn.setPointerCapture(ev.pointerId); } catch (e) {} };
-  function release() {
-    if (!holding) return; holding = false;
-    var d = Math.abs(val - center), half = width / 2;
-    finishMini(d <= half ? 0.7 + 0.3 * (1 - d / half) : 0.6 - (d - half) / 35);
-  }
-  btn.onpointerup = release; btn.onpointercancel = release;
-  function tick(now) {
-    var dt = Math.min(32, now - last); last = now;
-    if (holding) val = Math.min(100, val + dt * (0.055 - a * 0.02));
-    var f = document.getElementById("fill"); if (f) f.style.width = val + "%";
-    if (holding && val >= 100) { release(); return; }
-    MG.raf = requestAnimationFrame(tick);
-  }
-  MG.raf = requestAnimationFrame(tick);
-}
 function mgCollect(st, a, m) {
   var n = 5, limit = 4200 + a * 3500, got = 0, t0 = performance.now();
   st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgField" id="field"></div><div class="mgStatus" id="cs"></div>';
@@ -766,168 +743,8 @@ function mgCollect(st, a, m) {
     if (left <= 0) finishMini(got / n * 0.45);
   }, 100));
 }
-function mgRace(st, a, m) {
-  var taps = 0, target = 18 - a * 10, dur = 5000, t0 = performance.now();
-  var me = S.gender === "kiz" ? "🏃‍♀️" : "🏃‍♂️";
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgTrack"><div class="mgFinish"></div><div class="mgRunner you" id="you">' + me +
-    '<small>SEN</small></div><div class="mgRunner opp" id="opp">🏃</div></div><div class="mgStatus" id="rt">5.0 sn</div><button class="mgBig" id="tapBtn" style="touch-action:manipulation">HIZLAN!</button>';
-  document.getElementById("tapBtn").onpointerdown = function (ev) { ev.preventDefault(); taps++; };
-  MG.timers.push(setInterval(function () {
-    var el = performance.now() - t0, rem = Math.max(0, dur - el);
-    var you = Math.min(1, taps / target), opp = Math.min(1, el / dur * 0.88);
-    var y = document.getElementById("you"), o = document.getElementById("opp"), t = document.getElementById("rt");
-    if (y) y.style.left = "calc(" + Math.round(you * 84) + "% + 4px)";
-    if (o) o.style.left = "calc(" + Math.round(opp * 84) + "% + 4px)";
-    if (t) t.textContent = (rem / 1000).toFixed(1) + " sn";
-    if (rem <= 0) finishMini(taps / target);
-  }, 60));
-}
-function mgMemory(st, a, m) {
-  var src = (m.items && m.items.length >= 5) ? m.items : ["🧒🏻", "👧🏽", "🧒🏿", "👦🏼", "👧🏻", "🧒🏽"], ranks = [5, 4, 3, 2, 1, 2];
-  var pool = src.slice(0, 6).map(function (f, i) { return { f: f, r: ranks[i] }; })
-    .sort(function () { return Math.random() - 0.5; });
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgKids" id="kids">' + pool.map(function (k) {
-    return '<div class="mgKid"><div class="face">' + k.f + '</div><div class="stars">' + "★".repeat(k.r) + "</div></div>";
-  }).join("") + '</div><div class="mgStatus" id="ms">Gözlemle…</div>';
-  later(function () {
-    var t0 = performance.now();
-    document.getElementById("kids").innerHTML = pool.map(function (k, i) {
-      return '<button class="mgKid" data-i="' + i + '"><div class="face">' + k.f + '</div><div class="stars">?</div></button>';
-    }).join("");
-    document.getElementById("ms").textContent = "En iyi top kontrolü kimdeydi?";
-    Array.prototype.forEach.call(document.querySelectorAll("#kids button"), function (b) {
-      b.onclick = function () {
-        var r = pool[+b.getAttribute("data-i")].r, ms = performance.now() - t0;
-        finishMini(r === 5 ? (ms < 1800 ? 1 : 0.9) : r === 4 ? 0.55 : r === 3 ? 0.4 : r === 2 ? 0.3 : 0.15);
-      };
-    });
-  }, 1600 + a * 1800);
-}
-function mgCups(st, a, m) {
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgCups" id="cups"></div><div class="mgStatus" id="us">Parayı izle…</div>';
-  var box = document.getElementById("cups"), pos = [0, 1, 2], coin = Math.floor(Math.random() * 3);
-  var L = function (p) { return (p * 35) + "%"; };
-  var coinEl = document.createElement("div"); coinEl.className = "mgCoin"; coinEl.textContent = "🪙"; coinEl.style.left = L(coin); box.appendChild(coinEl);
-  var cups = [0, 1, 2].map(function (i) {
-    var b = document.createElement("button"); b.className = "mgCup lift"; b.textContent = "📦"; b.style.left = L(i); b.disabled = true; box.appendChild(b); return b;
-  });
-  var speed = 330 + a * 400, swaps = Math.round(7 - a * 8);
-  cups.forEach(function (b) { b.style.transitionDuration = speed + "ms"; });
-  later(function () {
-    cups.forEach(function (b) { b.classList.remove("lift"); });
-    later(function () {
-      coinEl.style.opacity = 0;
-      var k = 0;
-      (function swap() {
-        if (k++ >= swaps) {
-          document.getElementById("us").textContent = "Para hangi kutunun altında?";
-          var t0 = performance.now();
-          cups.forEach(function (b, i) {
-            b.disabled = false;
-            b.onclick = function () {
-              cups.forEach(function (x) { x.disabled = true; });
-              coinEl.style.left = L(pos[coin]); coinEl.style.opacity = 1; b.classList.add("lift");
-              var ms = performance.now() - t0;
-              finishMini(i === coin ? (ms < 1500 ? 1 : 0.9) : 0.3);
-            };
-          });
-          return;
-        }
-        var i = Math.floor(Math.random() * 3), j = (i + 1 + Math.floor(Math.random() * 2)) % 3;
-        var t = pos[i]; pos[i] = pos[j]; pos[j] = t;
-        cups[i].style.left = L(pos[i]); cups[j].style.left = L(pos[j]);
-        later(swap, speed + 60);
-      })();
-    }, 400);
-  }, 1200 + a * 1000);
-}
-function mgDoors(st, a, m) {
-  var shapes = [{ s: "Güneş", e: "☀️" }, { s: "Yıldız", e: "⭐" }, { s: "Balık", e: "🐟" }, { s: "Uçurtma", e: "🪁" }];
-  var colors = ["Sarı", "Mavi", "Kırmızı", "Yeşil"];
-  function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-  var target = { c: rnd(colors), sh: rnd(shapes) };
-  var sameShape = { c: rnd(colors.filter(function (c) { return c !== target.c; })), sh: target.sh };
-  var sameColor = { c: target.c, sh: rnd(shapes.filter(function (s) { return s !== target.sh; })) };
-  var other = { c: rnd(colors.filter(function (c) { return c !== target.c && c !== sameShape.c; })), sh: rnd(shapes.filter(function (s) { return s !== target.sh && s !== sameColor.sh; })) };
-  var doors = [target, sameShape, sameColor, other].sort(function () { return Math.random() - 0.5; });
-  function sign(d) { return '<span class="sign ' + d.c + '">' + d.sh.e + " " + d.c + " " + d.sh.s + "</span>"; }
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="clue" id="clue">Sınıfının kapısında şu işaret var:<br>' + sign(target) +
-    '</div><div class="mgStatus" id="ds">Aklında tut…</div><div class="mgDoors" id="doors" style="display:none"></div>';
-  later(function () {
-    document.getElementById("clue").style.display = "none";
-    document.getElementById("ds").textContent = "Hangi kapıydı?";
-    var dEl = document.getElementById("doors"); dEl.style.display = "grid";
-    var t0 = performance.now();
-    dEl.innerHTML = doors.map(function (d, i) { return '<button class="mgDoor" data-i="' + i + '"><div class="door">🚪</div>' + sign(d) + "</button>"; }).join("");
-    Array.prototype.forEach.call(dEl.querySelectorAll("button"), function (b) {
-      b.onclick = function () {
-        var d = doors[+b.getAttribute("data-i")], ms = performance.now() - t0;
-        finishMini(d === target ? (ms < 2500 ? 1 : 0.9) : (d === sameShape || d === sameColor) ? 0.5 : 0.3);
-      };
-    });
-  }, 1800 + a * 3000);
-}
-
 /* Ninni ritmi: ışık parladığı anda dokun */
-function mgRhythm(st, a, m) {
-  var beats = 8, gap = 780, win = 150 + a * 220, t0 = performance.now() + 1200, hits = [], used = [];
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><button class="mgPulse" id="pulse">🌙</button><div class="mgStatus" id="rs">Hazırlan…</div><div class="mgDots" id="dots">' +
-    Array(beats + 1).join('<i></i>') + '</div>';
-  var pulse = document.getElementById("pulse"), dots = document.querySelectorAll("#dots i");
-  for (var k = 0; k < beats; k++) (function (k) {
-    later(function () { pulse.classList.add("on"); document.getElementById("rs").textContent = "Dokun!"; later(function () { pulse.classList.remove("on"); }, 180); }, t0 + k * gap - performance.now());
-  })(k);
-  pulse.onpointerdown = function (ev) {
-    ev.preventDefault();
-    var t = performance.now(), k = Math.round((t - t0) / gap);
-    if (k < 0 || k >= beats || used[k]) return;
-    var err = Math.abs(t - (t0 + k * gap));
-    used[k] = true;
-    if (err <= win) { hits[k] = 1 - 0.5 * err / win; dots[k].className = "hit"; }
-    else { hits[k] = 0; dots[k].className = "miss"; }
-  };
-  later(function () {
-    var sum = 0; for (var k = 0; k < beats; k++) sum += hits[k] || 0;
-    finishMini(sum / beats * 1.05);
-  }, t0 + beats * gap + 400 - performance.now());
-}
-
 /* Kalabalıkta ilerle: şerit değiştirerek engellerden kaç */
-function mgLanes(st, a, m) {
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgLanes" id="lf"><div class="mgMe" id="me">' + (S.gender === "kiz" ? "👧" : "👦") +
-    '</div></div><div class="mgStatus" id="ls">Çarpma: 0</div><div class="row"><button class="mgBig" id="lb">◀</button><button class="mgBig" id="rb">▶</button></div>';
-  var field = document.getElementById("lf"), me = document.getElementById("me");
-  var lane = 1, obs = [], hits = 0, dur = 8000, t0 = performance.now(), last = t0, nextSpawn = t0 + 300;
-  var speed = 0.055 - a * 0.04, spawnGap = 640 + a * 500, faces = (m.obstacles && m.obstacles.length) ? m.obstacles : ["🧒", "👧", "👦", "🧒🏽", "👶"];
-  function place() { me.style.left = (lane * 33.33 + 16.66) + "%"; }
-  function move(d) { lane = clamp(lane + d, 0, 2); place(); }
-  place();
-  document.getElementById("lb").onpointerdown = function (ev) { ev.preventDefault(); move(-1); };
-  document.getElementById("rb").onpointerdown = function (ev) { ev.preventDefault(); move(1); };
-  var sx = null;
-  field.onpointerdown = function (ev) { sx = ev.clientX; };
-  field.onpointerup = function (ev) { if (sx == null) return; var dx = ev.clientX - sx; if (Math.abs(dx) > 25) move(dx > 0 ? 1 : -1); sx = null; };
-  function tick(now) {
-    var dt = Math.min(40, now - last); last = now;
-    if (now >= nextSpawn && now - t0 < dur - 900) {
-      var ln = Math.floor(Math.random() * 3), el = document.createElement("div");
-      el.className = "mgObs"; el.textContent = faces[Math.floor(Math.random() * faces.length)];
-      el.style.left = (ln * 33.33 + 16.66) + "%"; field.appendChild(el);
-      obs.push({ lane: ln, y: -8, el: el, hit: false });
-      nextSpawn = now + spawnGap * (0.75 + Math.random() * 0.5);
-    }
-    obs.forEach(function (o) {
-      o.y += dt * speed; o.el.style.top = o.y + "%";
-      if (!o.hit && o.y > 72 && o.y < 90 && o.lane === lane) { o.hit = true; hits++; o.el.classList.add("bump"); me.classList.add("bump"); setTimeout(function () { me.classList.remove("bump"); }, 250); }
-    });
-    obs = obs.filter(function (o) { if (o.y > 110) { o.el.remove(); return false; } return true; });
-    var ls = document.getElementById("ls"); if (ls) ls.textContent = "Çarpma: " + hits + " · " + (Math.max(0, dur - (now - t0)) / 1000).toFixed(1) + " sn";
-    if (now - t0 >= dur) { finishMini(1 - hits * 0.24); return; }
-    MG.raf = requestAnimationFrame(tick);
-  }
-  MG.raf = requestAnimationFrame(tick);
-}
-
 /* Sırayı tekrarla */
 function mgSimon(st, a, m) {
   var items = (m.items && m.items.length === 4) ? m.items : ["🥪", "🧃", "🍫", "🥯"], len = clamp(5 - Math.round(a * 3), 3, 6), show = 620 + a * 400;
@@ -957,37 +774,6 @@ function mgSimon(st, a, m) {
 }
 
 /* Poker yüzü: parmağı gezinen dairenin içinde tut */
-function mgPoker(st, a, m) {
-  var R = 44 + a * 44, dur = 5000, qs = (m.questions && m.questions.length) ? m.questions : ["Emin misin?", "Bana bak.", "Gözlerimin içine bak.", "Kulakların neden kızardı?", "Son kez soruyorum.", "Hımm…"];
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgPoker" id="pf"><div class="mgQ" id="pq">Parmağını daireye koy</div><div class="mgRing" id="ring" style="width:' + 2 * R + "px;height:" + 2 * R +
-    'px">😐</div></div><div class="mgStatus" id="ps">Başlamak için daireye dokun</div>';
-  var f = document.getElementById("pf"), ring = document.getElementById("ring"), W = f.clientWidth, H = f.clientHeight;
-  var cx = W / 2, cy = H / 2 + 10, tx = cx, ty = cy, px = -999, py = -999, down = false, started = 0, inside = 0, last = 0, qT = 0, qi = 0;
-  function pos(ev) { var r = f.getBoundingClientRect(); px = ev.clientX - r.left; py = ev.clientY - r.top; }
-  f.style.touchAction = "none";
-  f.onpointerdown = function (ev) { ev.preventDefault(); pos(ev); down = true; try { f.setPointerCapture(ev.pointerId); } catch (e) {} if (!started && Math.hypot(px - cx, py - cy) < R) { started = performance.now(); last = started; } };
-  f.onpointermove = function (ev) { if (down) pos(ev); };
-  f.onpointerup = f.onpointercancel = function () { down = false; };
-  function tick(now) {
-    if (started) {
-      var dt = now - last; last = now;
-      var el = now - started, hard = 0.6 + el / dur;
-      if (Math.hypot(tx - cx, ty - cy) < 6) { tx = R + Math.random() * (W - 2 * R); ty = R + 30 + Math.random() * (H - 2 * R - 30); }
-      cx += (tx - cx) * 0.035 * hard; cy += (ty - cy) * 0.035 * hard;
-      var ok = down && Math.hypot(px - cx, py - cy) < R;
-      if (ok) inside += dt;
-      ring.classList.toggle("bad", !ok);
-      ring.textContent = ok ? "😐" : "😳";
-      if (now > qT) { document.getElementById("pq").textContent = qs[qi++ % qs.length]; qT = now + 900; }
-      var ps = document.getElementById("ps"); if (ps) ps.textContent = "Soğukkanlılık %" + Math.round(100 * inside / Math.max(1, el)) + " · " + (Math.max(0, dur - el) / 1000).toFixed(1) + " sn";
-      if (el >= dur) { finishMini(inside / dur * 1.04); return; }
-    }
-    ring.style.left = (cx - R) + "px"; ring.style.top = (cy - R) + "px";
-    MG.raf = requestAnimationFrame(tick);
-  }
-  MG.raf = requestAnimationFrame(tick);
-}
-
 /* Harfi çiz: kesikli çizgiyi tek hamlede takip et */
 function mgTrace(st, a, m) {
   var P = m.shape === "imza" ? [[30, 150], [60, 60], [90, 150], [125, 70], [160, 145], [200, 75], [235, 140], [270, 95]] : [[40, 175], [40, 30], [150, 125], [260, 30], [260, 175]], tol = 20 + a * 26, N = 48, cps = [];
@@ -1022,109 +808,9 @@ function mgTrace(st, a, m) {
 }
 
 /* Pazarlık: karşı tarafın sabrı biterken doğru fiyatı bul */
-function mgBargain(st, a, m) {
-  var buy = m.mode !== "sell", T = 35 + Math.floor(Math.random() * 40), patience = 100, cost = 26 - a * 20, offers = 0;
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="mgPatience"><i id="pat" style="width:100%"></i></div><div class="muted">Karşı tarafın sabrı</div>' +
-    '<div class="bgOffer" id="bo">50</div><input type="range" min="0" max="100" value="50" id="bs" class="bgSlider">' +
-    '<div class="row muted"><span>' + (buy ? "ucuz" : "ucuz") + '</span><span style="text-align:right">pahalı</span></div>' +
-    '<div class="mgStatus" id="bm">' + esc(buy ? "Ne kadar ödemeyi teklif ediyorsun? (" + (m.item || "") + ")" : "Kaça satmak istiyorsun? (" + (m.item || "") + ")") + '</div><button class="mgBig" id="bb">TEKLİF VER</button>';
-  var sl = document.getElementById("bs"), bo = document.getElementById("bo");
-  sl.oninput = function () { bo.textContent = sl.value; };
-  document.getElementById("bb").onclick = function () {
-    var v = +sl.value, ok = buy ? v >= T : v <= T, d = Math.abs(v - T); offers++;
-    if (ok) { finishMini(Math.max(0.55, 1 - d / 35) + (offers === 1 ? 0.03 : 0)); return; }
-    patience -= cost; document.getElementById("pat").style.width = Math.max(0, patience) + "%";
-    var msg = buy ? (d > 20 ? "Güldü. Çok düşük." : d > 8 ? "Kaşlarını kaldırdı. Biraz daha çık." : "Tereddüt etti. Çok yakınsın.")
-                  : (d > 20 ? "Güldü. Çok yüksek." : d > 8 ? "Yüzünü buruşturdu. Biraz in." : "Tereddüt etti. Çok yakınsın.");
-    document.getElementById("bm").textContent = msg;
-    if (patience <= 0) finishMini(0.28);
-  };
-}
-
 /* Kartları hızla ayır */
-function mgSwipe(st, a, m) {
-  var items = (m.items || []).slice().sort(function () { return Math.random() - 0.5; }), i = 0, ok = 0, per = 2600 + a * 2200, t0 = 0;
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="swCard" id="sc"></div><div class="mgTimerBar"><i id="stb"></i></div>' +
-    '<div class="mgStatus" id="ss"></div><div class="row"><button class="mgBig sw" id="sl">◀ ' + esc(m.left || "Hayır") + '</button><button class="mgBig sw right" id="sr">' + esc(m.right || "Evet") + " ▶</button></div>";
-  var card = document.getElementById("sc");
-  function show() {
-    if (i >= items.length) { finishMini(ok / items.length * 1.02); return; }
-    card.className = "swCard in"; card.textContent = items[i].t; t0 = performance.now();
-    document.getElementById("ss").textContent = (i + 1) + " / " + items.length + " · doğru " + ok;
-  }
-  function answer(right) {
-    if (i >= items.length || MG.done) return;
-    if (right === !!items[i].right) ok++;
-    card.className = "swCard out " + (right ? "r" : "l"); i++;
-    setTimeout(show, 160);
-  }
-  document.getElementById("sl").onclick = function () { answer(false); };
-  document.getElementById("sr").onclick = function () { answer(true); };
-  var sx = null;
-  card.onpointerdown = function (ev) { sx = ev.clientX; };
-  card.onpointerup = function (ev) { if (sx == null) return; var dx = ev.clientX - sx; sx = null; if (Math.abs(dx) > 30) answer(dx > 0); };
-  function tick(now) {
-    if (i < items.length) {
-      var f = Math.min(1, (now - t0) / per), b = document.getElementById("stb"); if (b) b.style.width = (100 - f * 100) + "%";
-      if (f >= 1) { card.className = "swCard out"; i++; setTimeout(show, 160); t0 = now + 1e9; }
-    }
-    MG.raf = requestAnimationFrame(tick);
-  }
-  show(); MG.raf = requestAnimationFrame(tick);
-}
-
 /* Nefes: daire büyürken basılı tut, küçülürken bırak */
-function mgBreath(st, a, m) {
-  var cyc = 2800 + a * 1400, cycles = 3, dur = cyc * cycles, good = 0, total = 0, holding = false, t0 = 0;
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="brWrap"><div class="brCircle" id="bc"></div></div><div class="mgStatus" id="bs">Daire büyürken bas, küçülürken bırak</div>' +
-    '<button class="mgBig" id="bb" style="touch-action:none">BASILI TUT</button>';
-  var btn = document.getElementById("bb"), c = document.getElementById("bc");
-  btn.oncontextmenu = function (ev) { ev.preventDefault(); };
-  btn.onpointerdown = function (ev) { ev.preventDefault(); holding = true; if (!t0) t0 = performance.now(); try { btn.setPointerCapture(ev.pointerId); } catch (e) {} };
-  btn.onpointerup = btn.onpointercancel = function () { holding = false; };
-  var last = 0;
-  function tick(now) {
-    if (t0) {
-      var el = now - t0, ph = (el % cyc) / cyc, grow = ph < 0.5, s = grow ? 0.55 + ph * 1.3 : 1.2 - (ph - 0.5) * 1.3;
-      c.style.transform = "scale(" + s.toFixed(3) + ")"; c.classList.toggle("in", grow);
-      if (now - last > 50) { last = now; total++; if (holding === grow) good++; }
-      document.getElementById("bs").textContent = (grow ? "Nefes al…" : "Nefes ver…") + " %" + Math.round(100 * good / Math.max(1, total));
-      if (el >= dur) { finishMini((good / total - 0.35) / 0.6); return; }
-    }
-    MG.raf = requestAnimationFrame(tick);
-  }
-  MG.raf = requestAnimationFrame(tick);
-}
-
 /* Denge: kayan şeyin altında tepsiyi tut */
-function mgBalance(st, a, m) {
-  var dur = 6000, tol = 0.1 + a * 0.12, x = 0.5, tx = 0.5, tray = 0.5, inside = 0, last = 0, t0 = 0;
-  st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="blField" id="bf"><div class="blItem" id="bi">' + esc(m.item || "🍵") + '</div><div class="blTray" id="bt"></div></div>' +
-    '<div class="mgStatus" id="bs">Parmağını sürükleyerek tepsiyi altında tut</div>';
-  var f = document.getElementById("bf"), it = document.getElementById("bi"), tr = document.getElementById("bt");
-  f.style.touchAction = "none";
-  function pos(ev) { var r = f.getBoundingClientRect(); tray = clamp((ev.clientX - r.left) / r.width, 0, 1); if (!t0) { t0 = performance.now(); last = t0; } }
-  f.onpointerdown = function (ev) { ev.preventDefault(); try { f.setPointerCapture(ev.pointerId); } catch (e) {} pos(ev); };
-  f.onpointermove = function (ev) { if (ev.buttons || ev.pointerType === "touch") pos(ev); };
-  function tick(now) {
-    if (t0) {
-      var dt = now - last; last = now;
-      if (Math.abs(tx - x) < 0.02) tx = 0.1 + Math.random() * 0.8;
-      x += (tx - x) * (0.018 + (now - t0) / dur * 0.02);
-      var ok = Math.abs(tray - x) < tol; if (ok) inside += dt;
-      it.classList.toggle("bad", !ok);
-      var el = now - t0;
-      document.getElementById("bs").textContent = "Denge %" + Math.round(100 * inside / Math.max(1, el)) + " · " + (Math.max(0, dur - el) / 1000).toFixed(1) + " sn";
-      if (el >= dur) { finishMini(inside / dur * 1.05); return; }
-    }
-    it.style.left = (x * 100) + "%"; tr.style.left = (tray * 100) + "%"; tr.style.width = (tol * 200) + "%";
-    MG.raf = requestAnimationFrame(tick);
-  }
-  MG.raf = requestAnimationFrame(tick);
-}
-
-render();
-
 /* ── Tanıtım: her yeni oyunda sorulur, "?" menüsünden de açılır ── */
 var TUT_STATS = {
   "Akıl": "Düşünmek, hesaplamak, sınav ve plan.",
