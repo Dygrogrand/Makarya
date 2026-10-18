@@ -39,6 +39,7 @@ CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Özellik", "Zorluk", "Kesin etki
            "Aile desteği", "Başarısızlıkta hafıza", "Gereken varlık", "Kazanç kademesi", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap", "Cinsiyet", "Kritik başarıda hafıza", "Başarısızlıkta para kaybı"]
 VO_COLS = ["Olay ID", "Özellik", "Zorluk", "İç ses metni", "Başarısızlık metni", "Seçenek açar"]
 RE_COLS = ["Olay ID", "Hafıza", "Geçmişten metni"]
+VA_COLS = ["Olay ID", "Gereken hafıza", "Başlık", "Olay metni", "Seçim no", "Seçim metni", "Kesin sonuç metni", "Başarı", "Kritik başarı", "Başarısız", "Kritik hata"]
 TR_COLS = ["Rozet", "Açıklama", "Bonus", "Otomatik özellik"]
 FL_COLS = ["Hafıza", "Final kartı etiketi", "Sonraki bölümde", "Bölüm sonu cümlesi"]
 DC_COLS = ["Asgari yaş", "Azami yaş", "Mezar taşı metni", "Gereken hafıza", "Mekân grubu"]
@@ -413,6 +414,28 @@ def read_xlsx(path):
         if r["Başarısızlık metni"]: v["fail"] = str(r["Başarısızlık metni"])
         if yes(r["Seçenek açar"]): v["opens"] = True
         e["voices"].append(v)
+    if "Varyantlar" in wb.sheetnames:
+        for i, r in rows("Varyantlar", VA_COLS):
+            e = evmap.get(str(r["Olay ID"]))
+            where = f"Varyantlar satır {i}"
+            if not e: errs.append(f"{where}: Olay ID yok"); continue
+            fl = [x.strip() for x in str(r["Gereken hafıza"]).split(",") if x.strip()]
+            if not fl: errs.append(f"{where}: 'Gereken hafıza' boş"); continue
+            vs = e.setdefault("variants", [])
+            v = next((x for x in vs if x["flags"] == fl), None)
+            if v is None: v = {"flags": fl}; vs.append(v)
+            if r["Başlık"]: v["title"] = str(r["Başlık"])
+            if r["Olay metni"]: v["text"] = str(r["Olay metni"])
+            if r["Seçim no"] not in ("", None):
+                n = int(float(r["Seçim no"]))
+                if not 1 <= n <= len(e["choices"]): errs.append(f"{where}: seçim no yok"); continue
+                base = e["choices"][n - 1]; cv = v.setdefault("ch", {}).setdefault(str(n), {})
+                if r["Seçim metni"]: cv["t"] = str(r["Seçim metni"])
+                if base.get("direct") is not None or isinstance(base.get("r"), str):
+                    if r["Kesin sonuç metni"]: cv["r"] = str(r["Kesin sonuç metni"])
+                else:
+                    rr = {k: str(r[col]) for k, col in (("win", "Başarı"), ("crit", "Kritik başarı"), ("fail", "Başarısız"), ("bad", "Kritik hata")) if r[col]}
+                    if rr: cv["r"] = {**cv.get("r", {}), **rr}
     for i, r in rows("Geçmişten", RE_COLS):
         e = evmap.get(str(r["Olay ID"]))
         if not e: errs.append(f"Geçmişten satır {i}: Olay ID yok"); continue

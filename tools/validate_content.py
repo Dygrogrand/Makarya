@@ -60,7 +60,7 @@ def strings(o):
     elif isinstance(o, list):
         for v in o: yield from strings(v)
 
-HATS = ["memur", "beyazyaka", "esnaf", "serbest", "polis", "yargi", "hekim", "politika", "cete", "dolandirici", "sohret", "girisimci", "goc", "koy", "usta"]
+HATS = ["memur", "beyazyaka", "esnaf", "serbest", "polis", "yargi", "hekim", "politika", "cete", "dolandirici", "sohret", "girisimci", "goc", "koy", "usta", "avukat", "muhendis", "ogretmen"]
 
 def x_neg(val, f):
     return ("-" + f) in [x.strip() for x in str(val or "").split(",")]
@@ -119,6 +119,8 @@ def main(paths):
         for v in e.get("voices", []):
             if v.get("stat") not in STATS or v.get("diff") not in VOICE_DIFFS or not v.get("text"): errs.append(f"{where}: iç ses hatalı {v}")
             if v.get("opens"): voice_open.add(v.get("stat"))
+        for vv in e.get("variants", []):
+            for f_ in vv.get("flags", []): reqs.append((where, f_))
         for r in e.get("recall", []):
             if not r.get("flag") or not r.get("text"): errs.append(f"{where}: recall hatalı")
             reqs.append((where, r.get("flag")))

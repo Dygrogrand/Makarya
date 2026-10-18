@@ -89,7 +89,27 @@ function setEndAge(S, plan) {
 function eventAge(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge + " yaş" : S.krizAt && S.krizAt.id === e.id ? S.krizAt.age : e.age; }
 function ageYears(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge : evM(S, e) / 12; }
 function hasChapter(ch) { return !!CHAPTERS[ch] && EVENTS.some(function (e) { return e.ch === ch; }); }
-function curEvent(S) { return EV_BY_ID[S.plan[S.pi]]; }
+function curEvent(S) { var e = EV_BY_ID[S.plan[S.pi]]; return e && e.variants ? withVariant(S, e) : e; }
+/* Aynı olay, oyuncunun geçmişine göre farklı başlık/metin/seçim ifadesiyle gösterilir (ilk eşleşen varyant). Zar, bayrak ve zincirler aynı kalır. */
+function withVariant(S, e) {
+  var v = null;
+  for (var i = 0; i < e.variants.length; i++) if (e.variants[i].flags.every(function (f) { return S.flags.indexOf(f) >= 0; })) { v = e.variants[i]; break; }
+  if (!v) return e;
+  if (!v._e) {
+    var o = Object.assign({}, e); delete o.variants;
+    if (v.title) o.title = v.title;
+    if (v.text) o.text = v.text;
+    o.choices = e.choices.map(function (c, i) {
+      var cv = v.ch && v.ch[i + 1]; if (!cv) return c;
+      var n = Object.assign({}, c);
+      if (cv.t) n.t = cv.t;
+      if (cv.r != null) n.r = typeof cv.r === "string" ? cv.r : Object.assign({}, c.r, cv.r);
+      return n;
+    });
+    v._e = o;
+  }
+  return v._e;
+}
 
 /* Kavşağın sonucu tek bir yol adıyla: "İyi bir lise", "Okulu bıraktı", "Esnaf oldu" */
 function kavsakPath(e, c, outcome) {
