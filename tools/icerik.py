@@ -30,13 +30,13 @@ EV_COLS = ["Olay ID", "Bölüm", "Yaş", "Simge", "Başlık", "Olay metni", "Mek
            "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Herhangi biri hafıza", "Hat"]
 # Sonradan eklenen sütunlar: eski Excel dosyalarında yoksa hata verilmez, boş sayılır
 OPTIONAL_COLS = {"Bölüm sonu cümlesi", "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Aile desteği", "Başarısızlıkta hafıza", "Sonraki bölümde",
-                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap", "Cinsiyet", "Mekân grubu"}
+                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap", "Cinsiyet", "Mekân grubu", "Kritik başarıda hafıza"}
 CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Özellik", "Zorluk", "Kesin etki", "Kesin sonuç metni",
            "Başarı", "Kritik başarı", "Başarısız", "Kritik hata", "Yarım (mini oyun)",
            "Mini oyun", "Mini oyun başlığı", "Mini oyun ipucu", "Mini oyun ayarı",
            "Gereken rozet", "Gereken hafıza", "İç ses açar", "Kazandırdığı rozet",
            "Seçince hafıza", "Başarıda hafıza", "Kritik hatada hafıza", "Silinen hafıza", "Ölüm riski %", "Ölüm sebebi",
-           "Aile desteği", "Başarısızlıkta hafıza", "Gereken varlık", "Kazanç kademesi", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap", "Cinsiyet"]
+           "Aile desteği", "Başarısızlıkta hafıza", "Gereken varlık", "Kazanç kademesi", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap", "Cinsiyet", "Kritik başarıda hafıza"]
 VO_COLS = ["Olay ID", "Özellik", "Zorluk", "İç ses metni", "Başarısızlık metni", "Seçenek açar"]
 RE_COLS = ["Olay ID", "Hafıza", "Geçmişten metni"]
 TR_COLS = ["Rozet", "Açıklama", "Bonus", "Otomatik özellik"]
@@ -222,7 +222,7 @@ def write_xlsx(b, path):
                             (round(rk["p"] * 100, 2) if rk else ""), rk.get("cause", ""),
                             fmt_destek(c.get("destek")), c.get("flagFail", ""),
                             TIERS[c["reqVarlik"]] if c.get("reqVarlik") is not None else "", TIERS[c["varlik"]] if c.get("varlik") is not None else "",
-                            DESTEK_TR[c["reqDestek"]] if c.get("reqDestek") is not None else "", c.get("varlikKayip", ""), c.get("reqNotFlag", ""), ", ".join(f"{k} {v}" for k, v in (c.get("reqStat") or {}).items()), c.get("lakap", ""), {"erkek": "erkek", "kiz": "kız"}.get(c.get("reqGender", ""), "")])
+                            DESTEK_TR[c["reqDestek"]] if c.get("reqDestek") is not None else "", c.get("varlikKayip", ""), c.get("reqNotFlag", ""), ", ".join(f"{k} {v}" for k, v in (c.get("reqStat") or {}).items()), c.get("lakap", ""), {"erkek": "erkek", "kiz": "kız"}.get(c.get("reqGender", ""), ""), c.get("flagCrit", "")])
         for v in e.get("voices", []):
             rows_vo.append([e["id"], v["stat"], DIFF_TR[v["diff"]], v["text"], v.get("fail", ""), "E" if v.get("opens") else ""])
         for rc in e.get("recall", []):
@@ -367,7 +367,7 @@ def read_xlsx(path):
                 except Exception: errs.append(f"{where}: 'Mini oyun ayarı' okunamadı (JSON biçiminde olmalı)")
             c["mini"] = m
         for key, col in [("req", "Gereken rozet"), ("reqFlag", "Gereken hafıza"), ("reqVoice", "İç ses açar"), ("trait", "Kazandırdığı rozet"),
-                         ("flag", "Seçince hafıza"), ("flagWin", "Başarıda hafıza"), ("flagBad", "Kritik hatada hafıza"), ("unflag", "Silinen hafıza")]:
+                         ("flag", "Seçince hafıza"), ("flagWin", "Başarıda hafıza"), ("flagBad", "Kritik hatada hafıza"), ("flagCrit", "Kritik başarıda hafıza"), ("unflag", "Silinen hafıza")]:
             if r[col]: c[key] = str(r[col])
         if r["Aile desteği"]:
             try: c["destek"] = parse_destek(r["Aile desteği"], where)

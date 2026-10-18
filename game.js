@@ -298,15 +298,18 @@ function bondLine(e, recallHtml) {
   S.bondAt[e.id] = out; save();
   return out === "-" ? "" : out;
 }
+/* Gerekçesi oyuncuya açıkça gösterilen kapılar (gizlenmez, kilitli görünür) */
+var LOCK_FLAG_WHY = { "sinav-iyi": "Sınav puanın buna yetmedi: derece gerekir" };
 function lockedWhy(S, c, e) {
   if (c.reqGender && c.reqGender !== S.gender) return "";
   if (c.reqVoice) return "";
   if (c.reqNotFlag && flagList(c.reqNotFlag).some(function (f) { return S.flags.indexOf(f) >= 0; })) return "";
   /* hat ve meslek hafızaları kimliktir, kapı değil: başka hatların seçenekleri hiç görünmez */
+  if (c.reqFlag && S.flags.indexOf(c.reqFlag) < 0 && LOCK_FLAG_WHY[c.reqFlag]) return LOCK_FLAG_WHY[c.reqFlag];
   if (c.reqFlag && S.flags.indexOf(c.reqFlag) < 0) return e.kavsak && !/^(hat|meslek)-/.test(c.reqFlag) && c.reqFlag !== "evli" ? "Geçmişinde bu kapıyı açacak bir şey yok." : "";
   if (c.reqDestek != null && destekOf(S) < c.reqDestek) return e.kavsak ? "Ailen bu konuda arkanda değil." : "";
-  for (var rs in (c.reqStat || {})) if (S.stats[rs] < c.reqStat[rs]) return e.kavsak ? (rs === "İtibar" ? "İtibarın buna yetmiyor." : rs + " yetmiyor.") : "";
-  if (c.reqVarlik != null && varlikOf(S) < c.reqVarlik) return e.kavsak ? "Cebin buna yetmiyor." : "";
+  for (var rs in (c.reqStat || {})) if (S.stats[rs] < c.reqStat[rs]) return "Minimum " + rs + " sağlanmadı (şu an " + S.stats[rs] + ", gerekli " + c.reqStat[rs] + ")";
+  if (c.reqVarlik != null && varlikOf(S) < c.reqVarlik) return "Maddi durum yetmiyor (şu an " + TIERS[varlikOf(S)] + ", gerekli " + TIERS[c.reqVarlik] + ")";
   if (c.req && S.traits.indexOf(c.req) < 0) return "Bu seçenek için rozet gerekir: " + c.req;
   return "";
 }

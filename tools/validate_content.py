@@ -157,7 +157,7 @@ def main(paths):
             if c.get("reqFlag"): reqs.append((cw, c["reqFlag"]))
             if c.get("reqVoice") and c["reqVoice"] not in voice_open: errs.append(f"{cw}: reqVoice için 'opens: true' iç ses yok")
             if c.get("trait"): flags_set.add("trait:" + c["trait"])
-            for k in ["flag", "flagWin", "flagBad", "flagFail", "unflag"]:
+            for k in ["flag", "flagWin", "flagCrit", "flagBad", "flagFail", "unflag"]:
                 for f_ in [x.strip().lstrip("-") for x in str(c.get(k) or "").split(",") if x.strip()]:
                     if not FLAG.match(f_): errs.append(f"{cw}: {k} biçimi hatalı")
                     if k != "unflag" and not x_neg(c.get(k), f_): flags_set.add(f_)

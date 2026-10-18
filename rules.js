@@ -312,6 +312,7 @@ function applyOutcome(S, e, c, outcome, extra) {
     else if (outcome === "bad") addStat(S, c.stat, -d.loss, res);
     if (success) {
       addFlag(S, c.flagWin);
+      if (outcome === "crit") addFlag(S, c.flagCrit);
       gainTrait(S, c.trait, res);
       gainVarlik(S, c, res);
       if (!c.trait && (outcome === "crit" || c.diff === "hard" || c.diff === "veryHard")) gainTrait(S, AUTO_TRAITS[c.stat], res);
