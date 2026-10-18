@@ -459,3 +459,4 @@ button:disabled{cursor:default}
 .langRow{justify-content:center;gap:8px;margin-top:10px}.langRow .secondary{flex:0 0 auto;min-width:56px}.langRow .secondary.on{outline:2px solid currentColor;font-weight:700}
 .hud{flex:0 0 auto;display:flex;flex-wrap:wrap;justify-content:center;gap:2px 12px;background:#1a1714;color:#e9e1d3;font-size:12px;padding:5px 8px;border-top:1px solid #2a2622}.hud span{white-space:nowrap}
 .hud{cursor:pointer}.hud:active{background:#2a2622}
+.topbar{flex:0 0 34px;grid-template-columns:26px 1fr 26px;padding:0 10px}.brandWord{font-size:15px}.topBtn{width:24px;height:24px;font-size:13px;border-color:rgba(255,255,255,.25)}.hud{border-top:0;padding:2px 8px 6px}

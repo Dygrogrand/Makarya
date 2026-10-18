@@ -35,10 +35,10 @@ function imgFail(el) {
 }
 function art(srcs, icon, kicker, title, text, tall) {
   return '<div class="art' + (tall ? " tall" : "") + '"><div class="artIcon">' + icon + "</div>" + imgTag(srcs) +
-    '<div class="artCaption"><div class="artMeta">' + esc(kicker) + "</div><h1>" + esc(title) + "</h1>" + (text ? "<p>" + esc(text) + "</p>" : "") + "</div></div>";
+    '<div class="artCaption">' + (kicker ? '<div class="artMeta">' + esc(kicker) + "</div>" : "") + "<h1>" + esc(title) + "</h1>" + (text ? "<p>" + esc(text) + "</p>" : "") + "</div></div>";
 }
 function topbar(title) {
-  return '<div class="topbar"><button class="topBtn" onclick="showCharacter()" aria-label="Karakter">☻</button><div class="brandWord">' + esc(title) +
+  return '<div class="topbar"><span></span><div class="brandWord">' + esc(title) +
     '</div><button class="topBtn" onclick="showRules()" aria-label="Kurallar">?</button></div>' +
     hudBar() + '<div class="progress"><i style="width:' + (S.plan && S.plan.length ? Math.round(100 * S.pi / S.plan.length) : 0) + '%"></i></div>';
 }
@@ -292,7 +292,7 @@ function renderEvent() {
     }
     return choiceCard(e, c, idx);
   }).join("");
-  shell(chTitle(e.ch), e.kavsak ? kavsakHead(e) : art(sceneSrcs(e.id), e.icon, "Bölüm " + ROMAN[e.ch] + " · " + eventAge(S, e), e.title, e.text), karne + recall + bond + voices + famLine + choices);
+  shell(chTitle(e.ch), e.kavsak ? kavsakHead(e) : art(sceneSrcs(e.id), e.icon, "", e.title, e.text), karne + recall + bond + voices + famLine + choices);
 }
 /* Karakter bağı: olayın türüne uyan, daha önce yaşanmış bir hafızayı kısa bir satırla hatırlatır (aynı hafıza hayatta en çok iki kez). */
 var BOND = {
