@@ -489,3 +489,17 @@ button:disabled{cursor:default}
 .curFrame{position:relative;z-index:1;flex:0 0 auto;width:100%;aspect-ratio:3/2;box-shadow:0 10px 28px rgba(0,0,0,.55)}
 .curFrame .curImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .curCap{position:relative;left:auto;right:auto;bottom:auto;padding:18px 18px 76px;z-index:1}
+
+/* Perdede bağlam bölümü: çizgiyle ayrılmış, koyu zeminde okunur */
+.curRule{display:flex;align-items:center;gap:10px;margin:18px 0 10px;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;text-shadow:none}
+.curRule:before,.curRule:after{content:"";height:1px;background:linear-gradient(90deg,transparent,var(--gold));flex:1}
+.curRule:after{background:linear-gradient(270deg,transparent,var(--gold))}
+.curCtx{display:flex;flex-direction:column;gap:8px;text-shadow:none}
+.curCtx .recall,.curCtx .voice{background:rgba(255,255,255,.10);color:#f3e7d4;border-radius:0 10px 10px 0;font-style:normal;font-size:14px}
+.curCtx .recall{border-left-color:var(--gold)}.curCtx .recall b{color:#f1c565}
+.curCtx .voice b{filter:brightness(1.5)}.curCtx .voice b i{color:#d9cdb8}
+.curCtx .voice.off{opacity:.7}
+.curCtx .famLine{color:#e8dcc6;font-size:13.5px}
+/* Bölüm sonu 'Unutulmayan anlar' alt başlığı okunur */
+.chEnd .logList .logItem small{color:var(--muted)}
+.chEnd .compare .logItem small,.chEnd .logItem small{color:#6c5f4d!important}

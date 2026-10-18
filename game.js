@@ -284,20 +284,20 @@ var CURTAIN_KEY = null, CURTAIN_PEND = null;
 function curtainOff() { try { return localStorage.getItem("makarya-perde") === "0"; } catch (x) { return false; } }
 function toggleCurtain() { try { localStorage.setItem("makarya-perde", curtainOff() ? "1" : "0"); } catch (x) {} render(); }
 function openScene() { CURTAIN_KEY = CURTAIN_PEND; render(); }
+function curCtx(e) {
+  var X = eventCtx(e), body = X.karne + X.recall + X.bond + X.voices + X.famLine;
+  return body ? '<div class="curRule"><span>Bu sahnede seni etkileyenler</span></div><div class="curCtx">' + body + "</div>" : "";
+}
 function renderCurtain(e, ck) {
   CURTAIN_PEND = ck;
   var src = sceneSrcs(e.id);
   app.innerHTML = '<div class="screen curtain">' + topbar(chTitle(e.ch)) +
     '<div class="curtainArt" onclick="openScene()">' + imgTag(src, "curBg") +
     '<div class="curFrame"><div class="artIcon">' + e.icon + "</div>" + imgTag(src, "curImg") + "</div>" +
-    '<div class="curCap"><h1>' + esc(e.title) + "</h1><p>" + esc(e.text) + "</p></div>" +
+    '<div class="curCap"><h1>' + esc(e.title) + "</h1><p>" + esc(e.text) + "</p>" + curCtx(e) + "</div>" +
     '<button class="curNext" onclick="event.stopPropagation();openScene()">' + T("Devam") + " ›</button></div></div>";
 }
-function renderEvent() {
-  var e = curEvent(S);
-  if (e.kavsak && S.gateFor !== e.id) return renderGate(e);
-  var ck = S.ch + "|" + S.pi + "|" + e.id;
-  if (!e.kavsak && !curtainOff() && CURTAIN_KEY !== ck) return renderCurtain(e, ck);
+function eventCtx(e) {
   /* Aynı hafızayı açan bir seçenek kartta zaten gösteriliyorsa yukarıdaki "Geçmişten" kutusu tekrar etmesin */
   var shownFlags = e.choices.filter(function (c) { return c.reqFlag && hasReq(S, c, e); }).map(function (c) { return c.reqFlag; });
   var recall = (e.recall || []).filter(function (r) { return S.flags.indexOf(r.flag) >= 0 && shownFlags.indexOf(r.flag) < 0; })
@@ -314,6 +314,14 @@ function renderEvent() {
   }
   var bond = bondLine(e, recall);
   var famLine = e.fam && S.family ? '<div class="famLine"><span>🏠</span><span>' + esc(FAMILIES[S.family].lines[e.fam]) + "</span></div>" : "";
+  return { karne: karne, recall: recall, bond: bond, voices: voices, famLine: famLine };
+}
+function renderEvent() {
+  var e = curEvent(S);
+  if (e.kavsak && S.gateFor !== e.id) return renderGate(e);
+  var ck = S.ch + "|" + S.pi + "|" + e.id;
+  if (!e.kavsak && !curtainOff() && CURTAIN_KEY !== ck) return renderCurtain(e, ck);
+  var X = eventCtx(e), karne = X.karne, recall = X.recall, bond = X.bond, voices = X.voices, famLine = X.famLine;
   var choices = e.choices.map(function (c, idx) {
     if (!hasReq(S, c, e)) {
       /* Sürpriz politikası: geçmişe bağlı kapılar yalnızca kavşakta, belirsiz bir gerekçeyle kilitli görünür */
