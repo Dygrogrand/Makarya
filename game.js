@@ -60,17 +60,18 @@ function renderStart() {
   var sv = loadSave(), saveHtml = "";
   if (sv) {
     var e = EV_BY_ID[sv.plan[Math.min(sv.pi, sv.plan.length - 1)]];
-    saveHtml = '<div class="saveCard"><div><b>Kaldığın yer</b><small>' + esc(sv.family) + " ailesi · " + esc(eventAge(sv, e)) + " · " + esc(e.title) +
-      '</small></div><button onclick="resume()">DEVAM ET</button></div>';
+    saveHtml = '<div class="saveCard"><div><b>' + T("Kaldığın yer") + '</b><small>' + esc(sv.family) + " ailesi · " + esc(eventAge(sv, e)) + " · " + esc(e.title) +
+      '</small></div><button onclick="resume()">' + T("DEVAM ET") + '</button></div>';
   }
-  shell("Makarya", art(["img/baslangic.webp"], "🌇", "HAYAT ZARI", "Makarya", "Aynı şehir, birbirinden çok farklı hayatlar.", true),
-    '<div class="sectionTitle">Bir hayat başlıyor.</div>' +
-    '<div class="sectionSub">Hayatındaki pek çok şeyi seçemeyeceksin. Ama bu kez bazı cevapları sen vereceksin.</div>' + saveHtml +
+  shell("Makarya", art(["img/baslangic.webp"], "🌇", "HAYAT ZARI", "Makarya", T("Aynı şehir, birbirinden çok farklı hayatlar."), true),
+    '<div class="sectionTitle">' + T("Bir hayat başlıyor.") + '</div>' +
+    '<div class="sectionSub">' + T("Hayatındaki pek çok şeyi seçemeyeceksin. Ama bu kez bazı cevapları sen vereceksin.") + '</div>' + saveHtml +
     '<div class="genderRow"><button class="genderBtn kiz soon" disabled><span>👧</span> Kız<em>Yakında</em></button>' +
     '<button class="genderBtn erkek" onclick="startGame(\'erkek\')"><span>👦</span> Erkek</button></div>' +
-    '<div class="row"><button class="secondary" onclick="showTutorial()">Nasıl oynanır?</button>' +
+    '<div class="row"><button class="secondary" onclick="showTutorial()">' + T("Nasıl oynanır?") + '</button>' +
     (loadMeta().lives ? '<button class="secondary" onclick="showGraveyard()">🪦 Koleksiyon</button>' : "") + "</div>" +
-    '<div class="muted">Kız karakterin hikâyesi hazırlanıyor.</div>');
+    '<div class="muted">Kız karakterin hikâyesi hazırlanıyor.</div>' +
+    '<div class="row langRow"><button class="secondary' + (LANG === "tr" ? " on" : "") + '" onclick="setLang(\'tr\')">TR</button><button class="secondary' + (LANG === "en" ? " on" : "") + '" onclick="setLang(\'en\')">EN</button></div>');
 }
 function resume() {
   var sv = loadSave(); if (!sv) return; S = sv; CUR = null;
@@ -485,7 +486,7 @@ function doorsHtml() {
 function lifeLog() {
   return S.flags.filter(function (f) { return FLAG_LABELS[f]; }).map(function (f) { return '<div class="logItem">📜 ' + esc(FLAG_LABELS[f]) + "</div>"; }).join("") + highlights(null, 4);
 }
-function lifeAge() { return S.dead ? S.dead.age : S.ch === 10 && S.endAge ? S.endAge + " yaş" : CHAPTERS[S.ch].endAge.toLowerCase(); }
+function lifeAge() { return S.dead ? S.dead.age : S.ch === 10 && S.endAge ? ageDisp(S.endAge + " yaş") : CHAPTERS[S.ch].endAge.toLowerCase(); }
 function recordLife() {
   if (S.recorded) return; S.recorded = true;
   var m = loadMeta(), a = archetype(S);

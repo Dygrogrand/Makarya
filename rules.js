@@ -103,7 +103,7 @@ function setEndAge(S, plan) {
   plan.forEach(function (id) { if (id !== "son-soz") last = Math.max(last, EV_BY_ID[id]._m); });
   S.endAge = Math.floor(last / 12) + 1 + Math.floor(Math.random() * 5);
 }
-function eventAge(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge + " yaş" : S.krizAt && S.krizAt.id === e.id ? S.krizAt.age : e.age; }
+function eventAge(S, e) { return ageDisp(e.id === "son-soz" && S.endAge ? S.endAge + " yaş" : S.krizAt && S.krizAt.id === e.id ? S.krizAt.age : e.age); }
 function ageYears(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge : evM(S, e) / 12; }
 function hasChapter(ch) { return !!CHAPTERS[ch] && EVENTS.some(function (e) { return e.ch === ch; }); }
 function curEvent(S) { var e = EV_BY_ID[S.plan[S.pi]]; return e && e.variants ? withVariant(S, e) : e; }

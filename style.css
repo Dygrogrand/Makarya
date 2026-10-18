@@ -455,3 +455,5 @@ button:disabled{cursor:default}
 .chEnd .compare,.chEnd .logList,.chEnd .logList .logItem small{color:#f3e7d4}
 .chEnd .compare{border-color:rgba(243,231,212,.25)}
 .chEnd .compare .up{color:#8fd1a8}.chEnd .compare .down{color:#f4a897}
+
+.langRow{justify-content:center;gap:8px;margin-top:10px}.langRow .secondary{flex:0 0 auto;min-width:56px}.langRow .secondary.on{outline:2px solid currentColor;font-weight:700}
