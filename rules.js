@@ -159,13 +159,15 @@ function itibarLevel(S, ch) {
   var d = S.stats["İtibar"] - CHAPTERS[ch || S.ch].expected;
   return d >= ITIBAR_HIGH ? 1 : d <= ITIBAR_LOW ? -1 : 0;
 }
-/* Bölüm sonu: yüksek itibar küs aileyle barıştırır, düşük itibar aile desteğini aşındırır (Bölüm III'ten itibaren) */
+/* Bölüm sonu: yüksek itibar ilgisiz aileyi yeniden yakınlaştırır, düşük itibar aile desteğini aşındırır (Bölüm III'ten itibaren) */
 function closeChapter(S) {
   S.itibarNote = S.itibarNote || {};
   if (S.itibarNote[S.ch] !== undefined || S.ch < 3 || !S.family) return S.itibarNote[S.ch];
   var lv = itibarLevel(S), gl = gonulLevel(S), d0 = destekOf(S), note = 0, sum = lv + gl;
+  /* Aile desteği yalnızca ailenin hoşuna gitmeyen bir seçim yapıldıysa düşer; yalnızca düşük değerler yetmez */
+  var disliked = ((S.destekNeg || {})[S.ch] || 0) > 0;
   if (sum > 0 && d0 < 2) { S.destek = d0 + 1; note = 1; }
-  else if (sum < 0 && d0 > 0) { S.destek = d0 - 1; note = -1; }
+  else if (sum < 0 && d0 > 0 && disliked) { S.destek = d0 - 1; note = -1; }
   S.itibarNote[S.ch] = note;
   S.destekWhy = S.destekWhy || {}; S.destekWhy[S.ch] = lv && gl ? "ikisi" : gl ? "gonul" : "itibar";
   /* Borç faizi: ödenmemiş borç maddi durumu aşındırır (en çok iki kez) */
@@ -174,7 +176,7 @@ function closeChapter(S) {
   return note;
 }
 function destekOf(S) { return S.destek == null ? 2 : S.destek; }
-/* Aile desteği azaldıkça ailenin İYİ yönleri zayıflar (Tam %100, Mesafeli %60, Küs %25); kötü yönler aynen sürer */
+/* Aile desteği azaldıkça ailenin İYİ yönleri zayıflar (Tam %100, Mesafeli %60, İlgisiz %25); kötü yönler aynen sürer */
 var DESTEK_ETKI = [0.25, 0.6, 1];
 function sgn(v) { return v > 0 ? "+" + v : String(v); }
 function famScale(S, v) { return v > 0 ? Math.round(v * DESTEK_ETKI[destekOf(S)]) : v; }
@@ -224,7 +226,7 @@ var PASSIVE = { easy: -3, medium: 1, hard: 5, veryHard: 9 };
 /* İç seslerin karakteri: kart üstünde özellik adının yanında küçük etiket */
 var VOICE_CHAR = { "Akıl": "ukala öğretmen", "Çene": "pazarcı", "Kurnazlık": "eski tüfek", "Cesaret": "asker dayı", "Pişkinlik": "sunucu", "İtibar": "mahalle muhtarı", "Gönül": "âşık", "Dayanıklılık": "maratoncu komşu", "Sosyal Radar": "dedikoducu teyze" };
 /* Aile desteği ve varlık kademelerinin tek satırlık hali */
-var DESTEK_ALT = { "Küs": "Bayramda aranmadın.", "Mesafeli": "Sadece aile grubunda görüşüyorsunuz.", "Tam": "Pazar yemeği sende." };
+var DESTEK_ALT = { "İlgisiz": "Bayramda aranmadın.", "Mesafeli": "Sadece aile grubunda görüşüyorsunuz.", "Tam": "Pazar yemeği sende." };
 var TIER_ALT = { "Borç içinde": "Ay sonu zor.", "Fakir": "İdare eder, ama güç bela.", "Orta": "Ne eksik ne fazla.", "Rahat": "Hali vakti yerinde.", "Zengin": "Köşeyi dönmüş." };
 /* Bölüm sonu: babaannenin ağzından, bu bölümde açılan hafızalara göre */
 var NINE_SABLON = { kediSuclu: "“İki yaşında kediyi mahkûm ettirdi.”", ilkKelimePara: "“İlk kelimesi ‘para’ oldu; deden cüzdanını o gün çıkardı.”", yalanci: "“Duvara güneş çizdi, suçu kuzenine attı.”", yapiskan: "“Kreş kapısında bacak bırakmadı; bizde de öyleydi.”", kardesli: "“Kardeşi geldi; ilk gün hediyeleri saydı.”", sirVerdi: "“Kreşte bir sır duydu, akşama bütün kreş duydu.”", cesurPark: "“Parktaki koca çocuğa ‘Burası herkesin!’ dedi.”", "mahalle-cocugu": "“Sokaktan eve girmedi.”", "ekran-cocugu": "“Tableti benden iyi kullanır.”", "alcili-kol": "“Dut ağacına çıktı, kolu alçıyla döndü; alçıyı bütün sınıf imzaladı.”", tepsiTekeli: "“Mahallenin bütün tepsileri bir kış onda kaldı.”", baskan: "“Sınıf başkanı oldu; evde de seçim yaptırdı.”", kediGeldi: "“Eve kedi getirdi; kedi hâlâ burada, kendisi gitti.”", camKirildi: "“Komşunun camını kırdı; cam değişti, komşu değişmedi.”", "iyi-lise": "“Sınavı kazandı; mahallede üç gün baklava dağıttık.”", lakapli: "“Ortaokulda taktıkları ad liseye kadar gitti.”", evli: "“Evlendi; takı defterini ben tuttum.”", cocuklu: "“Çocuğu oldu; ilk gece ben uyumadım.”", hapis: "“Bir süre uzaktaydı. Sormayın.”", "askerlik-yapti": "“Askere gitti; mektupları hâlâ bende.”", "ev-sahibi": "“Ev aldı; ilk pazar yemeğini orada yedik.”" };
@@ -354,15 +356,19 @@ function addStat(S, k, v, res) {
 }
 
 /* Seçimin sonucunu uygula. outcome: direct | crit | win | mid | fail | bad */
+/* Para kazandıran iş olayları: bunlardan biri yaşanmadan ilk maaş/zarf olayı gelmez */
+var WORK_EV = ["b5-yaz-isi-garson", "b5-kurye-isi", "b5-ozel-ders", "b5-cay-ocagi", "b5-sanayi-ciragi", "b5-atolye-staji"];
 function applyOutcome(S, e, c, outcome, extra) {
   var res = { outcome: outcome, deltas: [], traits: [], note: "", text: "" };
   extra = extra || {};
   if (e.kavsak) { S.kavsak = S.kavsak || []; if (S.kavsak.indexOf(e.kavsak) < 0) S.kavsak.push(e.kavsak); }
   var wasHapis = S.flags.indexOf("hapis") >= 0, v00 = varlikOf(S), d00 = destekOf(S);
   addFlag(S, c.flag);
+  if (WORK_EV.indexOf(e.id) >= 0) addFlag(S, "yaz-calisti");
   if (c.unflag) { var un = flagList(c.unflag); S.flags = S.flags.filter(function (f) { return un.indexOf(f) < 0; }); }
   /* Aile desteği: seçimin kendisi aileyi etkiler (her seçim bir vazgeçiş) */
   var dd = destekDelta(S, c);
+  if (dd < 0) { S.destekNeg = S.destekNeg || {}; S.destekNeg[S.ch] = (S.destekNeg[S.ch] || 0) + 1; }
   if (dd) { var d0 = destekOf(S); S.destek = clamp(d0 + dd, 0, 2); if (S.destek !== d0) res.destek = S.destek - d0; }
   if (outcome === "direct") {
     for (var k in (c.direct || {})) addStat(S, k, c.direct[k], res);

@@ -16,7 +16,7 @@ var DIFF = {
 
 /* Varlık kademeleri ve aile desteği (aile yalnızca başlangıç kademesini belirler) */
 var TIERS = ["Borç içinde", "Fakir", "Orta", "Rahat", "Zengin"];
-var DESTEK = ["Küs", "Mesafeli", "Tam"];
+var DESTEK = ["İlgisiz", "Mesafeli", "Tam"];
 var FAMILIES = {
   "Yalçın": {
     tier: 1, slug: "yalcin", subtitle: "Tek gelirli, dayanışmacı alt-orta sınıf ev",

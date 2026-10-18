@@ -35,7 +35,7 @@ for f in LAB:
     mark(read_f, f, "etiket")
 BUILTIN = {"hapis"}  # motorun kendi yazdığı hafızalar
 # 1) okunan ama hiç yazılmayan hafıza: olay asla açılmaz
-ENGINE = {"universitesiz", "hapis", "eski-hukumlu"}
+ENGINE = {"universitesiz", "hapis", "eski-hukumlu", "yaz-calisti"}
 for f, who in read_f.items():
     if f not in set_f and f not in ENGINE and who != ["etiket"] and not f.startswith("hat-") or (f.startswith("hat-") and f not in set_f and who != ["etiket"]):
         real = [w for w in who if w != "etiket"]
