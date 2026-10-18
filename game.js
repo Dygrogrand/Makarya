@@ -350,7 +350,7 @@ function renderEvent() {
 }
 /* Karakter bağı: olayın türüne uyan, daha önce yaşanmış bir hafızayı kısa bir satırla hatırlatır (aynı hafıza hayatta en çok iki kez). */
 var BOND = {
-  home: ["kediSuclu", "kediGeldi", "yapiskan", "kardesli", "alcili-kol", "kendi-odasi", "karne-iyi", "karne-kotu"],
+  home: ["kediGeldi", "kardesli", "alcili-kol", "kendi-odasi", "karne-iyi", "karne-kotu"],
   money: ["ilkKelimePara", "teneffus-tuccari", "tepsiTekeli", "oyun-faturasi", "borclu", "taki-defteri", "dijital-paraci"],
   social: ["baskan", "cesurPark", "sirVerdi", "lakapli", "camKirildi", "sokak-yasagi", "mahalle-cocugu", "takim-oyuncusu", "yuruyus-grubu"],
   education: ["fuar-birincisi", "yz-odevci", "dershaneli", "iyi-lise", "karne-iyi", "karne-kotu", "ai-kopyaci", "kariyer-degisti"]
