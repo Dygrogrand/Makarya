@@ -204,3 +204,6 @@ function mgTower(st, a, m) {
   }
   document.getElementById("twBtn").onpointerdown = function (ev) { ev.preventDefault(); drop(); };
 }
+
+/* oyunu başlat */
+render();
