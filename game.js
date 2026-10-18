@@ -18,11 +18,12 @@ function loadMeta() { try { var m = JSON.parse(localStorage.getItem(META_KEY)); 
 function saveMeta(m) { try { localStorage.setItem(META_KEY, JSON.stringify(m)); } catch (e) {} }
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
 
-var IMG_Q = "?i=20261018k"; /* görseller değişince artır: tarayıcı önbelleği eski resmi göstermesin */
+var IMG_Q = "?i=20261018l"; /* görseller değişince artır: tarayıcı önbelleği eski resmi göstermesin */
 function withExt(base) { return [base + ".webp" + IMG_Q, base + ".png" + IMG_Q, base + ".jpg" + IMG_Q]; }
 function sceneSrcs(id) {
   var e = EV_BY_ID[id], out = withExt((S.gender === "kiz" ? "img/kiz/sahne/" : "img/sahne/") + id);
-  return e && e.place ? out.concat(withExt("img/mekan/" + e.place)) : out;
+  out = e && e.place ? out.concat(withExt("img/mekan/" + e.place)) : out;
+  return out.concat(["img/baslangic.webp" + IMG_Q]); /* sahne görseli yoksa boş fon yerine şehir görseli */
 }
 function famSrcs(name) { return withExt((S.gender === "kiz" ? "img/kiz/aile/" : "img/aile/") + FAMILIES[name].slug); }
 function imgTag(srcs, cls) {
