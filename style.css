@@ -461,3 +461,4 @@ button:disabled{cursor:default}
 .hud{cursor:pointer}.hud:active{background:#2a2622}
 .topbar{flex:0 0 34px;grid-template-columns:26px 1fr 26px;padding:0 10px}.brandWord{font-size:15px}.topBtn{width:24px;height:24px;font-size:13px;border-color:rgba(255,255,255,.25)}.hud{border-top:0;padding:2px 8px 6px}
 .chEnd .logList{color:inherit}.chEnd .logItem{color:var(--ink,#241d17)}.chEnd .logItem small{color:var(--muted)}
+.dfCell span{display:block;line-height:1}.dfCell .dfTilt{transform:rotate(-17deg)}.dfCell .dfSmall{transform:scale(.72)}.dfCell .dfFade{opacity:.5}.dfCell .dfDark{filter:brightness(.55)}

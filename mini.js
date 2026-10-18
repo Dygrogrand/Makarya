@@ -90,8 +90,10 @@ function mgDiff(st, a, m) {
   for (var k = 0; k < cells; k++) L.push(set[Math.floor(Math.random() * set.length)]);
   Rr = L.slice();
   while (diffs.length < N) { var p = Math.floor(Math.random() * cells); if (diffs.indexOf(p) < 0) diffs.push(p); }
-  diffs.forEach(function (p) { var o; do { o = set[Math.floor(Math.random() * set.length)]; } while (o === L[p]); Rr[p] = o; });
-  function grid(arr, side) { return '<div class="dfGrid">' + arr.map(function (x, k) { return '<button class="dfCell" data-s="' + side + '" data-k="' + k + '">' + x + "</button>"; }).join("") + "</div>"; }
+  /* Farklı olan hücre başka bir simge değil, AYNI simgenin hafif değişmiş hâli (eğik, küçük, soluk, koyu): göze çarpmaz, dikkatle bakmak gerekir */
+  var VARS = ["dfTilt", "dfSmall", "dfFade", "dfDark"], vmap = {};
+  diffs.forEach(function (p) { vmap[p] = VARS[Math.floor(Math.random() * VARS.length)]; });
+  function grid(arr, side) { return '<div class="dfGrid">' + arr.map(function (x, k) { return '<button class="dfCell" data-s="' + side + '" data-k="' + k + '"><span class="' + (side === "r" && vmap[k] ? vmap[k] : "") + '">' + x + "</span></button>"; }).join("") + "</div>"; }
   st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><div class="dfWrap">' + grid(L, "l") + grid(Rr, "r") + "</div>" + MX_CLOCK +
     '<div class="mgStatus" id="dfs">0 / ' + N + " fark</div>";
   var clk = mxClock(T, function () { fin(); });
