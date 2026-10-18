@@ -8,7 +8,7 @@ function newState() {
   var stats = {};
   STATS.forEach(function (k) { stats[k] = BASE_STAT; });
   return { v: 5, screen: "start", gender: "erkek", family: null, ch: 1, plan: [], pi: 0, stats: stats, famStats: null,
-    traits: [], flags: [], log: [], chStart: {}, chTraits: {}, last: null, lock: null, dead: null, kavsak: [], kavsakLog: [], chFlags: {}, gateFor: null, destek: 2 };
+    traits: [], flags: [], log: [], chStart: {}, chTraits: {}, last: null, lock: null, dead: null, kavsak: [], kavsakLog: [], chFlags: {}, gateFor: null, destek: 2, cash: null };
 }
 
 /* ── Hayat planı: her perdede sabit dönüm noktaları + havuzdan rastgele olaylar ── */
@@ -34,6 +34,8 @@ function eligible(S, e) {
   if (w.flag && S.flags.indexOf(w.flag) < 0) return false;
   if (w.notFlag && S.flags.indexOf(w.notFlag) >= 0) return false;
   for (var k in (w.minStat || {})) if (S.stats[k] < w.minStat[k]) return false;
+  if (w.cashMin != null && varlikOf(S) < w.cashMin) return false;
+  if (w.cashMax != null && varlikOf(S) > w.cashMax) return false;
   return true;
 }
 function pickEvents(S, ch, n, exclude, minM, rnd) {
@@ -48,6 +50,7 @@ function pickEvents(S, ch, n, exclude, minM, rnd) {
 function buildPlan(S, ch, rnd) {
   /* Bölüm VI: üniversiteye gitmeyen (ve ikinci sınavı ya da yurt dışını beklemeyen) herkes çalışma hayatına başlar */
   if (ch === 6 && !["universiteli", "yurtdisi-universite", "mezuna-kaldi"].some(function (f) { return S.flags.indexOf(f) >= 0; })) addFlag(S, "universitesiz");
+  if (ch === 6 && !S.indep) { S.indep = true; if (destekOf(S) < 2) cashChange(S, -1); }
   var plan = pickEvents(S, ch, CHAPTERS[ch].pick, [], 0, rnd);
   S._sig = stateSig(S);
   if (ch === 10) setEndAge(S, plan);
@@ -100,10 +103,10 @@ function kavsakPath(e, c, outcome) {
 /* Kendi kazancın: büyük olaylarda (meslek, göç, miras…) varlık kademesi yükselir; aile desteğinden bağımsızdır */
 function gainVarlik(S, c, res) {
   if (c.varlik == null && !c.varlikKayip) return;
+  res = res || {};
   var v0 = varlikOf(S);
-  if (c.varlik != null) S.own = Math.max(S.own || 0, c.varlik);
-  if (c.varlikKayip) S.own = Math.max(0, (S.own || 0) - c.varlikKayip);
-  if (varlikOf(S) !== v0) res.varlik = varlikOf(S) - v0;
+  if (c.varlik != null && c.varlik > v0) cashChange(S, c.varlik - v0, res);
+  if (c.varlikKayip) cashChange(S, -c.varlikKayip, res);
 }
 /* İtibar: bölümün beklenen stat değerine göre yüksek (+1), normal (0) ya da düşük (-1) */
 var ITIBAR_HIGH = 3, ITIBAR_LOW = -10;
@@ -119,6 +122,9 @@ function closeChapter(S) {
   if (lv > 0 && d0 < 2) { S.destek = d0 + 1; note = 1; }
   else if (lv < 0 && d0 > 0) { S.destek = d0 - 1; note = -1; }
   S.itibarNote[S.ch] = note;
+  /* Borç faizi: ödenmemiş borç maddi durumu aşındırır (en çok iki kez) */
+  S.faizN = S.faizN || 0; S.faizNote = S.faizNote || {};
+  if ((S.flags.indexOf("borclu") >= 0 || S.flags.indexOf("kart-borclu") >= 0) && S.faizN < 2 && varlikOf(S) >= 2) { cashChange(S, -1); S.faizN++; S.faizNote[S.ch] = 1; }
   return note;
 }
 function destekOf(S) { return S.destek == null ? 2 : S.destek; }
@@ -129,14 +135,23 @@ function destekDelta(S, c) {
 }
 /* Görünen varlık: ailenin kademesi desteğe göre (tam = aynı, mesafeli = bir aşağı, küs = hiçbir şey) */
 function varlikOf(S) {
-  var t = S.family ? FAMILIES[S.family].tier : 1, d = destekOf(S);
-  return Math.max(S.own || 0, d === 2 ? t : d === 1 ? t - 1 : 0);
+  if (S.cash == null) { /* eski kayıt: eski kurala göre bir kez hesapla */
+    var t = S.family ? FAMILIES[S.family].tier : 1, d = destekOf(S);
+    S.cash = Math.max(S.own || 0, d === 2 ? t : d === 1 ? t - 1 : 0);
+  }
+  return S.cash;
+}
+/* Maddi durum tek bir kademedir (0–4). Artış ve düşüş oyuncuya gösterilir. */
+function cashChange(S, d, res) {
+  var v0 = varlikOf(S); S.cash = clamp(v0 + d, 0, TIERS.length - 1);
+  if (res && S.cash !== v0) res.varlik = (res.varlik || 0) + (S.cash - v0);
 }
 function applyFamily(S, name) {
   S.family = name;
   var m = FAMILIES[name].mods;
   STATS.forEach(function (k) { S.stats[k] = clamp(S.stats[k] + (m[k] || 0), 0, 100); });
   S.famStats = Object.assign({}, S.stats);
+  S.cash = FAMILIES[name].tier;
 }
 
 function hasReq(S, c, e) {
@@ -160,7 +175,7 @@ var PASSIVE = { easy: -3, medium: 1, hard: 5, veryHard: 9 };
 var VOICE_CHAR = { "Akıl": "ukala öğretmen", "Çene": "pazarcı", "Kurnazlık": "eski tüfek", "Cesaret": "asker dayı", "Pişkinlik": "sunucu", "İtibar": "mahalle muhtarı", "Gönül": "âşık", "Dayanıklılık": "maratoncu komşu", "Sosyal Radar": "dedikoducu teyze" };
 /* Aile desteği ve varlık kademelerinin tek satırlık hali */
 var DESTEK_ALT = { "Küs": "Bayramda aranmadın.", "Mesafeli": "Sadece aile grubunda görüşüyorsunuz.", "Tam": "Pazar yemeği sende." };
-var TIER_ALT = { "Borçlu": "Ay sonu zor.", "Kıt": "İdare eder.", "Orta": "Ne eksik ne fazla.", "Rahat": "Hali vakti yerinde.", "Varlıklı": "Köşeyi dönmüş." };
+var TIER_ALT = { "Borç içinde": "Ay sonu zor.", "Fakir": "İdare eder, ama güç bela.", "Orta": "Ne eksik ne fazla.", "Rahat": "Hali vakti yerinde.", "Zengin": "Köşeyi dönmüş." };
 /* Bölüm sonu: babaannenin ağzından, bu bölümde açılan hafızalara göre */
 var NINE_SABLON = { kediSuclu: "“İki yaşında kediyi mahkûm ettirdi.”", ilkKelimePara: "“İlk kelimesi ‘para’ oldu; deden cüzdanını o gün çıkardı.”", yalanci: "“Duvara güneş çizdi, suçu kuzenine attı.”", yapiskan: "“Kreş kapısında bacak bırakmadı; bizde de öyleydi.”", kardesli: "“Kardeşi geldi; ilk gün hediyeleri saydı.”", sirVerdi: "“Kreşte bir sır duydu, akşama bütün kreş duydu.”", cesurPark: "“Parktaki koca çocuğa ‘Burası herkesin!’ dedi.”", "mahalle-cocugu": "“Sokaktan eve girmedi.”", "ekran-cocugu": "“Tableti benden iyi kullanır.”", "alcili-kol": "“Dut ağacına çıktı, kolu alçıyla döndü; alçıyı bütün sınıf imzaladı.”", tepsiTekeli: "“Mahallenin bütün tepsileri bir kış onda kaldı.”", baskan: "“Sınıf başkanı oldu; evde de seçim yaptırdı.”", kediGeldi: "“Eve kedi getirdi; kedi hâlâ burada, kendisi gitti.”", camKirildi: "“Komşunun camını kırdı; cam değişti, komşu değişmedi.”", "iyi-lise": "“Sınavı kazandı; mahallede üç gün baklava dağıttık.”", lakapli: "“Ortaokulda taktıkları ad liseye kadar gitti.”", evli: "“Evlendi; takı defterini ben tuttum.”", cocuklu: "“Çocuğu oldu; ilk gece ben uyumadım.”", hapis: "“Bir süre uzaktaydı. Sormayın.”", "askerlik-yapti": "“Askere gitti; mektupları hâlâ bende.”", "ev-sahibi": "“Ev aldı; ilk pazar yemeğini orada yedik.”" };
 var NINE_VARSAYILAN = "“Uslu çocuktu, ne diyeyim. Biraz da sessiz.”";
@@ -320,7 +335,7 @@ function applyOutcome(S, e, c, outcome, extra) {
     if (outcome === "bad") addFlag(S, c.flagBad);
     /* Kritik hata lakabı: mahalle bir ad takar; bölüm sonunda ve mezar taşında görünür */
     if (outcome === "bad" && c.lakap) { S.lakaplar = S.lakaplar || []; if (!S.lakaplar.some(function (l) { return l.n === c.lakap; })) { S.lakaplar.push({ n: c.lakap, ch: e.ch }); res.lakap = c.lakap; } }
-    if (!success) addFlag(S, c.flagFail);
+    if (!success) { addFlag(S, c.flagFail); if (c.paraFail) cashChange(S, -(c.paraFail + (outcome === "bad" ? 1 : 0)), res); }
     if (!c.mini || outcome !== "mid") S.failStreak = success ? 0 : (S.failStreak || 0) + 1;
     var r = c.r || {};
     res.text = r[outcome] || (outcome === "crit" ? r.win : null) || (outcome === "mid" ? r.fail : null) || DEFAULT_TEXT[outcome];
@@ -329,8 +344,8 @@ function applyOutcome(S, e, c, outcome, extra) {
      İtibarı yüksek olana mahalle kefil olur: ceza hafifler, aile küsmez, birikimin bir kısmı kalır, tahliye erken gelir. */
   if (!wasHapis && S.flags.indexOf("hapis") >= 0) {
     S.failStreak = 0;
-    if (itibarLevel(S, e.ch) > 0) { S.own = Math.max(0, (S.own || 0) - 2); addFlag(S, "ceza-indirimi"); res.note = "Mahallen sana kefil oldu: cezan hafifletildi, ailen arkanda."; }
-    else { S.own = 0; S.destek = Math.max(0, destekOf(S) - 1); }
+    if (itibarLevel(S, e.ch) > 0) { cashChange(S, -2); addFlag(S, "ceza-indirimi"); res.note = "Mahallen sana kefil oldu: cezan hafifletildi, ailen arkanda."; }
+    else { S.cash = 0; S.destek = Math.max(0, destekOf(S) - 1); }
     if (varlikOf(S) !== v00) res.varlik = varlikOf(S) - v00;
     if (destekOf(S) !== d00) res.destek = destekOf(S) - d00;
   }

@@ -15,7 +15,7 @@ var DIFF = {
 };
 
 /* Varlık kademeleri ve aile desteği (aile yalnızca başlangıç kademesini belirler) */
-var TIERS = ["Borçlu", "Kıt", "Orta", "Rahat", "Varlıklı"];
+var TIERS = ["Borç içinde", "Fakir", "Orta", "Rahat", "Zengin"];
 var DESTEK = ["Küs", "Mesafeli", "Tam"];
 var FAMILIES = {
   "Yalçın": {

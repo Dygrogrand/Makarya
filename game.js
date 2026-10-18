@@ -172,8 +172,9 @@ function choiceCard(e, c, idx) {
     earn.push(pvChip("pvSure", STAT_ICONS[c.stat] + " " + esc(c.stat) + " <b>+" + d.succ + '</b> <span class="pvDim">(kritik +' + d.crit + ")</span>"));
   }
   if (c.trait && S.traits.indexOf(c.trait) < 0) earn.push(pvChip("pvEarn", "🏅 " + esc(c.trait)));
-  if (c.varlik != null && c.varlik > varlikOf(S)) earn.push(pvChip("pvEarn", "💰 Varlık → " + TIERS[c.varlik]));
-  if (c.varlikKayip && (S.own || 0) > 0) earn.push(pvChip("pvHurt", "💰 Birikim −" + c.varlikKayip));
+  if (c.varlik != null && c.varlik > varlikOf(S)) earn.push(pvChip("pvEarn", "💰 Maddi durum → " + TIERS[c.varlik]));
+  if (c.varlikKayip && varlikOf(S) > 0) earn.push(pvChip("pvHurt", "💰 Maddi durum ↓ " + TIERS[Math.max(0, varlikOf(S) - c.varlikKayip)]));
+  if (c.paraFail && varlikOf(S) > 0) risk.push(pvChip("pvHurt", "💰 Başarısızsan maddi durum ↓"));
   if (c.risk) risk.push(pvChip("pvHurt", "☠️ Ölüm riski %" + Math.round(c.risk.p * 100)));
   var hapisIn = function (k) { return c[k] && flagList(c[k]).indexOf("hapis") >= 0; };
   if (hapisIn("flag")) risk.push(pvChip("pvHurt", "⛓️ Hapis"));
@@ -241,7 +242,7 @@ function renderKavsakResult() {
   var chips = res.deltas.map(function (d) { return pvChip(d[1] < 0 ? "pvHurt" : "pvSure", STAT_ICONS[d[0]] + " " + esc(d[0]) + " <b>" + signed(d[1]) + "</b>"); })
     .concat(res.traits.map(function (t) { return pvChip("pvEarn", "🏅 " + esc(t)); }))
     .concat(res.destek ? [pvChip(res.destek < 0 ? "pvHurt" : "pvHelpD", "🏠 Aile desteği " + (res.destek < 0 ? "↓ " : "↑ ") + DESTEK[destekOf(S)])] : [])
-    .concat(res.varlik ? [pvChip(res.varlik < 0 ? "pvHurt" : "pvEarn", "💰 Varlık " + (res.varlik < 0 ? "↓ " : "↑ ") + TIERS[varlikOf(S)])] : []);
+    .concat(res.varlik ? [pvChip(res.varlik < 0 ? "pvHurt" : "pvEarn", "💰 Maddi durum " + (res.varlik < 0 ? "↓ " : "↑ ") + TIERS[varlikOf(S)])] : []);
   app.innerHTML = '<div class="screen">' + topbar("Yol seçildi") + '<div class="kvGate kvDone' + (win || o === "direct" ? "" : " kvLost") + '">' +
     "<div>" + lifelineHtml(e.kavsak) + "</div>" +
     '<div class="kvStamp">YOL SEÇİLDİ</div><h1 class="kvTitle center">' + esc(title) + '</h1><p class="kvText center">' + esc(res.text) + "</p>" + roll +
@@ -379,7 +380,7 @@ function renderResult() {
     '<div class="resultHeader"><div class="badge o-' + o + '">' + OUT_LABEL[o] + '</div><div class="resultTitle">' + esc(o === "direct" ? c.t : OUT_TITLE[o]) + "</div>" +
     '<div class="resultText">' + esc(res.text) + "</div>" + (res.note ? '<div class="note">' + esc(res.note) + "</div>" : "") + "</div>" +
     rollCard + gains + traits + (res.lakap ? '<div class="lakapCard"><div class="l">MAHALLENİN TAKTIĞI AD</div><div class="n">“' + esc(res.lakap) + '”</div><div class="d">Bu bölümün sonunda ve mezar taşında anılacak.</div></div>' : "") + (res.destek || res.varlik ? '<div class="pvRow">' + (res.destek ? pvChip(res.destek < 0 ? "pvHurt" : "pvHelp", "🏠 Aile desteği " + (res.destek < 0 ? "↓ " : "↑ ") + DESTEK[destekOf(S)]) : "") +
-      (res.varlik ? pvChip(res.varlik < 0 ? "pvHurt" : "pvEarn", "💰 Varlık " + (res.varlik < 0 ? "↓ " : "↑ ") + TIERS[varlikOf(S)]) : "") + "</div>" : "") +
+      (res.varlik ? pvChip(res.varlik < 0 ? "pvHurt" : "pvEarn", "💰 Maddi durum " + (res.varlik < 0 ? "↓ " : "↑ ") + TIERS[varlikOf(S)]) : "") + "</div>" : "") +
     (res.death ? '<div class="deathCard"><div class="l">☠️ HAYAT BURADA SONA ERDİ</div><div class="d">' + esc(res.death) + "</div></div>" +
       '<button class="primary dark" onclick="advance()">🪦 MEZAR TAŞINI GÖR</button>' : '<button class="primary" onclick="advance()">DEVAM ET</button>') + "</div></div>";
 }
@@ -420,7 +421,7 @@ function renderChapterEnd() {
     '<div class="sectionTitle">Bölüm ' + ROMAN[ch] + " · Gelişim Özeti</div><div class=\"sectionSub\">" + esc(C.range) + "</div>" +
     nineHtml(ch) + kvHtml + starStatHtml(S.chStart[ch] || cloneStats(), cloneStats()) + '<h3 class="sectionTitle" style="font-size:18px">Özelliklerin</h3>' + compareHtml(S.chStart[ch] || cloneStats(), cloneStats()) +
     '<h3 class="sectionTitle" style="font-size:18px">Kazanılan rozetler</h3>' +
-    (gained.length ? gained.map(traitCardHtml).join("") : '<div class="muted">Bu bölümde yeni rozet kazanılmadı.</div>') + itibarNoteHtml(ch) +
+    (gained.length ? gained.map(traitCardHtml).join("") : '<div class="muted">Bu bölümde yeni rozet kazanılmadı.</div>') + itibarNoteHtml(ch) + ((S.faizNote || {})[ch] ? '<div class="kvWaits lost"><div class="kvWaitsT">💳 Borç faizi işledi</div>Ödenmemiş borç büyüdü. Maddi durum: <b>' + TIERS[varlikOf(S)] + "</b></div>" : "") +
     (hl ? '<h3 class="sectionTitle" style="font-size:18px">Unutulmayan anlar</h3><div class="logList">' + hl + "</div>" : "") +
     '<button class="primary" onclick="nextChapter()">' + esc(C.next) + "</button>");
 }
@@ -584,7 +585,7 @@ function showCharacter() {
   var d = destekOf(S);
   modal("<h2>Karakterin</h2><p>" + esc(S.family) + " ailesi · " + (S.gender === "kiz" ? "Kız" : "Erkek") + " · " + S.traits.length + " rozet</p>" +
     '<div class="pvRow">' + pvChip(d === 2 ? "pvHelp" : d === 1 ? "pvSure" : "pvHurt", "🏠 Aile desteği: <b>" + DESTEK[d] + "</b> <small>" + esc(DESTEK_ALT[DESTEK[d]] || "") + "</small>") +
-    pvChip("pvSure", "💰 Varlık: <b>" + TIERS[varlikOf(S)] + "</b> <small>" + esc(TIER_ALT[TIERS[varlikOf(S)]] || "") + "</small>") + "</div>" +
+    pvChip("pvSure", "💰 Maddi durum: <b>" + TIERS[varlikOf(S)] + "</b> <small>" + esc(TIER_ALT[TIERS[varlikOf(S)]] || "") + "</small>") + "</div>" +
     ((S.lakaplar || []).length ? '<div class="muted">Mahallenin taktığı adlar: ' + esc(S.lakaplar.map(function (l) { return l.n; }).join(", ")) + "</div>" : "") +
     "<h3>Özelliklerin</h3>" + barsHtml() + "<h3>Ailenden gelen huylar</h3>" + fam + "<h3>Kazanılan rozetler</h3>" + tr +
     (S.flags.length ? "<h3>Hafıza</h3>" + lifeLog() : ""));

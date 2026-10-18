@@ -107,7 +107,7 @@ def main(paths):
         if e.get("place") and e["place"] not in PLACES: errs.append(f"{where}: place geçersiz: {e['place']}")
         w = e.get("when") or {}
         for k in w:
-            if k not in ["flags", "anyFlags", "notFlags", "trait", "gender", "fam", "minStat", "hat"]: errs.append(f"{where}: when anahtarı geçersiz: {k}")
+            if k not in ["flags", "anyFlags", "notFlags", "trait", "gender", "fam", "minStat", "hat", "cashMin", "cashMax"]: errs.append(f"{where}: when anahtarı geçersiz: {k}")
         for f in w.get("flags", []) + w.get("anyFlags", []) + w.get("notFlags", []): reqs.append((where, f))
         if w.get("trait"): reqs.append((where, "trait:" + w["trait"]))
         for h_ in w.get("hat", []):

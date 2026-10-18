@@ -21,22 +21,22 @@ MINI_TYPES = ["timing", "collect", "simon", "trace", "duel", "lie", "diff", "fig
 PLACES = ["ev", "mutfak", "cocuk-odasi", "okul", "sinif", "okul-bahcesi", "sokak", "park", "bakkal", "market", "carsi",
           "ofis", "dukkan", "devlet-dairesi", "hastane", "dugun-salonu", "kafe", "toplu-tasima", "trafik", "universite",
           "kisla", "banka", "apartman", "sahil", "huzurevi", "mezarlik", "yazlik", "stadyum", "sahne", "mahkeme", "karakol", "cezaevi", "koy", "havalimani", "meclis", "studyo"]
-TIERS = ["Borçlu", "Kıt", "Orta", "Rahat", "Varlıklı"]
+TIERS = ["Borç içinde", "Fakir", "Orta", "Rahat", "Zengin"]
 DESTEK_TR = ["Küs", "Mesafeli", "Tam"]
 FAMILIES = ["Yalçın", "Erdem", "Keskin", "Tan", "Varlı", "Şen"]
 
 EV_COLS = ["Olay ID", "Bölüm", "Yaş", "Simge", "Başlık", "Olay metni", "Mekân", "Aile türü", "Sabit", "Ağırlık",
            "Gereken hafızalar", "Olmaması gereken hafızalar", "Gereken rozet", "Cinsiyet", "Sadece aileler", "Asgari özellik",
-           "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Herhangi biri hafıza", "Hat"]
+           "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Herhangi biri hafıza", "Hat", "Asgari varlık", "Azami varlık"]
 # Sonradan eklenen sütunlar: eski Excel dosyalarında yoksa hata verilmez, boş sayılır
 OPTIONAL_COLS = {"Bölüm sonu cümlesi", "Kavşak no", "Kavşak girişi", "Kazanırsan", "Kazanamazsan", "Aile desteği", "Başarısızlıkta hafıza", "Sonraki bölümde",
-                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap", "Cinsiyet", "Mekân grubu", "Kritik başarıda hafıza"}
+                 "Herhangi biri hafıza", "Gereken varlık", "Kazanç kademesi", "Hat", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap", "Cinsiyet", "Mekân grubu", "Kritik başarıda hafıza", "Asgari varlık", "Azami varlık", "Başarısızlıkta para kaybı"}
 CH_COLS = ["Olay ID", "Sıra", "Seçim metni", "Özellik", "Zorluk", "Kesin etki", "Kesin sonuç metni",
            "Başarı", "Kritik başarı", "Başarısız", "Kritik hata", "Yarım (mini oyun)",
            "Mini oyun", "Mini oyun başlığı", "Mini oyun ipucu", "Mini oyun ayarı",
            "Gereken rozet", "Gereken hafıza", "İç ses açar", "Kazandırdığı rozet",
            "Seçince hafıza", "Başarıda hafıza", "Kritik hatada hafıza", "Silinen hafıza", "Ölüm riski %", "Ölüm sebebi",
-           "Aile desteği", "Başarısızlıkta hafıza", "Gereken varlık", "Kazanç kademesi", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap", "Cinsiyet", "Kritik başarıda hafıza"]
+           "Aile desteği", "Başarısızlıkta hafıza", "Gereken varlık", "Kazanç kademesi", "Gereken aile desteği", "Varlık kaybı", "Engelleyen hafıza", "Gereken özellik değeri", "Lakap", "Cinsiyet", "Kritik başarıda hafıza", "Başarısızlıkta para kaybı"]
 VO_COLS = ["Olay ID", "Özellik", "Zorluk", "İç ses metni", "Başarısızlık metni", "Seçenek açar"]
 RE_COLS = ["Olay ID", "Hafıza", "Geçmişten metni"]
 TR_COLS = ["Rozet", "Açıklama", "Bonus", "Otomatik özellik"]
@@ -166,7 +166,7 @@ def write_xlsx(b, path):
         ["   • Mini oyunlu seçim: zarlı seçim + Mini oyun türü + başlık + ipucu + 'Yarım (mini oyun)' metni."],
         ["   • Ölüm riski yalnızca Bölüm 6 ve sonrası (18+). Yüzde olarak yaz (ör. 3). Oyuncu bu yüzdeyi görür."],
         ["   • Bir seçim birden fazla hafıza yazabilir: virgülle ayır (ör. 'hat-polis, meslek-memur'). Kavşak sonucunda ilk hafızanın etiketi görünür."],
-        ["   • Gereken varlık: seçenek yalnızca oyuncunun varlığı bu kademe ya da üstündeyse açılır (Borçlu, Kıt, Orta, Rahat, Varlıklı). Kazanç kademesi: seçim başarılı olursa varlık en az bu kademeye çıkar."],
+        ["   • Gereken varlık: seçenek yalnızca oyuncunun varlığı bu kademe ya da üstündeyse açılır (Borç içinde, Fakir, Orta, Rahat, Zengin). Kazanç kademesi: seçim başarılı olursa varlık en az bu kademeye çıkar."],
         ["   • Bir hafızanın başına eksi koyarsan silinir (ör. '-meslek-memur, hat-koy' hattı değiştirir). 'Hat' sütunu olayı yalnızca o hattaki oyuncuya çıkarır (ör. polis, cete)."],
         ["   • Lakap: seçim kritik hatayla biterse mahallenin karaktere taktığı ad (ör. 'Hıçkırık'). Bölüm sonunda ve mezar taşında görünür."],
         ["   • Gereken özellik değeri: seçenek yalnızca özellik bu değer ya da üstündeyse açılır (ör. 'İtibar 46'). İtibar kapıları kefil ve referans seçenekleri içindir."],
@@ -222,7 +222,7 @@ def write_xlsx(b, path):
                             (round(rk["p"] * 100, 2) if rk else ""), rk.get("cause", ""),
                             fmt_destek(c.get("destek")), c.get("flagFail", ""),
                             TIERS[c["reqVarlik"]] if c.get("reqVarlik") is not None else "", TIERS[c["varlik"]] if c.get("varlik") is not None else "",
-                            DESTEK_TR[c["reqDestek"]] if c.get("reqDestek") is not None else "", c.get("varlikKayip", ""), c.get("reqNotFlag", ""), ", ".join(f"{k} {v}" for k, v in (c.get("reqStat") or {}).items()), c.get("lakap", ""), {"erkek": "erkek", "kiz": "kız"}.get(c.get("reqGender", ""), ""), c.get("flagCrit", "")])
+                            DESTEK_TR[c["reqDestek"]] if c.get("reqDestek") is not None else "", c.get("varlikKayip", ""), c.get("reqNotFlag", ""), ", ".join(f"{k} {v}" for k, v in (c.get("reqStat") or {}).items()), c.get("lakap", ""), {"erkek": "erkek", "kiz": "kız"}.get(c.get("reqGender", ""), ""), c.get("flagCrit", ""), c.get("paraFail", "")])
         for v in e.get("voices", []):
             rows_vo.append([e["id"], v["stat"], DIFF_TR[v["diff"]], v["text"], v.get("fail", ""), "E" if v.get("opens") else ""])
         for rc in e.get("recall", []):
@@ -325,6 +325,10 @@ def read_xlsx(path):
         if r["Gereken hafızalar"]: w["flags"] = split_list(r["Gereken hafızalar"])
         if r.get("Herhangi biri hafıza"): w["anyFlags"] = split_list(r["Herhangi biri hafıza"])
         if r.get("Hat"): w["hat"] = split_list(r["Hat"])
+        for k_, col_ in (("cashMin", "Asgari varlık"), ("cashMax", "Azami varlık")):
+            if r.get(col_):
+                if str(r[col_]).strip() not in TIERS: errs.append(f"{where}: '{col_}' şunlardan biri olmalı: {', '.join(TIERS)}")
+                else: w[k_] = TIERS.index(str(r[col_]).strip())
         if r["Olmaması gereken hafızalar"]: w["notFlags"] = split_list(r["Olmaması gereken hafızalar"])
         if r["Gereken rozet"]: w["trait"] = r["Gereken rozet"]
         if r["Cinsiyet"]: w["gender"] = {"erkek": "erkek", "kız": "kiz", "kiz": "kiz"}.get(r["Cinsiyet"], r["Cinsiyet"])
@@ -373,6 +377,9 @@ def read_xlsx(path):
             try: c["destek"] = parse_destek(r["Aile desteği"], where)
             except ValueError as ex: errs.append(str(ex))
         if r["Başarısızlıkta hafıza"]: c["flagFail"] = str(r["Başarısızlıkta hafıza"])
+        if r.get("Başarısızlıkta para kaybı") not in ("", None):
+            try: c["paraFail"] = int(r["Başarısızlıkta para kaybı"])
+            except ValueError: errs.append(f"{where}: 'Başarısızlıkta para kaybı' tam sayı olmalı")
         for key, col in [("reqVarlik", "Gereken varlık"), ("varlik", "Kazanç kademesi")]:
             if r.get(col):
                 if str(r[col]).strip() not in TIERS: errs.append(f"{where}: '{col}' şunlardan biri olmalı: {', '.join(TIERS)}")
