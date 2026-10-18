@@ -776,7 +776,7 @@ function mgSimon(st, a, m) {
 /* Poker yüzü: parmağı gezinen dairenin içinde tut */
 /* Harfi çiz: kesikli çizgiyi tek hamlede takip et */
 function mgTrace(st, a, m) {
-  var P = m.shape === "imza" ? [[30, 150], [60, 60], [90, 150], [125, 70], [160, 145], [200, 75], [235, 140], [270, 95]] : [[40, 175], [40, 30], [150, 125], [260, 30], [260, 175]], tol = 20 + a * 26, N = 48, cps = [];
+  var P = m.shape === "imza" ? [[30, 150], [60, 60], [90, 150], [125, 70], [160, 145], [200, 75], [235, 140], [270, 95]] : [[40, 175], [40, 30], [150, 125], [260, 30], [260, 175]], tol = clamp(11 + a * 10, 7, 16), N = 48, cps = [];
   for (var s = 0; s < P.length - 1; s++) for (var k = 0; k < N / 4; k++) {
     var u = k / (N / 4); cps.push([P[s][0] + (P[s + 1][0] - P[s][0]) * u, P[s][1] + (P[s + 1][1] - P[s][1]) * u]);
   }
@@ -791,15 +791,16 @@ function mgTrace(st, a, m) {
     line.push(p); ink.setAttribute("points", line.map(function (q) { return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" "));
     var best = 1e9;
     cps.forEach(function (c, i) { var d = Math.hypot(c[0] - p[0], c[1] - p[1]); if (d < tol) hit[i] = true; if (d < best) best = d; });
-    if (best > tol * 1.6) off++;
+    if (best > tol * 1.15) off++;
     var cov = hit.filter(Boolean).length / cps.length;
     document.getElementById("ts").textContent = "Tamamlanan %" + Math.round(cov * 100);
   }
   function end() {
     if (done || !drawing) return; done = true; drawing = false;
     var cov = hit.filter(Boolean).length / cps.length, prec = line.length ? 1 - off / line.length : 0;
-    var fast = performance.now() - t0 < 4000 ? 0.04 : 0;
-    finishMini(cov * 0.8 + prec * 0.2 + fast - 0.02);
+    var fast = performance.now() - t0 < 4000 ? 0.03 : 0;
+    /* çizgiden uzaklaşmak puanı doğrudan düşürür: kapsama × isabet */
+    finishMini(Math.min(1, cov * Math.pow(prec, 1.5) + fast - 0.02));
   }
   svg.onpointerdown = function (ev) { if (done) return; ev.preventDefault(); drawing = true; t0 = t0 || performance.now(); try { svg.setPointerCapture(ev.pointerId); } catch (e) {} add(toV(ev)); };
   svg.onpointermove = function (ev) { if (drawing) add(toV(ev)); };
