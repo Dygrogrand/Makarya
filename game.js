@@ -313,7 +313,21 @@ function eventCtx(e) {
     karne = '<div class="recall karneBox karne-' + K.g + '"><b>' + KT[0] + " " + KT[1].toUpperCase() + " · ZAR " + K.roll + (K.pts ? (K.pts > 0 ? " +" : " ") + K.pts : "") + "</b>" + KT[2] + " Bu, şimdiye kadarki seçimlerin ve zarın sonucu.</div>";
   }
   var bond = bondLine(e, recall);
-  var famLine = e.fam && S.family ? '<div class="famLine"><span>🏠</span><span>' + esc(FAMILIES[S.family].lines[e.fam]) + "</span></div>" : "";
+  /* Ev etkisi yalnızca gerçekten bir seçeneğe yansıyorsa gösterilir: hangi özellikte kaç puan hedef düştüğüyle birlikte */
+  var famLine = "";
+  if (e.fam && S.family) {
+    var fx = {}, cut = false;
+    e.choices.forEach(function (c) {
+      if (!c.stat || !hasReq(S, c, e)) return;
+      var raw = familyEventBonus(S, e, c.stat), fb = famScale(S, raw);
+      if (raw > fb) cut = true;
+      if (fb > 0) fx[c.stat] = Math.max(fx[c.stat] || 0, fb);
+    });
+    var ks = Object.keys(fx);
+    if (ks.length) famLine = '<div class="famLine"><span>🏠</span><span>' + esc(FAMILIES[S.family].lines[e.fam]) + '<span class="famFx">' +
+      ks.map(function (k) { return "<em>" + STAT_ICONS[k] + " " + esc(k) + " kontrolü: hedef −" + fx[k] + "</em>"; }).join("") +
+      (cut ? "<small>Aile desteği düşük olduğu için etki azaldı.</small>" : "") + "</span></span></div>";
+  }
   return { karne: karne, recall: recall, bond: bond, voices: voices, famLine: famLine };
 }
 function renderEvent() {
