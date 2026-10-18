@@ -332,7 +332,7 @@ function renderEvent() {
     }
     return choiceCard(e, c, idx);
   }).join("");
-  shell(chTitle(e.ch), e.kavsak ? kavsakHead(e) : art(sceneSrcs(e.id), e.icon, "", e.title, e.text), karne + recall + bond + voices + famLine + choices);
+  shell(chTitle(e.ch), e.kavsak ? kavsakHead(e) : art(sceneSrcs(e.id), e.icon, "", e.title, e.text), (e.kavsak || curtainOff() ? karne + recall + bond + voices + famLine : "") + choices);
 }
 /* Karakter bağı: olayın türüne uyan, daha önce yaşanmış bir hafızayı kısa bir satırla hatırlatır (aynı hafıza hayatta en çok iki kez). */
 var BOND = {

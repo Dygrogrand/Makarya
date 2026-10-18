@@ -503,3 +503,4 @@ button:disabled{cursor:default}
 /* Bölüm sonu 'Unutulmayan anlar' alt başlığı okunur */
 .chEnd .logList .logItem small{color:var(--muted)}
 .chEnd .compare .logItem small,.chEnd .logItem small{color:#6c5f4d!important}
+.curCtx>*{animation:ctxIn .45s ease-out both}.curCtx>*:nth-child(2){animation-delay:.12s}.curCtx>*:nth-child(3){animation-delay:.24s}.curCtx>*:nth-child(4){animation-delay:.36s}@keyframes ctxIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
