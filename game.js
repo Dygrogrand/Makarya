@@ -269,7 +269,7 @@ function famShiftHtml(res) {
   var p0 = Math.round(DESTEK_ETKI[was] * 100), p1 = Math.round(DESTEK_ETKI[now] * 100);
   var good = FAMILIES[S.family].traits.filter(function (t) { return t.good; }).map(function (t) { return esc(t.name); }).join(", ");
   var line = up ? "Ailenin iyi huyları yeniden güçleniyor: etki %" + p0 + " → %" + p1 + (good ? " (" + good + ")" : "") + "."
-    : now === 0 ? "Aile ilgisizleşti. İyi huyların neredeyse hiç işlemiyor: etki %" + p0 + " → %" + p1 + (good ? " (" + good + ")" : "") + ". Kötü huylar aynen sürüyor."
+    : now === 0 ? "Aile küstü. İyi huyların neredeyse hiç işlemiyor: etki %" + p0 + " → %" + p1 + (good ? " (" + good + ")" : "") + ". Kötü huylar aynen sürüyor."
     : "Ailenin iyi huyları zayıfladı: etki %" + p0 + " → %" + p1 + (good ? " (" + good + ")" : "") + ". Kötü huylar aynen sürüyor.";
   return '<div class="famShift ' + (up ? "up" : "down") + '"><div class="fsL">🏠 AİLE DESTEĞİ ' + (up ? "YÜKSELDİ" : "DÜŞTÜ") + '</div><div class="fsV">' + DESTEK[was] + " → <b>" + DESTEK[now] + '</b></div><div class="fsD">' + line + "</div></div>";
 }
@@ -551,7 +551,7 @@ function itibarNoteHtml(ch) {
     var cut = d < 2 ? " <small>(aile desteği " + DESTEK[d].toLowerCase() + " olduğu için yalnızca %" + pct + " etkili)</small>" : " <small>(tam etkili)</small>";
     return "<li>✓ <b>" + esc(t.name) + "</b>" + cut + "</li>";
   }).concat(bad.map(function (t) { return "<li>! <b>" + esc(t.name) + "</b> <small>(destek ne olursa olsun tam etkili)</small></li>"; }));
-  var tip = d === 2 ? "Ailen arkanda: iyi huyları tam çalışıyor." : d === 1 ? "Aile mesafeli: iyi huyların etkisi azaldı, kötü huylar sürüyor. İtibar ve gönül yükselirse yeniden açılır." : "Aile ilgisiz: iyi huyların neredeyse etkisi kalmadı, kötü huylar sürüyor. Yeniden yakınlaşmak için itibar ve gönül gerek.";
+  var tip = d === 2 ? "Ailen arkanda: iyi huyları tam çalışıyor." : d === 1 ? "Aile mesafeli: iyi huyların etkisi azaldı, kötü huylar sürüyor. İtibar ve gönül yükselirse yeniden açılır." : "Aile küs: iyi huyların neredeyse etkisi kalmadı, kötü huylar sürüyor. Barışmak için itibar ve gönül gerek.";
   return '<h3 class="sectionTitle" style="font-size:18px">Aile durumu</h3><div class="kvWaits' + (lost || d === 0 ? " lost" : "") + '"><div class="kvWaitsT">🏠 ' + esc(S.family) + ' ailesi</div><div>' + head + "</div><div>" + tip + "</div><ul>" + lines.join("") + "</ul></div>";
 }
 function nextChapter() { var ch = S.ch + 1; S.ch = ch; S.chFlags = S.chFlags || {}; S.chFlags[ch] = S.flags.slice(); S.plan = buildPlan(S, ch); S.pi = 0; S.chStart[ch] = cloneStats(); S.chTraits[ch] = S.traits.slice(); S.screen = "event"; render(); }
@@ -710,7 +710,7 @@ function showRules() {
     "<p><b>Özellikler ve rozetler.</b> Dokuz özelliğin (Akıl, Çene, Gönül…) zarı belirler: bir özellik o yaştaki olağan seviyesinin her 4 puan üstündeyse hedef 1 düşer, her 4 puan altındaysa 1 yükselir. Cesaret ayrıca hayatında yol değiştiren zarlarda hedefi 5'e kadar düşürür. Kazandığın rozetler hedefleri ayrıca düşürür ve ileride yeni seçeneklerin kilidini açar (🔒).</p>" +
     "<p><b>Hafıza.</b> Bazı seçimler unutulmaz; yıllar sonra karşına çıkar.</p>" +
     "<p><b>Lakap.</b> Bazı kritik hatalar mahallenin diline düşer: sana bir ad takılır, bölüm sonunda babaannen anar, mezar taşına yazılır.</p>" +
-    "<p><b>İtibar.</b> Mahallede adının nasıl anıldığı. Yüksek itibar kefil ve referans gerektiren kapıları açar, bölüm sonunda ilgisizleşen ailenle yeniden yakınlaştırır, başın belaya girince mahalleyi arkana alır. Düşük itibar aile desteğini aşındırır.</p>" +
+    "<p><b>İtibar.</b> Mahallede adının nasıl anıldığı. Yüksek itibar kefil ve referans gerektiren kapıları açar, bölüm sonunda küs ailenle barıştırır, başın belaya girince mahalleyi arkana alır. Düşük itibar aile desteğini aşındırır.</p>" +
     "<p><b>Her hayat farklı.</b> Her bölümde olaylar geniş bir havuzdan seçilir; iki hayat birbirinin aynısı olmaz.</p>" +
     "<p><b>Ölüm.</b> 18 yaşından sonra hayat biraz daha kırılgan: ☠️ işaretli seçenekler ölüm riski taşır ve yüzdesi her zaman görünür; yaş ilerledikçe arka planda küçük bir risk de vardır. Sağlıklı alışkanlıklar ve Dayanıklılık bu riski düşürür. Her hayat bir mezar taşıyla biter ve koleksiyona girer.</p>" +
     "<p><b>Hatlar.</b> Meslek, evlilik, çocuk ve geçmiş seçimlerin, önüne çıkacak olayları değiştirir.</p>" +

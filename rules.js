@@ -159,7 +159,7 @@ function itibarLevel(S, ch) {
   var d = S.stats["İtibar"] - CHAPTERS[ch || S.ch].expected;
   return d >= ITIBAR_HIGH ? 1 : d <= ITIBAR_LOW ? -1 : 0;
 }
-/* Bölüm sonu: yüksek itibar ilgisiz aileyi yeniden yakınlaştırır, düşük itibar aile desteğini aşındırır (Bölüm III'ten itibaren) */
+/* Bölüm sonu: yüksek itibar küs aileyle barıştırır, düşük itibar aile desteğini aşındırır (Bölüm III'ten itibaren) */
 function closeChapter(S) {
   S.itibarNote = S.itibarNote || {};
   if (S.itibarNote[S.ch] !== undefined || S.ch < 3 || !S.family) return S.itibarNote[S.ch];
@@ -176,7 +176,7 @@ function closeChapter(S) {
   return note;
 }
 function destekOf(S) { return S.destek == null ? 2 : S.destek; }
-/* Aile desteği azaldıkça ailenin İYİ yönleri zayıflar (Tam %100, Mesafeli %60, İlgisiz %25); kötü yönler aynen sürer */
+/* Aile desteği azaldıkça ailenin İYİ yönleri zayıflar (Tam %100, Mesafeli %60, Küs %25); kötü yönler aynen sürer */
 var DESTEK_ETKI = [0.25, 0.6, 1];
 function sgn(v) { return v > 0 ? "+" + v : String(v); }
 function famScale(S, v) { return v > 0 ? Math.round(v * DESTEK_ETKI[destekOf(S)]) : v; }
@@ -226,7 +226,7 @@ var PASSIVE = { easy: -3, medium: 1, hard: 5, veryHard: 9 };
 /* İç seslerin karakteri: kart üstünde özellik adının yanında küçük etiket */
 var VOICE_CHAR = { "Akıl": "ukala öğretmen", "Çene": "pazarcı", "Kurnazlık": "eski tüfek", "Cesaret": "asker dayı", "Pişkinlik": "sunucu", "İtibar": "mahalle muhtarı", "Gönül": "âşık", "Dayanıklılık": "maratoncu komşu", "Sosyal Radar": "dedikoducu teyze" };
 /* Aile desteği ve varlık kademelerinin tek satırlık hali */
-var DESTEK_ALT = { "İlgisiz": "Bayramda aranmadın.", "Mesafeli": "Sadece aile grubunda görüşüyorsunuz.", "Tam": "Pazar yemeği sende." };
+var DESTEK_ALT = { "Küs": "Bayramda aranmadın.", "Mesafeli": "Sadece aile grubunda görüşüyorsunuz; ilgi azaldı, kapı kapanmadı.", "Tam": "Pazar yemeği sende." };
 var TIER_ALT = { "Borç içinde": "Ay sonu zor.", "Fakir": "İdare eder, ama güç bela.", "Orta": "Ne eksik ne fazla.", "Rahat": "Hali vakti yerinde.", "Zengin": "Köşeyi dönmüş." };
 /* Bölüm sonu: babaannenin ağzından, bu bölümde açılan hafızalara göre */
 var NINE_SABLON = { kediSuclu: "“İki yaşında kediyi mahkûm ettirdi.”", ilkKelimePara: "“İlk kelimesi ‘para’ oldu; deden cüzdanını o gün çıkardı.”", yalanci: "“Duvara güneş çizdi, suçu kuzenine attı.”", yapiskan: "“Kreş kapısında bacak bırakmadı; bizde de öyleydi.”", kardesli: "“Kardeşi geldi; ilk gün hediyeleri saydı.”", sirVerdi: "“Kreşte bir sır duydu, akşama bütün kreş duydu.”", cesurPark: "“Parktaki koca çocuğa ‘Burası herkesin!’ dedi.”", "mahalle-cocugu": "“Sokaktan eve girmedi.”", "ekran-cocugu": "“Tableti benden iyi kullanır.”", "alcili-kol": "“Dut ağacına çıktı, kolu alçıyla döndü; alçıyı bütün sınıf imzaladı.”", tepsiTekeli: "“Mahallenin bütün tepsileri bir kış onda kaldı.”", baskan: "“Sınıf başkanı oldu; evde de seçim yaptırdı.”", kediGeldi: "“Eve kedi getirdi; kedi hâlâ burada, kendisi gitti.”", camKirildi: "“Komşunun camını kırdı; cam değişti, komşu değişmedi.”", "iyi-lise": "“Sınavı kazandı; mahallede üç gün baklava dağıttık.”", lakapli: "“Ortaokulda taktıkları ad liseye kadar gitti.”", evli: "“Evlendi; takı defterini ben tuttum.”", cocuklu: "“Çocuğu oldu; ilk gece ben uyumadım.”", hapis: "“Bir süre uzaktaydı. Sormayın.”", "askerlik-yapti": "“Askere gitti; mektupları hâlâ bende.”", "ev-sahibi": "“Ev aldı; ilk pazar yemeğini orada yedik.”" };
