@@ -524,3 +524,13 @@ button:disabled{cursor:default}
 .curBg{display:none}
 .curtainArt{background:radial-gradient(120% 70% at 50% 0%,#1d3a3b 0%,#122526 45%,#0b1617 100%)}
 .curCap{background:linear-gradient(180deg,rgba(9,19,20,.78),rgba(7,14,15,.9));border-color:rgba(241,197,101,.38);box-shadow:0 8px 22px rgba(0,0,0,.35)}
+/* Perde v6: açık kâğıt kart, koyu mürekkep yazı */
+.curCap{background:linear-gradient(180deg,#fbf3df 0%,#f3e6c8 100%);border:1px solid #cdb88c;box-shadow:0 10px 26px rgba(0,0,0,.45),inset 0 0 0 4px #fbf3df,inset 0 0 0 5px rgba(166,124,36,.35);color:#2a2118;padding:24px 22px}
+.curCap h1{color:#1d1915;text-shadow:none;font-size:30px;margin-bottom:12px}
+.curCap h1:after{content:"";display:block;width:44px;height:3px;border-radius:3px;background:var(--gold);margin-top:10px}
+.curCap p{color:#3a2f24;font-size:16.5px;line-height:1.6;text-shadow:none}
+.curCap .curRule{color:#8a6212}
+.curCap .curRule:before{background:linear-gradient(90deg,transparent,#a67c24)}.curCap .curRule:after{background:linear-gradient(270deg,transparent,#a67c24)}
+.curCap .curCtx .recall,.curCap .curCtx .voice{background:rgba(166,124,36,.10);color:#4c3f2e;font-style:italic}
+.curCap .curCtx .recall b{color:#8a6212}
+.curCap .curCtx .karneBox{color:#3a2f24}
