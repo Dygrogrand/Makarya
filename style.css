@@ -520,3 +520,7 @@ button:disabled{cursor:default}
   background:linear-gradient(180deg,rgba(30,24,18,.82),rgba(18,14,11,.92));box-shadow:0 8px 24px rgba(0,0,0,.4);overflow:visible}
 .curCap:before{display:none}
 .curtainArt{padding-bottom:84px;overflow:auto}
+/* Perde v5: bulanık zemin yok; kendine özgü koyu petrol yeşili zemin (bölüm sonu mor-bordo, kavşak lacivertinden ayrı) */
+.curBg{display:none}
+.curtainArt{background:radial-gradient(120% 70% at 50% 0%,#1d3a3b 0%,#122526 45%,#0b1617 100%)}
+.curCap{background:linear-gradient(180deg,rgba(9,19,20,.78),rgba(7,14,15,.9));border-color:rgba(241,197,101,.38);box-shadow:0 8px 22px rgba(0,0,0,.35)}
