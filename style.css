@@ -463,3 +463,4 @@ button:disabled{cursor:default}
 .chEnd .logList{color:inherit}.chEnd .logItem{color:var(--ink,#241d17)}.chEnd .logItem small{color:var(--muted)}
 .dfCell span{display:block;line-height:1}.dfCell .dfTilt{transform:rotate(-17deg)}.dfCell .dfSmall{transform:scale(.72)}.dfCell .dfFade{opacity:.5}.dfCell .dfDark{filter:brightness(.55)}
 .chEnd .kvWaits,.chEnd .kvWaits b{color:#3c3226}.chEnd .kvWaits .kvWaitsT{color:#8a6212}.chEnd .kvWaits.lost .kvWaitsT{color:#9b3a24}
+.kvWaits ul{list-style:none;padding-left:0}.kvWaits li{margin:2px 0}.kvWaits small{opacity:.8}

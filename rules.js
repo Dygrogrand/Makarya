@@ -103,7 +103,7 @@ function setEndAge(S, plan) {
   plan.forEach(function (id) { if (id !== "son-soz") last = Math.max(last, EV_BY_ID[id]._m); });
   S.endAge = Math.floor(last / 12) + 1 + Math.floor(Math.random() * 5);
 }
-function eventAge(S, e) { return ageDisp(e.id === "son-soz" && S.endAge ? S.endAge + " yaş" : S.krizAt && S.krizAt.id === e.id ? S.krizAt.age : e.age); }
+function eventAge(S, e) { return (typeof ageDisp === "function" ? ageDisp : String)(e.id === "son-soz" && S.endAge ? S.endAge + " yaş" : S.krizAt && S.krizAt.id === e.id ? S.krizAt.age : e.age); }
 function ageYears(S, e) { return e.id === "son-soz" && S.endAge ? S.endAge : evM(S, e) / 12; }
 function hasChapter(ch) { return !!CHAPTERS[ch] && EVENTS.some(function (e) { return e.ch === ch; }); }
 function curEvent(S) { var e = EV_BY_ID[S.plan[S.pi]]; return e && e.variants ? withVariant(S, e) : e; }
@@ -147,6 +147,11 @@ function gainVarlik(S, c, res) {
 }
 /* İtibar: bölümün beklenen stat değerine göre yüksek (+1), normal (0) ya da düşük (-1) */
 var ITIBAR_HIGH = 3, ITIBAR_LOW = -10;
+/* Gönül: aileyle bağ. Beklenenin belirgin üstü desteği artırır, belirgin altı aşındırır */
+function gonulLevel(S, ch) {
+  var d = S.stats["Gönül"] - statNorm("Gönül", ch || S.ch);
+  return d >= 6 ? 1 : d <= -6 ? -1 : 0;
+}
 function itibarLevel(S, ch) {
   var d = S.stats["İtibar"] - CHAPTERS[ch || S.ch].expected;
   return d >= ITIBAR_HIGH ? 1 : d <= ITIBAR_LOW ? -1 : 0;
@@ -155,16 +160,21 @@ function itibarLevel(S, ch) {
 function closeChapter(S) {
   S.itibarNote = S.itibarNote || {};
   if (S.itibarNote[S.ch] !== undefined || S.ch < 3 || !S.family) return S.itibarNote[S.ch];
-  var lv = itibarLevel(S), d0 = destekOf(S), note = 0;
-  if (lv > 0 && d0 < 2) { S.destek = d0 + 1; note = 1; }
-  else if (lv < 0 && d0 > 0) { S.destek = d0 - 1; note = -1; }
+  var lv = itibarLevel(S), gl = gonulLevel(S), d0 = destekOf(S), note = 0, sum = lv + gl;
+  if (sum > 0 && d0 < 2) { S.destek = d0 + 1; note = 1; }
+  else if (sum < 0 && d0 > 0) { S.destek = d0 - 1; note = -1; }
   S.itibarNote[S.ch] = note;
+  S.destekWhy = S.destekWhy || {}; S.destekWhy[S.ch] = lv && gl ? "ikisi" : gl ? "gonul" : "itibar";
   /* Borç faizi: ödenmemiş borç maddi durumu aşındırır (en çok iki kez) */
   S.faizN = S.faizN || 0; S.faizNote = S.faizNote || {};
   if ((S.flags.indexOf("borclu") >= 0 || S.flags.indexOf("kart-borclu") >= 0) && S.faizN < 2 && varlikOf(S) >= 2) { cashChange(S, -1); S.faizN++; S.faizNote[S.ch] = 1; }
   return note;
 }
 function destekOf(S) { return S.destek == null ? 2 : S.destek; }
+/* Aile desteği azaldıkça ailenin İYİ yönleri zayıflar (Tam %100, Mesafeli %60, Küs %25); kötü yönler aynen sürer */
+var DESTEK_ETKI = [0.25, 0.6, 1];
+function sgn(v) { return v > 0 ? "+" + v : String(v); }
+function famScale(S, v) { return v > 0 ? Math.round(v * DESTEK_ETKI[destekOf(S)]) : v; }
 function destekDelta(S, c) {
   if (!c.destek || !S.family) return 0;
   var d = c.destek[S.family]; if (d == null) d = c.destek["*"];
@@ -229,7 +239,7 @@ var VOICE_NAMES = { "Akıl": "AKIL", "Çene": "ÇENE", "Kurnazlık": "KURNAZLIK"
 function voicePower(S, stat) {
   var p = S.stats[stat];
   S.traits.forEach(function (t) { p += 2 * (((TRAITS[t] || {}).bonus || {})[stat] || 0); });
-  if (S.family) FAMILIES[S.family].traits.forEach(function (t) { p += 2 * ((t.stats || {})[stat] || 0); });
+  if (S.family) FAMILIES[S.family].traits.forEach(function (t) { p += 2 * famScale(S, (t.stats || {})[stat] || 0); });
   return p;
 }
 function eventVoices(S, e) {
@@ -268,11 +278,11 @@ function needBreakdown(S, e, c) {
     if (cb) rows.push({ icon: "🔥", label: "Cesaret: yol değiştirme cesareti", val: -cb, kind: "cesaret" });
   }
   if (e.id === "karne-gunu" && S.karne && S.karne.g !== "orta") rows.push({ icon: "📜", label: S.karne.g === "iyi" ? "Karne iyi" : "Karne kötü", val: S.karne.g === "iyi" ? -3 : 3, kind: "karne" });
-  var fb = familyEventBonus(S, e, c.stat);
+  var fb = famScale(S, familyEventBonus(S, e, c.stat));
   if (fb) rows.push({ icon: "🏠", label: S.family + " ailesi etkisi", val: -fb, kind: "family" });
   if (S.family) FAMILIES[S.family].traits.forEach(function (t) {
-    var v = (t.stats || {})[c.stat] || 0;
-    if (v) rows.push({ icon: t.good ? "🏠" : "⚠️", label: t.name, val: -v, kind: "famtrait" });
+    var v0 = (t.stats || {})[c.stat] || 0, v = famScale(S, v0);
+    if (v0) rows.push({ icon: t.good ? "🏠" : "⚠️", label: t.name + (v !== v0 ? " (aile desteği " + DESTEK[destekOf(S)].toLowerCase() + ": " + sgn(-v0) + " → " + sgn(-v) + ")" : ""), val: -v, kind: "famtrait" });
   });
   var tsum = 0, trows = [];
   S.traits.forEach(function (t) {

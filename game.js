@@ -47,7 +47,7 @@ function hudBar() {
   var e = null; try { e = curEvent(S); } catch (x) {}
   var age = S.dead ? S.dead.age : e ? eventAge(S, e) : "";
   var top = STATS.slice().sort(function (a, b) { return S.stats[b] - S.stats[a]; })[0];
-  return '<div class="hud" role="button" tabindex="0" onclick="showCharacter()" title="Karakteri aç"><span title="Yaş">🎂 ' + esc(age) + '</span><span title="Aile">🏠 ' + esc(S.family) + '</span><span title="En gelişmiş özellik">' +
+  return '<div class="hud" role="button" tabindex="0" onclick="showCharacter()" title="Karakteri aç"><span title="Yaş">🎂 ' + esc(age) + '</span><span title="Aile">🏠 ' + esc(S.family) + '</span><span title="Aile desteği">🤝 ' + esc(DESTEK[destekOf(S)]) + '</span><span title="En gelişmiş özellik">' +
     STAT_ICONS[top] + " " + esc(top) + " " + S.stats[top] + '</span><span title="Maddi durum">💰 ' + esc(TIERS[varlikOf(S)]) + "</span></div>";
 }
 function shell(title, artHtml, panelHtml) {
@@ -461,10 +461,21 @@ function traitCardHtml(t) {
   return '<div class="tCard"><b>🏅 ' + esc(t) + "</b><div>" + esc((TRAITS[t] || {}).desc || "") + "</div>" + (fx ? '<div class="tFx">' + esc(fx) + "</div>" : "") + "</div>";
 }
 function itibarNoteHtml(ch) {
-  var n = (S.itibarNote || {})[ch];
-  if (n === 1) return '<div class="kvWaits"><div class="kvWaitsT">🤝 İtibarın işe yaradı</div>Mahallede adın iyi anılıyor; bu ailenin de kulağına gitti. Aile desteği yükseldi: <b>' + DESTEK[destekOf(S)] + "</b>.</div>";
-  if (n === -1) return '<div class="kvWaits lost"><div class="kvWaitsT">🤝 İtibarın zedelendi</div>Mahallede hakkında konuşulanlar eve kadar geldi. Aile desteği düştü: <b>' + DESTEK[destekOf(S)] + "</b>.</div>";
-  return "";
+  if (!S.family) return "";
+  var n = (S.itibarNote || {})[ch], why = (S.destekWhy || {})[ch], d = destekOf(S), lost = n === -1;
+  var reasonUp = { itibar: "Mahallede adın iyi anılıyor; bu ailenin de kulağına gitti.", gonul: "Eve gönlünü verdin; aile bunu hissetti.", ikisi: "Hem adın iyi anılıyor hem de eve gönlünü veriyorsun." };
+  var reasonDown = { itibar: "Mahallede hakkında konuşulanlar eve kadar geldi.", gonul: "Eve uzak kaldın; aile gönlünün başka yerde olduğunu düşünüyor.", ikisi: "Hem mahalledeki dedikodu eve kadar geldi hem de eve uzak kaldın." };
+  var head = n === 1 ? "Aile desteği yükseldi: <b>" + DESTEK[d] + "</b>. " + (reasonUp[why] || "")
+    : n === -1 ? "Aile desteği düştü: <b>" + DESTEK[d] + "</b>. " + (reasonDown[why] || "")
+    : "Aile desteğin: <b>" + DESTEK[d] + "</b>. " + (DESTEK_ALT[DESTEK[d]] || "");
+  var pct = Math.round(DESTEK_ETKI[d] * 100), f = FAMILIES[S.family];
+  var good = f.traits.filter(function (t) { return t.good; }), bad = f.traits.filter(function (t) { return !t.good; });
+  var lines = good.map(function (t) {
+    var cut = d < 2 ? " <small>(aile desteği " + DESTEK[d].toLowerCase() + " olduğu için yalnızca %" + pct + " etkili)</small>" : " <small>(tam etkili)</small>";
+    return "<li>✓ <b>" + esc(t.name) + "</b>" + cut + "</li>";
+  }).concat(bad.map(function (t) { return "<li>! <b>" + esc(t.name) + "</b> <small>(destek ne olursa olsun tam etkili)</small></li>"; }));
+  var tip = d === 2 ? "Ailen arkanda: iyi huyları tam çalışıyor." : d === 1 ? "Aile mesafeli: iyi huyların etkisi azaldı, kötü huylar sürüyor. İtibar ve gönül yükselirse yeniden açılır." : "Aile küs: iyi huyların neredeyse etkisi kalmadı, kötü huylar sürüyor. Barışmak için itibar ve gönül gerek.";
+  return '<h3 class="sectionTitle" style="font-size:18px">Aile durumu</h3><div class="kvWaits' + (lost || d === 0 ? " lost" : "") + '"><div class="kvWaitsT">🏠 ' + esc(S.family) + ' ailesi</div><div>' + head + "</div><div>" + tip + "</div><ul>" + lines.join("") + "</ul></div>";
 }
 function nextChapter() { var ch = S.ch + 1; S.ch = ch; S.chFlags = S.chFlags || {}; S.chFlags[ch] = S.flags.slice(); S.plan = buildPlan(S, ch); S.pi = 0; S.chStart[ch] = cloneStats(); S.chTraits[ch] = S.traits.slice(); S.screen = "event"; render(); }
 
