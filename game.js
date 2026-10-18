@@ -201,6 +201,14 @@ function lifelineHtml(cur) {
   return '<div class="kvLine">' + h + '</div><div class="kvLineLbl"><span>Doğum</span><span>' +
     (passed ? passed + " / " + KAVSAK_TOPLAM + " kavşak geçildi" : "Hayat çizgin · " + KAVSAK_TOPLAM + " kavşak") + "</span><span>Son söz</span></div>";
 }
+/* Kavşak görseli: aynı sahne ikiye bölünür; sol "Kazanırsan", sağ "Kazanamazsan" ihtimalini taşır */
+function forkArt(e) {
+  var srcs = sceneSrcs(e.id);
+  var L = e.kavsakKazan ? "<b>↗ Kazanırsan</b>" + esc(e.kavsakKazan) : "<b>↗ Bir yol</b>Seçtiğin yol hayatını belirler.";
+  var R = e.kavsakKazan ? "<b>↘ Kazanamazsan</b>" + esc(e.kavsakKaybet || "") : "<b>↘ Başka yol</b>Bir daha dönüş yok.";
+  return '<div class="forkArt"><div class="fk fkL">' + imgTag(srcs, "fkImg") + '<div class="fkTxt">' + L + '</div></div>' +
+    '<div class="fk fkR">' + imgTag(srcs, "fkImg") + '<div class="fkTxt">' + R + '</div></div><div class="fkSeam"></div><div class="fkSign">⑂</div></div>';
+}
 function kavsakBring(e) {
   var chips = [], seen = {};
   function add(key, html) { if (!seen[key]) { seen[key] = 1; chips.push(html); } }
@@ -216,23 +224,19 @@ function kavsakBring(e) {
   return chips;
 }
 function renderGate(e) {
-  var fork = e.kavsakKazan ?
-    '<div class="kvFork"><svg viewBox="0 0 340 140" preserveAspectRatio="none"><path d="M0 70 C 70 70, 110 70, 160 20 L 172 20" stroke="#8fd1a8" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M0 70 C 70 70, 110 70, 160 120 L 172 120" stroke="#ef9a8a" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="7 6"/><circle cx="4" cy="70" r="6" fill="#c69a3c"/></svg>' +
-    '<div class="kvWay up"><b>Kazanırsan</b>' + esc(e.kavsakKazan) + '</div><div class="kvWay down"><b>Kazanamazsan</b>' + esc(e.kavsakKaybet || "") + "</div></div>"
-    : '<div class="kvNote">Burada seçtiğin yol, hayatının geri kalanını belirler.</div>';
+  var fork = forkArt(e);
   var bring = kavsakBring(e);
   app.innerHTML = '<div class="screen">' + topbar(chTitle(e.ch)) + '<div class="kvGate">' +
     "<div>" + lifelineHtml(e.kavsak) + "</div>" +
-    '<div><div class="kvKick">Kavşak ' + e.kavsak + " / " + KAVSAK_TOPLAM + '</div><h1 class="kvTitle">' + esc(e.title) + '</h1><div class="kvAge">' + esc(eventAge(S, e)) + "</div></div>" +
-    '<p class="kvText">' + esc(e.kavsakGiris || e.text) + "</p>" + fork +
+    '<div><div class="kvKick">Kavşak ' + e.kavsak + " / " + KAVSAK_TOPLAM + '</div><h1 class="kvTitle">' + esc(e.title) + '</h1><div class="kvAge">' + esc(eventAge(S, e)) + "</div></div>" + fork +
+    '<p class="kvText">' + esc(e.kavsakGiris || e.text) + "</p>" +
     '<div class="kvBring"><div class="kvBringT">Geçmişinden yanına aldıkların</div>' +
     (bring.length ? '<div class="pvRow">' + bring.join("") + "</div>" : '<div class="kvMuted">Yanında sadece kendin varsın.</div>') + "</div>" +
     '<button class="kvBtn" onclick="S.gateFor=\'' + e.id + '\';render()">HAZIRIM</button></div></div>';
 }
 function kavsakHead(e) {
-  var stakes = e.kavsakKazan ? '<div class="kvStakes"><div class="up"><b>↗ Kazanırsan</b>' + esc(e.kavsakKazan) + '</div><div class="dn"><b>↘ Kazanamazsan</b>' + esc(e.kavsakKaybet || "") + "</div></div>" : "";
-  return '<div class="kvHead"><div class="kvHeadRow"><span class="kvKick">Kavşak ' + e.kavsak + " · " + esc(eventAge(S, e)) + '</span><span class="kvStake">Geri dönüş yok</span></div>' +
-    '<h2>' + esc(e.title) + "</h2><p>" + esc(e.text) + "</p>" + stakes + "</div>";
+  return '<div class="kvHead">' + forkArt(e) + '<div class="kvHeadRow"><span class="kvKick">Kavşak ' + e.kavsak + " · " + esc(eventAge(S, e)) + '</span><span class="kvStake">Geri dönüş yok</span></div>' +
+    '<h2>' + esc(e.title) + "</h2><p>" + esc(e.text) + "</p></div>";
 }
 function renderKavsakResult() {
   var e = CUR.e, c = CUR.c, res = CUR.res, o = res.outcome, win = o === "crit" || o === "win";
@@ -424,6 +428,7 @@ function renderChapterEnd() {
     (gained.length ? gained.map(traitCardHtml).join("") : '<div class="muted">Bu bölümde yeni rozet kazanılmadı.</div>') + itibarNoteHtml(ch) + ((S.faizNote || {})[ch] ? '<div class="kvWaits lost"><div class="kvWaitsT">💳 Borç faizi işledi</div>Ödenmemiş borç büyüdü. Maddi durum: <b>' + TIERS[varlikOf(S)] + "</b></div>" : "") +
     (hl ? '<h3 class="sectionTitle" style="font-size:18px">Unutulmayan anlar</h3><div class="logList">' + hl + "</div>" : "") +
     '<button class="primary" onclick="nextChapter()">' + esc(C.next) + "</button>");
+  var scr = app.querySelector(".screen"); if (scr) scr.classList.add("chEnd");
 }
 /* Babaannen anlatıyor: bu bölümde açılan hafızalardan en fazla ikisi + bu bölümde takılan lakap */
 function nineHtml(ch) {

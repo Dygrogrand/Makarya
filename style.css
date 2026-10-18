@@ -426,3 +426,32 @@ button:disabled{cursor:default}
 .twField{position:relative;height:230px;border-radius:14px;background:linear-gradient(#f6ecd6,#e8dbbd);border:1px solid #cdbb99;overflow:hidden}
 .twBlk{position:absolute;display:grid;place-items:center;background:#c69b49;border:1px solid #8f6b24;border-radius:6px;font-size:18px;overflow:hidden;white-space:nowrap}
 .twBlk.base{background:#8a7a5a}.twBlk.cur{background:#d8b16a}.twBlk.perfect{box-shadow:0 0 0 3px rgba(246,217,120,.9)}.twBlk.fall{transition:transform .6s,opacity .6s;transform:translateY(200px) rotate(25deg);opacity:0}
+
+/* Kavşak: gece yolu (lacivert) · Bölüm sonu: akşam kızıllığı (mor-bordo) · normal sahneler: kâğıt */
+.kvGate{background:radial-gradient(120% 70% at 50% 14%,#26315a 0%,#12172c 62%)}
+.kvDone{background:radial-gradient(120% 60% at 50% 30%,#1c4a44 0%,#101a24 64%)}
+.kvDone.kvLost{background:radial-gradient(120% 60% at 50% 30%,#4a2038 0%,#1a1020 64%)}
+.kvHead{background:#12172c;border-bottom-color:#c69a3c}
+.forkArt{position:relative;height:150px;margin:-12px -16px 2px;overflow:hidden;background:#12172c;display:flex}
+.kvGate .forkArt{margin:0 -20px;flex:0 0 150px}
+.fk{position:absolute;top:0;bottom:0;overflow:hidden}
+.fkL{left:0;width:56%;clip-path:polygon(0 0,100% 0,calc(100% - 22px) 100%,0 100%)}
+.fkR{right:0;width:56%;clip-path:polygon(22px 0,100% 0,100% 100%,0 100%)}
+.fkImg{position:absolute;top:0;height:100%;width:178%;max-width:none;object-fit:cover}
+.fkL .fkImg{left:0;filter:saturate(1.15) brightness(.8) sepia(.25) hue-rotate(60deg)}
+.fkR .fkImg{right:0;filter:grayscale(.85) brightness(.6) sepia(.5) hue-rotate(-35deg)}
+.fk:before{content:"";position:absolute;inset:0;z-index:1}
+.fkL:before{background:linear-gradient(180deg,rgba(18,23,44,.1),rgba(30,90,60,.65))}
+.fkR:before{background:linear-gradient(180deg,rgba(18,23,44,.1),rgba(110,30,30,.7))}
+.fkTxt{position:absolute;z-index:2;left:10px;right:10px;bottom:8px;font-size:11.5px;font-weight:700;line-height:1.3;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.fkR .fkTxt{left:26px}.fkL .fkTxt{right:26px}
+.fkTxt b{display:block;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.fkL .fkTxt b{color:#9fe3b8}.fkR .fkTxt b{color:#f4a897}
+.fkSeam{position:absolute;z-index:3;left:calc(50% - 2px);top:0;bottom:0;width:4px;background:#c69a3c;transform:skewX(8deg);box-shadow:0 0 14px rgba(198,154,60,.8)}
+.fkSign{position:absolute;z-index:4;left:50%;top:8px;transform:translateX(-50%);width:30px;height:30px;border-radius:50%;background:#c69a3c;color:#1a130b;display:grid;place-items:center;font-weight:900;font-size:18px}
+.chEnd .panel{background:linear-gradient(180deg,#2d2145 0%,#43263a 55%,#2a1a20 100%)}
+.chEnd .panel .sectionTitle,.chEnd .panel h3,.chEnd .panel .sectionSub,.chEnd .panel .muted{color:#f3e7d4}
+.chEnd .art{background:radial-gradient(circle at 50% 38%,#e8a98a 0,#a2556a 50%,#3a2145 100%)}
+.chEnd .compare,.chEnd .logList,.chEnd .logList .logItem small{color:#f3e7d4}
+.chEnd .compare{border-color:rgba(243,231,212,.25)}
+.chEnd .compare .up{color:#8fd1a8}.chEnd .compare .down{color:#f4a897}
