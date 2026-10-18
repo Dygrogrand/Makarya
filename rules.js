@@ -40,7 +40,7 @@ function eligible(S, e) {
 }
 function pickEvents(S, ch, n, exclude, minM, rnd) {
   rnd = rnd || Math.random;
-  var pool = EVENTS.filter(function (e) { return e.ch === ch && e.id.indexOf("kriz-") !== 0 && eligible(S, e) && exclude.indexOf(e.id) < 0 && e._m >= minM; });
+  var pool = EVENTS.filter(function (e) { return e.ch === ch && e.id.indexOf("kriz-") !== 0 && e.id.indexOf("yol-") !== 0 && eligible(S, e) && exclude.indexOf(e.id) < 0 && e._m >= minM; });
   var fixed = pool.filter(function (e) { return e.fixed; });
   var rest = pool.filter(function (e) { return !e.fixed; })
     .map(function (e) { return { e: e, k: Math.pow(rnd(), 1 / (e.weight || 1)) }; })
@@ -67,6 +67,7 @@ function replanRest(S, rnd) {
     if (S.ch === 10) setEndAge(S, S.plan);
   }
   maybeCrisis(S);
+  maybeYol(S);
 }
 /* Kriz: hattında üst üste 3 başarısızlık bir kriz olayı açar (bölüm başına en fazla bir, hayat boyu en fazla iki) */
 function maybeCrisis(S) {
@@ -77,6 +78,22 @@ function maybeCrisis(S) {
   var k = EVENTS.filter(function (e) { return e.ch === S.ch && e.id.indexOf("kriz-") === 0 && eligible(S, e); })[0];
   if (!k) return;
   S.krizCh[S.ch] = k.id; S.failStreak = 0;
+  S.krizAt = { id: k.id, age: eventAge(S, cur), m: evM(S, cur) };
+  S.plan.splice(S.pi + 1, 0, k.id);
+}
+/* Zorunlu yol değişimi: maddi durum dibe vurup üst üste başarısızlık varken (ya da tamamen sıfırlanınca) hayat başka bir yola sokulur.
+   Bölüm başına en fazla bir, hayat boyu en fazla üç; olayın kendi koşulları (hat, hafıza, maddi durum) `when` ile süzülür. */
+function maybeYol(S) {
+  if (S.ch < 7 || S.ch > 9 || S.flags.indexOf("hapis") >= 0 || S.pi >= S.plan.length - 1) return;
+  S.yolCh = S.yolCh || {};
+  if (S.yolCh[S.ch] || Object.keys(S.yolCh).length >= 3 || S.krizCh && S.krizCh[S.ch]) return;
+  var cash = varlikOf(S), fs = S.failStreak || 0;
+  if (!((cash <= 1 && fs >= 2) || (cash === 0 && S.ch >= 8))) return;
+  var cur = EV_BY_ID[S.plan[S.pi]];
+  var pool = EVENTS.filter(function (e) { return e.ch === S.ch && e.id.indexOf("yol-") === 0 && eligible(S, e) && S.plan.indexOf(e.id) < 0; });
+  if (!pool.length) return;
+  var k = pool[Math.floor(Math.random() * pool.length)];
+  S.yolCh[S.ch] = k.id; S.failStreak = 0;
   S.krizAt = { id: k.id, age: eventAge(S, cur), m: evM(S, cur) };
   S.plan.splice(S.pi + 1, 0, k.id);
 }

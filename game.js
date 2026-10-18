@@ -496,7 +496,7 @@ function renderFinal() {
   var head = dead ? art(sceneSrcs(curEvent(S).id), "🪦", "HAYAT SONA ERDİ · " + dead.age, dead.title, dead.cause)
     : art(sceneSrcs(C.endImg), "📜", "BÖLÜM " + ROMAN[S.ch] + " TAMAMLANDI", C.endAge, C.endText);
   shell(dead ? "Mezar Taşı" : "Hayat Kartı", head,
-    '<div class="finalCard' + (dead ? " grave" : "") + '"><div class="k">' + (dead ? "MAKARYA · MEZAR TAŞI" : "MAKARYA · HAYAT KARTI") + "</div><h2>" + esc(a.title) + "</h2><p><b>" + esc(S.family) + " ailesi · " + gender + " · " + esc(lifeAge()) + "</b></p><p>" + esc(dead ? dead.cause : a.prophecy) + "</p>" + (dead ? '<p class="taziye">' + esc(taziyeText(S)) + "</p>" : "") + ((S.lakaplar || []).length ? '<p class="lakaplar">Burada ' + esc(S.lakaplar.slice(-3).map(function (l) { return "“" + l.n + "”"; }).join(", ")) + " yatıyor. Hepsi aynı kişiydi.</p>" : "") + "</div>" +
+    '<div class="finalCard' + (dead ? " grave" : "") + '"><div class="k">' + (dead ? "MAKARYA · MEZAR TAŞI" : "MAKARYA · HAYAT KARTI") + "</div><h2>" + esc(a.title) + "</h2><p><b>" + esc(S.family) + " ailesi · " + gender + " · " + esc(lifeAge()) + " · 💰 " + TIERS[varlikOf(S)] + "</b></p><p>" + esc(dead ? dead.cause : a.prophecy) + "</p>" + (dead ? '<p class="taziye">' + esc(taziyeText(S)) + "</p>" : "") + ((S.lakaplar || []).length ? '<p class="lakaplar">Burada ' + esc(S.lakaplar.slice(-3).map(function (l) { return "“" + l.n + "”"; }).join(", ")) + " yatıyor. Hepsi aynı kişiydi.</p>" : "") + "</div>" +
     '<button class="primary" onclick="shareCard()">📤 KARTI PAYLAŞ</button>' +
     '<h3 class="sectionTitle" style="font-size:18px">Özelliklerin</h3>' + barsHtml() +
     '<h3 class="sectionTitle" style="font-size:18px">Rozetler</h3>' +
