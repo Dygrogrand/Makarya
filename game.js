@@ -538,8 +538,10 @@ function traitCardHtml(t) {
 function itibarNoteHtml(ch) {
   if (!S.family) return "";
   var n = (S.itibarNote || {})[ch], why = (S.destekWhy || {})[ch], d = destekOf(S), lost = n === -1;
-  var reasonUp = { itibar: "Mahallede adın iyi anılıyor; bu ailenin de kulağına gitti.", gonul: "Eve gönlünü verdin; aile bunu hissetti.", ikisi: "Hem adın iyi anılıyor hem de eve gönlünü veriyorsun." };
-  var reasonDown = { itibar: "Mahallede hakkında konuşulanlar eve kadar geldi.", gonul: "Eve uzak kaldın; aile gönlünün başka yerde olduğunu düşünüyor.", ikisi: "Hem mahalledeki dedikodu eve kadar geldi hem de eve uzak kaldın." };
+  var itN = S.stats["İtibar"], itE = CHAPTERS[ch].expected, glN = S.stats["Gönül"], glE = Math.round(statNorm("Gönül", ch));
+  var itTxt = "İtibarın " + itN + ", bu bölümde beklenen " + itE + "; ", glTxt = "Gönül değerin " + glN + ", beklenen " + glE + "; ";
+  var reasonUp = { itibar: itTxt + "adın beklenenin üstünde, aile bunu duydu.", gonul: glTxt + "eve gönlünü verdin, aile bunu hissetti.", ikisi: itTxt + glTxt + "ikisi de beklenenin üstünde." };
+  var reasonDown = { itibar: itTxt + "beklenenin belirgin altında kaldığı için aile desteği aşındı.", gonul: glTxt + "beklenenin belirgin altında kaldığı için aile desteği aşındı.", ikisi: itTxt + glTxt + "ikisi birlikte aile desteğini aşındırdı." };
   var head = n === 1 ? "Aile desteği yükseldi: <b>" + DESTEK[d] + "</b>. " + (reasonUp[why] || "")
     : n === -1 ? "Aile desteği düştü: <b>" + DESTEK[d] + "</b>. " + (reasonDown[why] || "")
     : "Aile desteğin: <b>" + DESTEK[d] + "</b>. " + (DESTEK_ALT[DESTEK[d]] || "");
