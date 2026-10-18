@@ -129,7 +129,10 @@ function withVariant(S, e) {
 }
 
 /* Kavşağın sonucu tek bir yol adıyla: "İyi bir lise", "Okulu bıraktı", "Esnaf oldu" */
+var PATH_LABEL = { "k10-esnaf|Markete “koruma” ortaklığı sat": ["Mahallenin “koruyucusu” oldu", "Koruma pazarlığı tutmadı"] };
 function kavsakPath(e, c, outcome) {
+  var po = PATH_LABEL[e.id + "|" + c.t];
+  if (po) return outcome === "crit" || outcome === "win" ? po[0] : po[1];
   var lbl = function (f) { f = flagList(f).filter(function (x) { return x.charAt(0) !== "-"; })[0]; return f && FLAG_LABELS[f] ? FLAG_LABELS[f].replace(/\.$/, "") : ""; };
   var win = outcome === "crit" || outcome === "win";
   if (outcome === "direct") return lbl(c.flag) || c.t;

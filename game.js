@@ -79,7 +79,7 @@ function renderStart() {
     '<div class="row"><button class="secondary" onclick="showTutorial()">' + T("Nasıl oynanır?") + '</button>' +
     (loadMeta().lives ? '<button class="secondary" onclick="showGraveyard()">🪦 Koleksiyon</button>' : "") + "</div>" +
     '<div class="muted">Kız karakterin hikâyesi hazırlanıyor.</div>' +
-    '<div class="row langRow"><button class="secondary' + (LANG === "tr" ? " on" : "") + '" onclick="setLang(\'tr\')">TR</button><button class="secondary' + (LANG === "en" ? " on" : "") + '" onclick="setLang(\'en\')">EN</button></div>');
+    '<div class="row langRow"><button class="secondary" onclick="toggleCurtain()" title="Sahne ekranı">🎬 ' + (curtainOff() ? "Kapalı" : "Açık") + '</button><button class="secondary' + (LANG === "tr" ? " on" : "") + '" onclick="setLang(\'tr\')">TR</button><button class="secondary' + (LANG === "en" ? " on" : "") + '" onclick="setLang(\'en\')">EN</button></div>');
 }
 function resume() {
   var sv = loadSave(); if (!sv) return; S = sv; CUR = null;
@@ -247,6 +247,17 @@ function kavsakHead(e) {
   return '<div class="kvHead">' + forkArt(e) + '<div class="kvHeadRow"><span class="kvKick">Kavşak ' + e.kavsak + " · " + esc(eventAge(S, e)) + '</span><span class="kvStake">Geri dönüş yok</span></div>' +
     '<h2>' + esc(e.title) + "</h2><p>" + esc(e.text) + "</p></div>";
 }
+/* Aile desteği değiştiğinde sonuç ekranında büyük, açıklamalı kart */
+function famShiftHtml(res) {
+  if (!res || !res.destek || !S.family) return "";
+  var now = destekOf(S), was = clamp(now - res.destek, 0, 2), up = res.destek > 0;
+  var p0 = Math.round(DESTEK_ETKI[was] * 100), p1 = Math.round(DESTEK_ETKI[now] * 100);
+  var good = FAMILIES[S.family].traits.filter(function (t) { return t.good; }).map(function (t) { return esc(t.name); }).join(", ");
+  var line = up ? "Ailenin iyi huyları yeniden güçleniyor: etki %" + p0 + " → %" + p1 + (good ? " (" + good + ")" : "") + "."
+    : now === 0 ? "Aile küstü. İyi huyların neredeyse hiç işlemiyor: etki %" + p0 + " → %" + p1 + (good ? " (" + good + ")" : "") + ". Kötü huylar aynen sürüyor."
+    : "Ailenin iyi huyları zayıfladı: etki %" + p0 + " → %" + p1 + (good ? " (" + good + ")" : "") + ". Kötü huylar aynen sürüyor.";
+  return '<div class="famShift ' + (up ? "up" : "down") + '"><div class="fsL">🏠 AİLE DESTEĞİ ' + (up ? "YÜKSELDİ" : "DÜŞTÜ") + '</div><div class="fsV">' + DESTEK[was] + " → <b>" + DESTEK[now] + '</b></div><div class="fsD">' + line + "</div></div>";
+}
 function renderKavsakResult() {
   var e = CUR.e, c = CUR.c, res = CUR.res, o = res.outcome, win = o === "crit" || o === "win";
   var title = kavsakPath(e, c, o);
@@ -254,18 +265,31 @@ function renderKavsakResult() {
     : CUR.mini != null ? '<div class="kvRoll"><div class="kvDie small">%' + Math.round(CUR.mini * 100) + "</div><span>Mini oyun<br>" + OUT_LABEL[o] + "</span></div>" : "";
   var chips = res.deltas.map(function (d) { return pvChip(d[1] < 0 ? "pvHurt" : "pvSure", STAT_ICONS[d[0]] + " " + esc(d[0]) + " <b>" + signed(d[1]) + "</b>"); })
     .concat(res.traits.map(function (t) { return pvChip("pvEarn", "🏅 " + esc(t)); }))
-    .concat(res.destek ? [pvChip(res.destek < 0 ? "pvHurt" : "pvHelpD", "🏠 Aile desteği " + (res.destek < 0 ? "↓ " : "↑ ") + DESTEK[destekOf(S)])] : [])
     .concat(res.varlik ? [pvChip(res.varlik < 0 ? "pvHurt" : "pvEarn", "💰 Maddi durum " + (res.varlik < 0 ? "↓ " : "↑ ") + TIERS[varlikOf(S)])] : []);
   app.innerHTML = '<div class="screen">' + topbar("Yol seçildi") + '<div class="kvGate kvDone' + (win || o === "direct" ? "" : " kvLost") + '">' +
     "<div>" + lifelineHtml(e.kavsak) + "</div>" +
     '<div class="kvStamp">YOL SEÇİLDİ</div><h1 class="kvTitle center">' + esc(title) + '</h1><p class="kvText center">' + esc(res.text) + "</p>" + roll +
-    (chips.length ? '<div class="pvRow center o-' + o + '">' + chips.join("") + "</div>" : "") +
+    (chips.length ? '<div class="pvRow center o-' + o + '">' + chips.join("") + "</div>" : "") + famShiftHtml(res) +
     (res.death ? '<div class="deathCard"><div class="l">☠️ HAYAT BURADA SONA ERDİ</div><div class="d">' + esc(res.death) + "</div></div>" +
       '<button class="kvBtn" onclick="advance()">🪦 MEZAR TAŞINI GÖR</button>' : '<button class="kvBtn" onclick="advance()">DEVAM ET</button>') + "</div></div>";
+}
+/* Sahne perdesi: olay önce tam ekran görsel + başlık/metinle açılır; “Devam” seçeneklere geçirir */
+var CURTAIN_KEY = null, CURTAIN_PEND = null;
+function curtainOff() { try { return localStorage.getItem("makarya-perde") === "0"; } catch (x) { return false; } }
+function toggleCurtain() { try { localStorage.setItem("makarya-perde", curtainOff() ? "1" : "0"); } catch (x) {} render(); }
+function openScene() { CURTAIN_KEY = CURTAIN_PEND; render(); }
+function renderCurtain(e, ck) {
+  CURTAIN_PEND = ck;
+  app.innerHTML = '<div class="screen curtain">' + topbar(chTitle(e.ch)) +
+    '<div class="curtainArt" onclick="openScene()"><div class="artIcon">' + e.icon + "</div>" + imgTag(sceneSrcs(e.id)) +
+    '<div class="curCap"><h1>' + esc(e.title) + "</h1><p>" + esc(e.text) + '</p></div>' +
+    '<button class="curNext" onclick="event.stopPropagation();openScene()">' + T("Devam") + ' ›</button></div></div>';
 }
 function renderEvent() {
   var e = curEvent(S);
   if (e.kavsak && S.gateFor !== e.id) return renderGate(e);
+  var ck = S.ch + "|" + S.pi + "|" + e.id;
+  if (!e.kavsak && !curtainOff() && CURTAIN_KEY !== ck) return renderCurtain(e, ck);
   /* Aynı hafızayı açan bir seçenek kartta zaten gösteriliyorsa yukarıdaki "Geçmişten" kutusu tekrar etmesin */
   var shownFlags = e.choices.filter(function (c) { return c.reqFlag && hasReq(S, c, e); }).map(function (c) { return c.reqFlag; });
   var recall = (e.recall || []).filter(function (r) { return S.flags.indexOf(r.flag) >= 0 && shownFlags.indexOf(r.flag) < 0; })
@@ -392,8 +416,7 @@ function renderResult() {
     '<div class="resultImg"><div class="artIcon">' + e.icon + "</div>" + imgTag(sceneSrcs(e.id)) + "</div>" +
     '<div class="resultHeader"><div class="badge o-' + o + '">' + OUT_LABEL[o] + '</div><div class="resultTitle">' + esc(o === "direct" ? c.t : OUT_TITLE[o]) + "</div>" +
     '<div class="resultText">' + esc(res.text) + "</div>" + (res.note ? '<div class="note">' + esc(res.note) + "</div>" : "") + "</div>" +
-    rollCard + gains + traits + (res.lakap ? '<div class="lakapCard"><div class="l">MAHALLENİN TAKTIĞI AD</div><div class="n">“' + esc(res.lakap) + '”</div><div class="d">Bu bölümün sonunda ve mezar taşında anılacak.</div></div>' : "") + (res.destek || res.varlik ? '<div class="pvRow">' + (res.destek ? pvChip(res.destek < 0 ? "pvHurt" : "pvHelp", "🏠 Aile desteği " + (res.destek < 0 ? "↓ " : "↑ ") + DESTEK[destekOf(S)]) : "") +
-      (res.varlik ? pvChip(res.varlik < 0 ? "pvHurt" : "pvEarn", "💰 Maddi durum " + (res.varlik < 0 ? "↓ " : "↑ ") + TIERS[varlikOf(S)]) : "") + "</div>" : "") +
+    famShiftHtml(res) + rollCard + gains + traits + (res.lakap ? '<div class="lakapCard"><div class="l">MAHALLENİN TAKTIĞI AD</div><div class="n">“' + esc(res.lakap) + '”</div><div class="d">Bu bölümün sonunda ve mezar taşında anılacak.</div></div>' : "") + (res.varlik ? '<div class="pvRow">' + (res.varlik ? pvChip(res.varlik < 0 ? "pvHurt" : "pvEarn", "💰 Maddi durum " + (res.varlik < 0 ? "↓ " : "↑ ") + TIERS[varlikOf(S)]) : "") + "</div>" : "") +
     (res.death ? '<div class="deathCard"><div class="l">☠️ HAYAT BURADA SONA ERDİ</div><div class="d">' + esc(res.death) + "</div></div>" +
       '<button class="primary dark" onclick="advance()">🪦 MEZAR TAŞINI GÖR</button>' : '<button class="primary" onclick="advance()">DEVAM ET</button>') + "</div></div>";
 }
