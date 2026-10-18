@@ -47,7 +47,7 @@ function hudBar() {
   var e = null; try { e = curEvent(S); } catch (x) {}
   var age = S.dead ? S.dead.age : e ? eventAge(S, e) : "";
   var top = STATS.slice().sort(function (a, b) { return S.stats[b] - S.stats[a]; })[0];
-  return '<div class="hud"><span title="Yaş">🎂 ' + esc(age) + '</span><span title="Aile">🏠 ' + esc(S.family) + '</span><span title="En gelişmiş özellik">' +
+  return '<div class="hud" role="button" tabindex="0" onclick="showCharacter()" title="Karakteri aç"><span title="Yaş">🎂 ' + esc(age) + '</span><span title="Aile">🏠 ' + esc(S.family) + '</span><span title="En gelişmiş özellik">' +
     STAT_ICONS[top] + " " + esc(top) + " " + S.stats[top] + '</span><span title="Maddi durum">💰 ' + esc(TIERS[varlikOf(S)]) + "</span></div>";
 }
 function shell(title, artHtml, panelHtml) {
