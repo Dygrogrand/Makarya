@@ -304,7 +304,7 @@ function renderCurtain(e, ck) {
     '<div class="curtainArt" onclick="openScene()">' + imgTag(src, "curBg") +
     '<div class="curFrame"><div class="artIcon">' + e.icon + "</div>" + imgTag(src, "curImg") + "</div>" +
     '<div class="curCap"><h1>' + esc(e.title) + "</h1><p>" + esc(e.text) + "</p>" + curCtx(e) + "</div>" +
-    '<button class="curNext" onclick="event.stopPropagation();openScene()">' + T("Devam") + " ›</button></div></div>";
+    '<div class="curBar"><button class="curNext" onclick="event.stopPropagation();openScene()">' + T("Devam") + " ›</button></div></div></div>";
 }
 function eventCtx(e) {
   /* Aynı hafızayı açan bir seçenek kartta zaten gösteriliyorsa yukarıdaki "Geçmişten" kutusu tekrar etmesin */
