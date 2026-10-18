@@ -286,10 +286,12 @@ function toggleCurtain() { try { localStorage.setItem("makarya-perde", curtainOf
 function openScene() { CURTAIN_KEY = CURTAIN_PEND; render(); }
 function renderCurtain(e, ck) {
   CURTAIN_PEND = ck;
+  var src = sceneSrcs(e.id);
   app.innerHTML = '<div class="screen curtain">' + topbar(chTitle(e.ch)) +
-    '<div class="curtainArt" onclick="openScene()"><div class="artIcon">' + e.icon + "</div>" + imgTag(sceneSrcs(e.id)) +
-    '<div class="curCap"><h1>' + esc(e.title) + "</h1><p>" + esc(e.text) + '</p></div>' +
-    '<button class="curNext" onclick="event.stopPropagation();openScene()">' + T("Devam") + ' ›</button></div></div>';
+    '<div class="curtainArt" onclick="openScene()">' + imgTag(src, "curBg") +
+    '<div class="curFrame"><div class="artIcon">' + e.icon + "</div>" + imgTag(src, "curImg") + "</div>" +
+    '<div class="curCap"><h1>' + esc(e.title) + "</h1><p>" + esc(e.text) + "</p></div>" +
+    '<button class="curNext" onclick="event.stopPropagation();openScene()">' + T("Devam") + " ›</button></div></div>";
 }
 function renderEvent() {
   var e = curEvent(S);
