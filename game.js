@@ -247,6 +247,12 @@ function kavsakHead(e) {
   return '<div class="kvHead">' + forkArt(e) + '<div class="kvHeadRow"><span class="kvKick">Kavşak ' + e.kavsak + " · " + esc(eventAge(S, e)) + '</span><span class="kvStake">Geri dönüş yok</span></div>' +
     '<h2>' + esc(e.title) + "</h2><p>" + esc(e.text) + "</p></div>";
 }
+/* Arka plan (doğal) ölümün nedeni: seçimden bağımsız, yaşa bağlı rastgele risk */
+function deathWhy(res) {
+  if (!res.natural) return "";
+  var pc = res.deathP != null ? (res.deathP * 100).toFixed(1).replace(".", ",") : "";
+  return '<div class="deathWhy">Bu, seçiminin sonucu değil: yaşa bağlı arka plan riski. Bu yaşta her olayda yaklaşık %' + pc + ' ölüm payı var; zar kötü geldi. Dayanıklılığın ve alışkanlıkların bu payı azaltır ya da artırır.</div>';
+}
 /* Aile desteği değiştiğinde sonuç ekranında büyük, açıklamalı kart */
 function famShiftHtml(res) {
   if (!res || !res.destek || !S.family) return "";
@@ -270,7 +276,7 @@ function renderKavsakResult() {
     "<div>" + lifelineHtml(e.kavsak) + "</div>" +
     '<div class="kvStamp">YOL SEÇİLDİ</div><h1 class="kvTitle center">' + esc(title) + '</h1><p class="kvText center">' + esc(res.text) + "</p>" + roll +
     (chips.length ? '<div class="pvRow center o-' + o + '">' + chips.join("") + "</div>" : "") + famShiftHtml(res) +
-    (res.death ? '<div class="deathCard"><div class="l">☠️ HAYAT BURADA SONA ERDİ</div><div class="d">' + esc(res.death) + "</div></div>" +
+    (res.death ? '<div class="deathCard"><div class="l">☠️ HAYAT BURADA SONA ERDİ</div><div class="d">' + esc(res.death) + "</div>" + deathWhy(res) + "</div>" +
       '<button class="kvBtn" onclick="advance()">🪦 MEZAR TAŞINI GÖR</button>' : '<button class="kvBtn" onclick="advance()">DEVAM ET</button>') + "</div></div>";
 }
 /* Sahne perdesi: olay önce tam ekran görsel + başlık/metinle açılır; “Devam” seçeneklere geçirir */
@@ -417,7 +423,7 @@ function renderResult() {
     '<div class="resultHeader"><div class="badge o-' + o + '">' + OUT_LABEL[o] + '</div><div class="resultTitle">' + esc(o === "direct" ? c.t : OUT_TITLE[o]) + "</div>" +
     '<div class="resultText">' + esc(res.text) + "</div>" + (res.note ? '<div class="note">' + esc(res.note) + "</div>" : "") + "</div>" +
     famShiftHtml(res) + rollCard + gains + traits + (res.lakap ? '<div class="lakapCard"><div class="l">MAHALLENİN TAKTIĞI AD</div><div class="n">“' + esc(res.lakap) + '”</div><div class="d">Bu bölümün sonunda ve mezar taşında anılacak.</div></div>' : "") + (res.varlik ? '<div class="pvRow">' + (res.varlik ? pvChip(res.varlik < 0 ? "pvHurt" : "pvEarn", "💰 Maddi durum " + (res.varlik < 0 ? "↓ " : "↑ ") + TIERS[varlikOf(S)]) : "") + "</div>" : "") +
-    (res.death ? '<div class="deathCard"><div class="l">☠️ HAYAT BURADA SONA ERDİ</div><div class="d">' + esc(res.death) + "</div></div>" +
+    (res.death ? '<div class="deathCard"><div class="l">☠️ HAYAT BURADA SONA ERDİ</div><div class="d">' + esc(res.death) + "</div>" + deathWhy(res) + "</div>" +
       '<button class="primary dark" onclick="advance()">🪦 MEZAR TAŞINI GÖR</button>' : '<button class="primary" onclick="advance()">DEVAM ET</button>') + "</div></div>";
 }
 function advance() {

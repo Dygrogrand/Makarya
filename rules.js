@@ -404,7 +404,7 @@ function applyOutcome(S, e, c, outcome, extra) {
     S.dead = { cause: c.risk.cause, age: eventAge(S, e), title: e.title };
   } else if (e.ch >= 6) {
     var bg = backgroundDeath(S, e, extra.bgRoll);
-    if (bg) { res.death = bg; res.natural = true; S.dead = { cause: bg, age: eventAge(S, e), title: e.title }; }
+    if (bg) { res.death = bg; res.natural = true; res.deathP = hazard(S, e); S.dead = { cause: bg, age: eventAge(S, e), title: e.title }; }
   }
   var unlock = c.reqFlag && /^(hat|meslek)-|^evli$/.test(c.reqFlag) ? null : c.reqFlag ? { type: "flag", key: c.reqFlag } : c.reqVoice ? { type: "voice", key: c.reqVoice } : c.req ? { type: "trait", key: c.req } :
     c.reqVarlik != null ? { type: "varlik", key: TIERS[c.reqVarlik] } : c.reqDestek != null ? { type: "destek", key: DESTEK[c.reqDestek] } : null;
