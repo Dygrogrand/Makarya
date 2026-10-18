@@ -534,3 +534,11 @@ button:disabled{cursor:default}
 .curCap .curCtx .recall,.curCap .curCtx .voice{background:rgba(166,124,36,.10);color:#4c3f2e;font-style:italic}
 .curCap .curCtx .recall b{color:#8a6212}
 .curCap .curCtx .karneBox{color:#3a2f24}
+
+/* aşağı kaydır tutamacı */
+.screen{position:relative}
+#scrollDn{position:absolute;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:30;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(20,30,32,.78);color:#f3e6c8;font-size:24px;line-height:36px;padding:0;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.35);animation:dnBob 1.8s ease-in-out infinite}
+#scrollDn[hidden]{display:none}
+@keyframes dnBob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+.panel{scrollbar-width:thin;scrollbar-color:rgba(120,100,70,.55) transparent}
+.panel::-webkit-scrollbar{width:4px}.panel::-webkit-scrollbar-thumb{background:rgba(120,100,70,.55);border-radius:4px}

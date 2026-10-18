@@ -60,6 +60,7 @@ function render() {
   var f = { start: renderStart, family: renderFamily, familyResult: renderFamilyResult, event: renderEvent, check: renderCheck,
     minigame: renderMini, result: renderResult, chapterEnd: renderChapterEnd, final: renderFinal }[S.screen] || renderStart;
   f();
+  scrollHint();
   if (["familyResult", "event", "result", "chapterEnd", "final"].indexOf(S.screen) >= 0) save();
 }
 
@@ -355,13 +356,26 @@ var BOND = {
   social: ["baskan", "cesurPark", "sirVerdi", "lakapli", "camKirildi", "sokak-yasagi", "mahalle-cocugu", "takim-oyuncusu", "yuruyus-grubu"],
   education: ["fuar-birincisi", "yz-odevci", "dershaneli", "iyi-lise", "karne-iyi", "karne-kotu", "ai-kopyaci", "kariyer-degisti"]
 };
+/* Her hafıza yalnızca konusu olayla gerçekten örtüşüyorsa hatırlanır (olay başlığı + metninde anahtar sözcük aranır). */
+var BOND_KW = {
+  kediGeldi: /kedi|evcil|köpek|veteriner/i, kardesli: /kardeş/i, "alcili-kol": /hastane|ilaç kutu|ağaç|voleybol|alçı/i,
+  "kendi-odasi": /odası|odan|boş oda|taşın|kendi kapın/i, "karne-iyi": /karne|sınav kâğıdı|deneme sonuç|veli toplantı|öğretmenler günü/i, "karne-kotu": /karne|sınav kâğıdı|deneme sonuç|veli toplantı|öğretmenler günü/i,
+  ilkKelimePara: /harçlık|bozuk para|cüzdan|market kasa|kasada|ilk kelime/i, "teneffus-tuccari": /kantin|tezgâh|ikinci el|satış|esnaf/i, tepsiTekeli: /tepsi|kış boyu/i,
+  "oyun-faturasi": /oyun|satın alma|kart ekstre/i, borclu: /borç|asgari|taksit|kredi/i, "taki-defteri": /takı|düğün|nikâh/i, "dijital-paraci": /dijital para|kripto|borsa/i,
+  baskan: /başkan|temsilci|seçim|oy verme/i, cesurPark: /haraç|kavga|arka duvar|büyük çocuk|köşedeki/i, sirVerdi: /sır|dedikodu|söylenti/i,
+  lakapli: /gülüyorlar|lakap|takma ad|eski sınıf|buluşma/i, camKirildi: /komşu|apartman|aidat|genel kurul|cam\b/i, "sokak-yasagi": /sokak|haraç/i,
+  "mahalle-cocugu": /mahalle|sokakta oyun|sokak mı/i, "takim-oyuncusu": /takım|seçme|turnuva|voleybol|maç/i, "yuruyus-grubu": /yürüyüş|emekli grup/i,
+  "fuar-birincisi": /bilim fuar|fuar/i, "yz-odevci": /yapay zek.*ödev|ödev asistan|ödev.*yapay zek/i, dershaneli: /dershane|deneme/i, "iyi-lise": /lise sınav|tercih|lise.*sınav/i, "ai-kopyaci": /yapay zek.*ödev|ödev asistan/i, "kariyer-degisti": /meslek|kariyer|yeniden öğren/i
+};
+function bondOk(f, e) { var r = BOND_KW[f]; return !!r && r.test((e.title || "") + " " + (e.text || "")); }
+
 function bondLine(e, recallHtml) {
   if (!e.fam || recallHtml || e.kavsak || e.ch < 2 || e.id === "karne-gunu") return "";
   S.bondN = S.bondN || {}; S.bondAt = S.bondAt || {};
   if (S.bondAt[e.id]) return S.bondAt[e.id] === "-" ? "" : S.bondAt[e.id];
-  var out = "-", pool = (BOND[e.fam] || []).filter(function (f) { return S.flags.indexOf(f) >= 0 && (S.bondN[f] || 0) < 2 && FLAG_LABELS[f]; });
+  var out = "-", pool = (BOND[e.fam] || []).filter(function (f) { return S.flags.indexOf(f) >= 0 && (S.bondN[f] || 0) < 2 && FLAG_LABELS[f] && bondOk(f, e); });
   var lk = (S.lakaplar || []).filter(function (l) { return l.ch < e.ch; });
-  if (lk.length && e.fam === "social" && (S.bondN.lakap || 0) < 3) { var L = lk[lk.length - 1]; S.bondN.lakap = (S.bondN.lakap || 0) + 1; out = '<div class="recall bondLine"><b>HATIRLANAN</b>Mahalle seni hâlâ “' + esc(L.n) + '” diye anıyor.</div>'; }
+  if (lk.length && e.fam === "social" && (S.bondN.lakap || 0) < 3 && bondOk("lakapli", e)) { var L = lk[lk.length - 1]; S.bondN.lakap = (S.bondN.lakap || 0) + 1; out = '<div class="recall bondLine"><b>HATIRLANAN</b>Mahalle seni hâlâ “' + esc(L.n) + '” diye anıyor.</div>'; }
   else if (pool.length) { var f = pool[(e._i || 0) % pool.length]; S.bondN[f] = (S.bondN[f] || 0) + 1; out = '<div class="recall bondLine"><b>HATIRLANAN</b>' + esc(FLAG_LABELS[f].replace(/\.$/, "")) + ".</div>"; }
   S.bondAt[e.id] = out; save();
   return out === "-" ? "" : out;
@@ -987,3 +1001,15 @@ function tutRender() {
 }
 function tutGo(d) { TUT.p = Math.max(0, Math.min(TUT_PAGES.length - 1, TUT.p + d)); tutRender(); }
 function tutClose() { if (TUT && TUT.el) TUT.el.remove(); TUT = null; }
+
+/* Sayfaya sığmayan içerik için küçük "aşağı" tutamacı: panel taşıyorsa ve sonuna gelinmediyse görünür; dokununca aşağı kaydırır. */
+function scrollHint() {
+  var old = document.getElementById("scrollDn"); if (old) old.remove();
+  var sc = document.querySelector("#app .screen"), pn = document.querySelector("#app .panel");
+  if (!sc || !pn) return;
+  var b = document.createElement("button"); b.id = "scrollDn"; b.type = "button"; b.setAttribute("aria-label", "Aşağı kaydır"); b.textContent = "⌄"; b.hidden = true;
+  b.onclick = function () { pn.scrollBy({ top: Math.round(pn.clientHeight * 0.8), behavior: "smooth" }); };
+  sc.appendChild(b);
+  function upd() { b.hidden = !(pn.scrollHeight - pn.clientHeight > 40 && pn.scrollHeight - pn.scrollTop - pn.clientHeight > 40); }
+  pn.addEventListener("scroll", upd, { passive: true }); setTimeout(upd, 60); setTimeout(upd, 500);
+}
