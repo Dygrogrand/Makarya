@@ -285,7 +285,7 @@ function curtainOff() { try { return localStorage.getItem("makarya-perde") === "
 function toggleCurtain() { try { localStorage.setItem("makarya-perde", curtainOff() ? "1" : "0"); } catch (x) {} render(); }
 function openScene() { CURTAIN_KEY = CURTAIN_PEND; render(); }
 function curCtx(e) {
-  var X = eventCtx(e), body = X.karne + X.recall + X.bond + X.voices + X.famLine;
+  var X = eventCtx(e), body = X.karne + X.recall + X.bond + X.voices;
   return body ? '<div class="curRule"><span>Bu sahnede seni etkileyenler</span></div><div class="curCtx">' + body + "</div>" : "";
 }
 function renderCurtain(e, ck) {
@@ -346,7 +346,7 @@ function renderEvent() {
     }
     return choiceCard(e, c, idx);
   }).join("");
-  shell(chTitle(e.ch), e.kavsak ? kavsakHead(e) : art(sceneSrcs(e.id), e.icon, "", e.title, e.text), (e.kavsak || curtainOff() ? karne + recall + bond + voices + famLine : "") + choices);
+  shell(chTitle(e.ch), e.kavsak ? kavsakHead(e) : art(sceneSrcs(e.id), e.icon, "", e.title, e.text), (e.kavsak || curtainOff() ? karne + recall + bond + voices : "") + choices);
 }
 /* Karakter bağı: olayın türüne uyan, daha önce yaşanmış bir hafızayı kısa bir satırla hatırlatır (aynı hafıza hayatta en çok iki kez). */
 var BOND = {
