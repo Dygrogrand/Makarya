@@ -542,3 +542,11 @@ button:disabled{cursor:default}
 @keyframes dnBob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
 .panel{scrollbar-width:thin;scrollbar-color:rgba(120,100,70,.55) transparent}
 .panel::-webkit-scrollbar{width:4px}.panel::-webkit-scrollbar-thumb{background:rgba(120,100,70,.55);border-radius:4px}
+
+/* kavşak: her yön kendi görseli (kavsak-yol.js) */
+.fkNew .fkImg{width:100%;height:100%;object-fit:cover}
+.fkNew .fkL .fkImg{left:0;filter:saturate(1.05) brightness(.82)}
+.fkNew .fkR .fkImg{right:0;left:auto;filter:saturate(.95) brightness(.74)}
+.fkNew .fkTxt b{font-size:12px}
+.fkNew .fkR .fkTxt{left:36px}.fkNew .fkL .fkTxt{right:36px}
+.kvGate .forkArt.fkNew{flex-basis:172px;height:172px}

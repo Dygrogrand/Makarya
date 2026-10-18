@@ -18,7 +18,7 @@ function loadMeta() { try { var m = JSON.parse(localStorage.getItem(META_KEY)); 
 function saveMeta(m) { try { localStorage.setItem(META_KEY, JSON.stringify(m)); } catch (e) {} }
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
 
-var IMG_Q = "?i=20261018p"; /* görseller değişince artır: tarayıcı önbelleği eski resmi göstermesin */
+var IMG_Q = "?i=20261018q"; /* görseller değişince artır: tarayıcı önbelleği eski resmi göstermesin */
 function withExt(base) { return [base + ".webp" + IMG_Q, base + ".png" + IMG_Q, base + ".jpg" + IMG_Q]; }
 function sceneSrcs(id) {
   var e = EV_BY_ID[id], out = withExt((S.gender === "kiz" ? "img/kiz/sahne/" : "img/sahne/") + id);
@@ -213,6 +213,14 @@ function lifelineHtml(cur) {
 }
 /* Kavşak görseli: aynı sahne ikiye bölünür; sol "Kazanırsan", sağ "Kazanamazsan" ihtimalini taşır */
 function forkArt(e) {
+  var Y = (typeof KAVSAK_YOL !== "undefined" && KAVSAK_YOL[e.id]) || null;
+  if (Y) {
+    var win = !!e.kavsakKazan;
+    var L = win ? "<b>↗ Kazanırsan</b>" + esc(e.kavsakKazan) : "<b>" + esc(Y.l[0]) + "</b>" + esc(Y.l[1]);
+    var R = win ? "<b>↘ Kazanamazsan</b>" + esc(e.kavsakKaybet || "") : "<b>" + esc(Y.r[0]) + "</b>" + esc(Y.r[1]);
+    return '<div class="forkArt fkNew"><div class="fk fkL">' + imgTag(["img/kavsak/" + e.id + "-l.webp" + IMG_Q], "fkImg") + '<div class="fkTxt">' + L + '</div></div>' +
+      '<div class="fk fkR">' + imgTag(["img/kavsak/" + e.id + "-r.webp" + IMG_Q], "fkImg") + '<div class="fkTxt">' + R + '</div></div><div class="fkSeam"></div><div class="fkSign">⑂</div></div>';
+  }
   var srcs = sceneSrcs(e.id);
   var L = e.kavsakKazan ? "<b>↗ Kazanırsan</b>" + esc(e.kavsakKazan) : "<b>↗ Bir yol</b>Seçtiğin yol hayatını belirler.";
   var R = e.kavsakKazan ? "<b>↘ Kazanamazsan</b>" + esc(e.kavsakKaybet || "") : "<b>↘ Başka yol</b>Bir daha dönüş yok.";
