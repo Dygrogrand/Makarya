@@ -40,7 +40,15 @@ function art(srcs, icon, kicker, title, text, tall) {
 function topbar(title) {
   return '<div class="topbar"><button class="topBtn" onclick="showCharacter()" aria-label="Karakter">☻</button><div class="brandWord">' + esc(title) +
     '</div><button class="topBtn" onclick="showRules()" aria-label="Kurallar">?</button></div>' +
-    '<div class="progress"><i style="width:' + (S.plan && S.plan.length ? Math.round(100 * S.pi / S.plan.length) : 0) + '%"></i></div>';
+    hudBar() + '<div class="progress"><i style="width:' + (S.plan && S.plan.length ? Math.round(100 * S.pi / S.plan.length) : 0) + '%"></i></div>';
+}
+function hudBar() {
+  if (!S || !S.family || !S.plan || !S.plan.length || S.screen === "start" || S.screen === "family") return "";
+  var e = null; try { e = curEvent(S); } catch (x) {}
+  var age = S.dead ? S.dead.age : e ? eventAge(S, e) : "";
+  var top = STATS.slice().sort(function (a, b) { return S.stats[b] - S.stats[a]; })[0];
+  return '<div class="hud"><span title="Yaş">🎂 ' + esc(age) + '</span><span title="Aile">🏠 ' + esc(S.family) + '</span><span title="En gelişmiş özellik">' +
+    STAT_ICONS[top] + " " + esc(top) + " " + S.stats[top] + '</span><span title="Maddi durum">💰 ' + esc(TIERS[varlikOf(S)]) + "</span></div>";
 }
 function shell(title, artHtml, panelHtml) {
   app.innerHTML = '<div class="screen">' + topbar(title) + artHtml + '<div class="panel">' + panelHtml + "</div></div>";
