@@ -460,7 +460,8 @@ function backgroundDeath(S, e, roll) {
 
 /* Final kartı: en güçlü iki stat (mevcut değer + gelişimin iki katı) */
 var ARCH_ADJ = { "Akıl": "Hesaplı", "Çene": "Dili Güçlü", "Kurnazlık": "Kurnaz", "Cesaret": "Gözü Kara", "Pişkinlik": "Pişkin", "İtibar": "Saygın", "Gönül": "Sevecen", "Dayanıklılık": "Sabırlı", "Sosyal Radar": "Sezgili" };
-var ARCH_NOUN = { "Akıl": "Mühendis", "Çene": "Diplomat", "Kurnazlık": "Tüccar", "Cesaret": "Kaptan", "Pişkinlik": "Şovmen", "İtibar": "Muhtar", "Gönül": "Âşık", "Dayanıklılık": "Maratoncu", "Sosyal Radar": "Dedektif" };
+/* Meslek adı değil, karakter adı: hangi yolu seçersen seç çelişmesin (polis yolunda "Mühendis" çıkmasın) */
+var ARCH_NOUN = { "Akıl": "Bilge", "Çene": "Hatip", "Kurnazlık": "Tilki", "Cesaret": "Yiğit", "Pişkinlik": "Şovmen", "İtibar": "Mahalle Büyüğü", "Gönül": "Âşık", "Dayanıklılık": "Maratoncu", "Sosyal Radar": "Gözlemci" };
 var PROPHECY = {
   "Akıl": "Makarya'da bir gün bir köprü, bir yazılım ya da en azından bir tablo dosyası senin adını taşıyacak.",
   "Çene": "Ya büyükelçi olacaksın ya da çarşının en iyi pazarlığını yapan kişi.",
