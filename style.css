@@ -555,3 +555,13 @@ button:disabled{cursor:default}
 .curBar{position:sticky;bottom:0;z-index:5;margin-top:auto;flex:0 0 auto;display:flex;justify-content:flex-end;padding:22px 16px 16px;background:linear-gradient(180deg,rgba(11,22,23,0),rgba(11,22,23,.92) 38%)}
 .curBar .curNext{position:static;margin:0;right:auto;bottom:auto}
 .curtainArt .curCap{margin-bottom:0}
+/* kavşak v2: parlak görsel, hafif renk tonu, doğru eğimli ayraç */
+.fkNew .fkL .fkImg,.fkNew .fkR .fkImg{filter:none;object-position:center}
+.fkNew .fkL:before{background:linear-gradient(180deg,rgba(40,150,90,.16) 0%,rgba(0,0,0,0) 40%,rgba(8,14,12,.82) 100%)}
+.fkNew .fkR:before{background:linear-gradient(180deg,rgba(190,60,50,.16) 0%,rgba(0,0,0,0) 40%,rgba(20,8,8,.82) 100%)}
+.fkNew .fkSeam{transform:skewX(-7.3deg);width:3px;left:calc(50% - 1.5px)}
+.fkNew .fkL,.fkNew .fkR{width:54%}
+.fkNew .fkL{clip-path:polygon(0 0,100% 0,calc(100% - 22px) 100%,0 100%)}
+.fkNew .fkR{clip-path:polygon(22px 0,100% 0,100% 100%,0 100%)}
+.fkNew .fkL,.fkNew .fkR{width:56%}
+.fkNew .fkSeam{width:4px;left:calc(50% - 2px);background:linear-gradient(180deg,#f1c565,#c69a3c);box-shadow:0 0 0 1px rgba(0,0,0,.35),0 0 12px rgba(241,197,101,.7)}
