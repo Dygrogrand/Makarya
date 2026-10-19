@@ -166,8 +166,8 @@ function closeChapter(S) {
   var lv = itibarLevel(S), gl = gonulLevel(S), d0 = destekOf(S), note = 0, sum = lv + gl;
   /* Aile desteği yalnızca ailenin hoşuna gitmeyen bir seçim yapıldıysa düşer; yalnızca düşük değerler yetmez */
   var disliked = ((S.destekNeg || {})[S.ch] || 0) > 0;
-  if (sum > 0 && d0 < 2) { S.destek = d0 + 1; note = 1; }
-  else if (sum < 0 && d0 > 0 && disliked) { S.destek = d0 - 1; note = -1; }
+  if (sum > 0 && dpOf(S) < 100) { dpChange(S, 1); note = destekOf(S) !== d0 ? 1 : 0; }
+  else if (sum < 0 && dpOf(S) > 0 && disliked) { dpChange(S, -1); note = destekOf(S) !== d0 ? -1 : 0; }
   S.itibarNote[S.ch] = note;
   S.destekWhy = S.destekWhy || {}; S.destekWhy[S.ch] = lv && gl ? "ikisi" : gl ? "gonul" : "itibar";
   /* Borç faizi: ödenmemiş borç maddi durumu aşındırır (en çok iki kez) */
@@ -175,7 +175,12 @@ function closeChapter(S) {
   if ((S.flags.indexOf("borclu") >= 0 || S.flags.indexOf("kart-borclu") >= 0) && S.faizN < 2 && varlikOf(S) >= 2) { cashChange(S, -1); S.faizN++; S.faizNote[S.ch] = 1; }
   return note;
 }
-function destekOf(S) { return S.destek == null ? 2 : S.destek; }
+/* Aile desteği gizli bir puandır (0–100); kademe puandan çıkar: Tam ≥67, Mesafeli ≥34, Küs altı.
+   Bir seçim ya da bölüm sonu puanı DP_ADIM kadar oynatır; kademe ancak eşik geçilince değişir. */
+var DP_ADIM = 25;
+function dpOf(S) { if (S.dp == null) S.dp = (S.destek == null || S.destek === 2) ? 100 : S.destek === 1 ? 50 : 15; return S.dp; }
+function destekOf(S) { var p = dpOf(S); return p >= 67 ? 2 : p >= 34 ? 1 : 0; }
+function dpChange(S, units) { S.dp = clamp(dpOf(S) + units * DP_ADIM, 0, 100); S.destek = destekOf(S); }
 /* Aile desteği azaldıkça ailenin İYİ yönleri zayıflar (Tam %100, Mesafeli %60, Küs %25); kötü yönler aynen sürer */
 var DESTEK_ETKI = [0.25, 0.6, 1];
 function sgn(v) { return v > 0 ? "+" + v : String(v); }
@@ -369,7 +374,7 @@ function applyOutcome(S, e, c, outcome, extra) {
   /* Aile desteği: seçimin kendisi aileyi etkiler (her seçim bir vazgeçiş) */
   var dd = destekDelta(S, c);
   if (dd < 0) { S.destekNeg = S.destekNeg || {}; S.destekNeg[S.ch] = (S.destekNeg[S.ch] || 0) + 1; }
-  if (dd) { var d0 = destekOf(S); S.destek = clamp(d0 + dd, 0, 2); if (S.destek !== d0) res.destek = S.destek - d0; }
+  if (dd) { var d0 = destekOf(S); dpChange(S, dd); if (destekOf(S) !== d0) res.destek = destekOf(S) - d0; }
   if (outcome === "direct") {
     for (var k in (c.direct || {})) addStat(S, k, c.direct[k], res);
     gainTrait(S, c.trait, res);
@@ -391,6 +396,10 @@ function applyOutcome(S, e, c, outcome, extra) {
     if (outcome === "bad") addFlag(S, c.flagBad);
     /* Kritik hata lakabı: mahalle bir ad takar; bölüm sonunda ve mezar taşında görünür */
     if (outcome === "bad" && c.lakap) { S.lakaplar = S.lakaplar || []; if (!S.lakaplar.some(function (l) { return l.n === c.lakap; })) { S.lakaplar.push({ n: c.lakap, ch: e.ch }); res.lakap = c.lakap; } }
+    if (!success && c.destekFail && S.family) {
+      var df = c.destekFail[S.family]; if (df == null) df = c.destekFail["*"];
+      if (df) { var dq = destekOf(S); dpChange(S, df); if (df < 0) { S.destekNeg = S.destekNeg || {}; S.destekNeg[S.ch] = (S.destekNeg[S.ch] || 0) + 1; } if (destekOf(S) !== dq) res.destek = (res.destek || 0) + destekOf(S) - dq; }
+    }
     if (!success) { addFlag(S, c.flagFail); if (c.paraFail) cashChange(S, -(c.paraFail + (outcome === "bad" ? 1 : 0)), res); }
     if (!c.mini || outcome !== "mid") S.failStreak = success ? 0 : (S.failStreak || 0) + 1;
     var r = c.r || {};
@@ -401,7 +410,7 @@ function applyOutcome(S, e, c, outcome, extra) {
   if (!wasHapis && S.flags.indexOf("hapis") >= 0) {
     S.failStreak = 0;
     if (itibarLevel(S, e.ch) > 0) { cashChange(S, -2); addFlag(S, "ceza-indirimi"); res.note = "Mahallen sana kefil oldu: cezan hafifletildi, ailen arkanda."; }
-    else { S.cash = 0; S.destek = Math.max(0, destekOf(S) - 1); }
+    else { S.cash = 0; dpChange(S, -2); }
     if (varlikOf(S) !== v00) res.varlik = varlikOf(S) - v00;
     if (destekOf(S) !== d00) res.destek = destekOf(S) - d00;
   }
