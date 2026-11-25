@@ -654,6 +654,18 @@ function shareCard() {
     cv.toBlob(function (blob) {
       if (!blob) return;
       var file = new File([blob], "makarya-hayat-karti.png", { type: "image/png" });
+      var cap = window.Capacitor, plug = cap && cap.Plugins;
+      if (cap && cap.isNativePlatform && cap.isNativePlatform() && plug && plug.Filesystem && plug.Share) {
+        var rd = new FileReader();
+        rd.onload = function () {
+          var b64 = String(rd.result).split(",")[1];
+          plug.Filesystem.writeFile({ path: "makarya-hayat-karti.png", data: b64, directory: "CACHE" })
+            .then(function (r) { return plug.Share.share({ title: "Makarya", text: "Makarya'da " + a.title + " oldum. Sen nasıl biterdin?", url: r.uri }); })
+            .catch(function () {});
+        };
+        rd.readAsDataURL(blob);
+        return;
+      }
       try {
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           navigator.share({ files: [file], title: "Makarya", text: "Makarya'da " + a.title + " oldum. Sen nasıl biterdin?" }).catch(function () {});

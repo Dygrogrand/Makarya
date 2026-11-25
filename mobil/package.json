@@ -1,0 +1,25 @@
+{
+  "name": "makarya-mobil",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Makarya – Hayat Zarı: iOS ve Android kabuğu (Capacitor)",
+  "scripts": {
+    "www": "bash scripts/build-www.sh",
+    "sync": "bash scripts/build-www.sh && npx cap sync",
+    "ios": "npm run sync && npx cap open ios",
+    "android": "npm run sync && npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/ios": "^8.6.2",
+    "@capacitor/share": "^8.0.3",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "^8.6.2"
+  }
+}

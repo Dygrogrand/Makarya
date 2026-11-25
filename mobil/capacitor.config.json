@@ -1,0 +1,9 @@
+{
+  "appId": "com.dygrogrand.makarya",
+  "appName": "Makarya",
+  "webDir": "www",
+  "backgroundColor": "#17130f",
+  "ios": { "contentInset": "never", "scrollEnabled": false, "limitsNavigationsToAppBoundDomains": false },
+  "android": { "allowMixedContent": false },
+  "server": { "androidScheme": "https" }
+}
