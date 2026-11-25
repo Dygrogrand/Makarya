@@ -618,45 +618,45 @@ function wrapText(ctx, text, x, y, maxW, lh) {
   return y + lines.length * lh;
 }
 function shareCard() {
-  var a = archetype(S), W = 1080, H = 1350;
+  var a = archetype(S), W = 1080, H = 1350, dead = S.dead;
   var cv = document.createElement("canvas"); cv.width = W; cv.height = H;
   var ctx = cv.getContext("2d");
   function draw(img) {
     ctx.fillStyle = "#1d1915"; ctx.fillRect(0, 0, W, H);
+    var IH = 620;
     if (img) {
-      var r = Math.max(W / img.width, 560 / img.height), iw = img.width * r, ih = img.height * r;
-      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, 580); ctx.clip();
-      ctx.drawImage(img, (W - iw) / 2, (560 - ih) / 2, iw, ih); ctx.restore();
-      var g = ctx.createLinearGradient(0, 300, 0, 580); g.addColorStop(0, "rgba(29,25,21,0)"); g.addColorStop(1, "rgba(29,25,21,1)");
-      ctx.fillStyle = g; ctx.fillRect(0, 300, W, 280);
+      var r = Math.max(W / img.width, IH / img.height), iw = img.width * r, ih = img.height * r;
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, IH); ctx.clip();
+      ctx.drawImage(img, (W - iw) / 2, (IH - ih) / 2, iw, ih); ctx.restore();
+      var g = ctx.createLinearGradient(0, 340, 0, IH); g.addColorStop(0, "rgba(29,25,21,0)"); g.addColorStop(1, "rgba(29,25,21,1)");
+      ctx.fillStyle = g; ctx.fillRect(0, 340, W, IH - 340);
     }
     ctx.textAlign = "center";
-    ctx.fillStyle = "#d8b16a"; ctx.font = "900 30px sans-serif"; ctx.fillText(S.dead ? "MAKARYA · MEZAR TAŞI" : "MAKARYA · HAYAT KARTI", W / 2, 620);
+    var y = 660;
+    ctx.fillStyle = "#d8b16a"; ctx.font = "900 30px sans-serif"; ctx.fillText(dead ? "MAKARYA · MEZAR TAŞI" : "MAKARYA · HAYAT KARTI", W / 2, y);
     ctx.fillStyle = "#fff"; ctx.font = "900 84px Georgia, serif";
-    var y = wrapText(ctx, a.title, W / 2, 715, 960, 90);
-    ctx.fillStyle = "#e7dbc4"; ctx.font = "700 34px sans-serif";
-    ctx.fillText(S.family + " ailesi · " + (S.gender === "kiz" ? "Kız" : "Erkek") + " · " + lifeAge(), W / 2, y + 10);
-    ctx.font = "italic 32px Georgia, serif";
-    y = wrapText(ctx, S.dead ? S.dead.cause : a.prophecy, W / 2, y + 70, 900, 42);
-    ctx.textAlign = "left"; ctx.font = "700 30px sans-serif";
-    var max = Math.max(60, Math.max.apply(null, STATS.map(function (k) { return S.stats[k]; })));
-    STATS.forEach(function (k, i) {
-      var col = i % 2, row = Math.floor(i / 2), x = 80 + col * 480, yy = y + 40 + row * 62;
-      ctx.fillStyle = "#e7dbc4"; ctx.fillText(k, x, yy);
-      ctx.fillStyle = "#3a332c"; ctx.fillRect(x + 220, yy - 20, 170, 16);
-      ctx.fillStyle = "#c69b49"; ctx.fillRect(x + 220, yy - 20, 170 * S.stats[k] / max, 16);
-      ctx.fillStyle = "#fff"; ctx.fillText(String(S.stats[k]), x + 400, yy);
-    });
-    ctx.textAlign = "center"; ctx.fillStyle = "#d8b16a"; ctx.font = "700 28px sans-serif";
-    var ly = wrapText(ctx, S.traits.slice(-3).map(function (t) { return "🏅 " + t; }).join("   "), W / 2, Math.min(y + 370, H - 150), 940, 36);
-    if ((S.lakaplar || []).length) { ctx.fillStyle = "#e7dbc4"; ctx.font = "italic 26px Georgia, serif"; wrapText(ctx, "Burada " + S.lakaplar.slice(-3).map(function (l) { return "“" + l.n + "”"; }).join(", ") + " yatıyor. Hepsi aynı kişiydi.", W / 2, Math.min(ly + 6, H - 90), 940, 32); }
-    ctx.fillStyle = "#8f836f"; ctx.font = "700 26px sans-serif"; ctx.fillText("dygrogrand.github.io/Makarya", W / 2, H - 40);
+    y = wrapText(ctx, a.title, W / 2, y + 95, 960, 90);
+    ctx.fillStyle = "#e7dbc4"; ctx.font = "700 32px sans-serif";
+    ctx.fillText(S.family + " ailesi · " + (S.gender === "kiz" ? "Kız" : "Erkek") + " · " + lifeAge(), W / 2, y + 4);
+    y += 70;
+    ctx.fillStyle = "#f3e6c8"; ctx.font = "italic 38px Georgia, serif";
+    y = wrapText(ctx, "“" + (dead ? dead.cause : a.prophecy) + "”", W / 2, y, 900, 50);
+    var top = STATS.slice().sort(function (p, q) { return S.stats[q] - S.stats[p]; }).slice(0, 3);
+    y += 36;
+    ctx.fillStyle = "#d8b16a"; ctx.font = "700 30px sans-serif";
+    ctx.fillText(top.map(function (k) { return (STAT_ICONS[k] || "") + " " + k + " " + S.stats[k]; }).join("    "), W / 2, y);
+    y += 56;
+    var tr = S.traits.slice(-3);
+    if (tr.length) { ctx.fillStyle = "#c9bca4"; ctx.font = "700 28px sans-serif"; y = wrapText(ctx, tr.map(function (t) { return "🏅 " + t; }).join("   "), W / 2, y, 940, 38); }
+    if ((S.lakaplar || []).length) { ctx.fillStyle = "#e7dbc4"; ctx.font = "italic 28px Georgia, serif"; wrapText(ctx, "Mahalle ona " + S.lakaplar.slice(-2).map(function (l) { return "“" + l.n + "”"; }).join(", ") + " dedi.", W / 2, y + 8, 940, 36); }
+    ctx.fillStyle = "#d8b16a"; ctx.font = "800 30px sans-serif"; ctx.fillText("Sen nasıl biterdin?", W / 2, H - 78);
+    ctx.fillStyle = "#8f836f"; ctx.font = "700 26px sans-serif"; ctx.fillText("dygrogrand.github.io/Makarya", W / 2, H - 36);
     cv.toBlob(function (blob) {
       if (!blob) return;
       var file = new File([blob], "makarya-hayat-karti.png", { type: "image/png" });
       try {
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Makarya", text: "Makarya'da " + a.title + " oldum." }).catch(function () {});
+          navigator.share({ files: [file], title: "Makarya", text: "Makarya'da " + a.title + " oldum. Sen nasıl biterdin?" }).catch(function () {});
           return;
         }
       } catch (e) {}
@@ -665,7 +665,7 @@ function shareCard() {
       setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
     }, "image/png");
   }
-  var srcs = famSrcs(S.family), img = new Image(), k = 0;
+  var srcs = dead ? sceneSrcs(curEvent(S).id).concat(famSrcs(S.family)) : famSrcs(S.family), img = new Image(), k = 0;
   img.onload = function () { draw(img); };
   img.onerror = function () { k++; if (k < srcs.length) img.src = srcs[k]; else draw(null); };
   img.src = srcs[0];
