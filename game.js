@@ -16,6 +16,9 @@ function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } cat
 function loadSave() { try { var raw = localStorage.getItem(SAVE_KEY); if (raw && raw.indexOf("Vicdan") >= 0) raw = raw.replace(/"Vicdan"/g, '"İtibar"').replace(/"İç Pusula"/g, '"Sözü Senet"'); var s = JSON.parse(raw); if (s && s.stats && s.stats["Gönül"] == null) { var gv = BASE_STAT + ((FAMILIES[s.family] || {}).mods || {})["Gönül"] || BASE_STAT; [s.stats, s.famStats].concat(Object.values(s.chStart || {})).forEach(function (o) { if (o && o["Gönül"] == null) o["Gönül"] = gv; }); } if (s && s.v === 5 && s.family && s.plan && s.plan.length && s.screen !== "final") return s; } catch (e) {} return null; }
 function loadMeta() { try { var m = JSON.parse(localStorage.getItem(META_KEY)); if (m && m.deaths) return m; } catch (e) {} return { lives: 0, deaths: [], titles: {} }; }
 function saveMeta(m) { try { localStorage.setItem(META_KEY, JSON.stringify(m)); } catch (e) {} }
+var SEEN_EVENTS = (function () { try { return loadMeta().seen || {}; } catch (e) { return {}; } })();
+function toggleBig() { var on = !document.documentElement.classList.contains("big"); document.documentElement.classList.toggle("big", on); try { localStorage.setItem("makarya-big", on ? "1" : "0"); } catch (e) {} }
+try { if (localStorage.getItem("makarya-big") === "1") document.documentElement.classList.add("big"); } catch (e) {}
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
 
 var IMG_Q = "?i=20261019a"; /* görseller değişince artır: tarayıcı önbelleği eski resmi göstermesin */
@@ -38,7 +41,7 @@ function art(srcs, icon, kicker, title, text, tall) {
     '<div class="artCaption">' + (kicker ? '<div class="artMeta">' + esc(kicker) + "</div>" : "") + "<h1>" + esc(title) + "</h1>" + (text ? "<p>" + esc(text) + "</p>" : "") + "</div></div>";
 }
 function topbar(title) {
-  return '<div class="topbar"><span></span><div class="brandWord">' + esc(title) +
+  return '<div class="topbar"><button class="topBtn" onclick="toggleBig()" aria-label="Yazı boyutu" style="font-size:13px">Aa</button><div class="brandWord">' + esc(title) +
     '</div><button class="topBtn" onclick="showRules()" aria-label="Kurallar">?</button></div>' +
     hudBar() + '<div class="progress"><i style="width:' + (S.plan && S.plan.length ? Math.round(100 * S.pi / S.plan.length) : 0) + '%"></i></div>';
 }
@@ -586,6 +589,7 @@ function lifeAge() { return S.dead ? S.dead.age : S.ch === 10 && S.endAge ? ageD
 function recordLife() {
   if (S.recorded) return; S.recorded = true;
   var m = loadMeta(), a = archetype(S);
+  m.seen = m.seen || {}; (S.plan || []).slice(0, (S.pi || 0) + 1).forEach(function (id) { m.seen[id] = (m.seen[id] || 0) + 1; }); SEEN_EVENTS = m.seen;
   m.lives++; m.titles[a.title] = (m.titles[a.title] || 0) + 1;
   if (S.dead) m.deaths.push({ cause: S.dead.cause, age: S.dead.age, title: S.dead.title, family: S.family, arch: a.title });
   saveMeta(m); save();

@@ -565,3 +565,6 @@ button:disabled{cursor:default}
 .fkNew .fkR{clip-path:polygon(22px 0,100% 0,100% 100%,0 100%)}
 .fkNew .fkL,.fkNew .fkR{width:56%}
 .fkNew .fkSeam{width:4px;left:calc(50% - 2px);background:linear-gradient(180deg,#f1c565,#c69a3c);box-shadow:0 0 0 1px rgba(0,0,0,.35),0 0 12px rgba(241,197,101,.7)}
+
+/* Büyük yazı (Aa düğmesi) */
+.big .artCaption p{font-size:17.5px}.big .choiceMain b{font-size:18.5px}.big .choiceMain small{font-size:14.5px}.big .sectionSub,.big .muted{font-size:15px}.big .statCard{font-size:16px}.big .artCaption h1{font-size:30px}

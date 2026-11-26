@@ -43,7 +43,7 @@ function pickEvents(S, ch, n, exclude, minM, rnd) {
   var pool = EVENTS.filter(function (e) { return e.ch === ch && e.id.indexOf("kriz-") !== 0 && e.id.indexOf("yol-") !== 0 && eligible(S, e) && exclude.indexOf(e.id) < 0 && e._m >= minM; });
   var fixed = pool.filter(function (e) { return e.fixed; });
   var rest = pool.filter(function (e) { return !e.fixed; })
-    .map(function (e) { return { e: e, k: Math.pow(rnd(), 1 / (e.weight || 1)) }; })
+    .map(function (e) { var sn = (typeof SEEN_EVENTS !== "undefined" && SEEN_EVENTS[e.id]) || 0; return { e: e, k: Math.pow(rnd(), (1 + 0.9 * sn) / (e.weight || 1)) }; })
     .sort(function (a, b) { return b.k - a.k; }).map(function (x) { return x.e; });
   return fixed.concat(rest.slice(0, Math.max(0, n - fixed.length))).sort(function (a, b) { return a._m - b._m || a._i - b._i; }).map(function (e) { return e.id; });
 }
@@ -287,6 +287,8 @@ function needBreakdown(S, e, c) {
     var cb = clamp(Math.round((S.stats["Cesaret"] - statNorm("Cesaret", e.ch)) / 3), 0, 5);
     if (cb) rows.push({ icon: "🔥", label: "Cesaret: yol değiştirme cesareti", val: -cb, kind: "cesaret" });
   }
+  /* Şans dengesi: üst üste kötü zar gelince bir sonraki zar biraz kolaylaşır (2. kötüde −1, 3.'de −2, en fazla −3) */
+  if ((S.failStreak || 0) >= 2) rows.push({ icon: "🍀", label: "Şans dengesi: üst üste kötü seri", val: -Math.min(3, S.failStreak - 1), kind: "pity" });
   if (e.id === "karne-gunu" && S.karne && S.karne.g !== "orta") rows.push({ icon: "📜", label: S.karne.g === "iyi" ? "Karne iyi" : "Karne kötü", val: S.karne.g === "iyi" ? -3 : 3, kind: "karne" });
   var fb = famScale(S, familyEventBonus(S, e, c.stat));
   if (fb) rows.push({ icon: "🏠", label: S.family + " ailesi etkisi", val: -fb, kind: "family" });
