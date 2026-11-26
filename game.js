@@ -104,7 +104,11 @@ function commit() {
   S.last = { idx: CUR.idx, res: CUR.res, roll: CUR.roll == null ? null : CUR.roll, mini: CUR.mini == null ? null : CUR.mini, need: CUR.b ? CUR.b.need : null };
   S.lock = null; S.screen = "result"; save();
 }
-function startGame(g) { if (g === "kiz" && !GIRL_OPEN) return; clearSave(); S = newState(); S.gender = g; S.screen = "family"; render(); showTutorialAsk(); }
+function startGame(g, ok) {
+  if (g === "kiz" && !GIRL_OPEN) return;
+  if (!ok && loadSave()) { modal("<h2>Yeni hayat?</h2><p>Yarım kalan hayatın silinecek. Devam etmek istersen vazgeç, başlangıç ekranındaki “Kaldığın yer” kartını kullan.</p>" +
+    '<button class="secondary" onclick="this.closest(\'.modal\').remove();startGame(\'' + g + '\',true)">Sil ve yeni başla</button>'); return; }
+  clearSave(); S = newState(); S.gender = g; S.screen = "family"; render(); showTutorialAsk(); }
 
 /* ── aile kurası ── */
 function renderFamily() {
@@ -897,21 +901,40 @@ function mgSimon(st, a, m) {
 
 /* Poker yüzü: parmağı gezinen dairenin içinde tut */
 /* Harfi çiz: kesikli çizgiyi tek hamlede takip et */
+var TRACE_SHAPES = {
+  harf: [[40, 175], [40, 30], [150, 125], [260, 30], [260, 175]],
+  imza: [[30, 150], [60, 60], [90, 150], [125, 70], [160, 145], [200, 75], [235, 140], [270, 95]],
+  zigzag: [[30, 100], [90, 40], [150, 160], [210, 40], [270, 100]],
+  s: [[240, 30], [60, 30], [60, 100], [240, 100], [240, 170], [60, 170]],
+  duz: [[30, 100], [270, 100]],
+  dalga: [[20, 100], [45, 55], [70, 100], [95, 145], [120, 100], [145, 55], [170, 100], [195, 145], [220, 100], [245, 55], [270, 100]],
+  gulumse: [[40, 70], [60, 120], [100, 155], [150, 170], [200, 155], [240, 120], [260, 70]],
+  yildiz: [[150, 20], [200, 175], [69, 79], [231, 79], [100, 175], [150, 20]],
+  ok: [[30, 100], [240, 100], [190, 50], [240, 100], [190, 150]],
+  ev: [[60, 170], [60, 90], [150, 25], [240, 90], [240, 170], [60, 170]]
+};
 function mgTrace(st, a, m) {
-  var P = m.shape === "imza" ? [[30, 150], [60, 60], [90, 150], [125, 70], [160, 145], [200, 75], [235, 140], [270, 95]] : [[40, 175], [40, 30], [150, 125], [260, 30], [260, 175]], tol = clamp(11 + a * 10, 7, 16), N = 48, cps = [];
-  for (var s = 0; s < P.length - 1; s++) for (var k = 0; k < N / 4; k++) {
-    var u = k / (N / 4); cps.push([P[s][0] + (P[s + 1][0] - P[s][0]) * u, P[s][1] + (P[s + 1][1] - P[s][1]) * u]);
+  /* Gerçekten izlemek gerekir: çizgiye çok yakın kalmak şart (tolerans dar), araya düşen boşluklar doldurulur */
+  var P = TRACE_SHAPES[m.shape] || TRACE_SHAPES.harf, tol = clamp(6 + a * 6, 4.5, 8), cps = [];
+  for (var s = 0; s < P.length - 1; s++) {
+    var segLen = Math.hypot(P[s + 1][0] - P[s][0], P[s + 1][1] - P[s][1]), n = Math.max(4, Math.ceil(segLen / 5));
+    for (var k = 0; k < n; k++) { var u = k / n; cps.push([P[s][0] + (P[s + 1][0] - P[s][0]) * u, P[s][1] + (P[s + 1][1] - P[s][1]) * u]); }
   }
   cps.push(P[P.length - 1]);
   var pts = P.map(function (p) { return p.join(","); }).join(" ");
   st.innerHTML = '<div class="mgTitle">' + esc(m.title) + '</div><svg class="mgTrace" id="tsvg" viewBox="0 0 300 200"><polyline points="' + pts +
     '" class="guide"/><circle cx="' + P[0][0] + '" cy="' + P[0][1] + '" r="9" class="startDot"/><polyline id="ink" points="" class="ink"/></svg><div class="mgStatus" id="ts">Yeşil noktadan başla</div>';
-  var svg = document.getElementById("tsvg"), ink = document.getElementById("ink"), drawing = false, done = false, line = [], hit = [], off = 0, t0 = 0;
+  var svg = document.getElementById("tsvg"), ink = document.getElementById("ink"), drawing = false, done = false, line = [], hit = [], off = 0, nProbe = 0, t0 = 0;
   svg.style.touchAction = "none";
   function toV(ev) { var r = svg.getBoundingClientRect(); return [(ev.clientX - r.left) * 300 / r.width, (ev.clientY - r.top) * 200 / r.height]; }
   function add(p) {
-    line.push(p); ink.setAttribute("points", line.map(function (q) { return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" "));
-    var best = 1e9;
+    var lp = line.length ? line[line.length - 1] : null;
+    if (lp) { var dd = Math.hypot(p[0] - lp[0], p[1] - lp[1]), steps = Math.ceil(dd / 2.5); for (var q = 1; q < steps; q++) probe([lp[0] + (p[0] - lp[0]) * q / steps, lp[1] + (p[1] - lp[1]) * q / steps]); }
+    line.push(p); probe(p);
+    ink.setAttribute("points", line.map(function (q) { return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" "));
+  }
+  function probe(p) {
+    var best = 1e9; nProbe++;
     cps.forEach(function (c, i) { var d = Math.hypot(c[0] - p[0], c[1] - p[1]); if (d < tol) hit[i] = true; if (d < best) best = d; });
     if (best > tol * 1.15) off++;
     var cov = hit.filter(Boolean).length / cps.length;
@@ -919,7 +942,7 @@ function mgTrace(st, a, m) {
   }
   function end() {
     if (done || !drawing) return; done = true; drawing = false;
-    var cov = hit.filter(Boolean).length / cps.length, prec = line.length ? 1 - off / line.length : 0;
+    var cov = hit.filter(Boolean).length / cps.length, prec = nProbe ? 1 - off / nProbe : 0;
     var fast = performance.now() - t0 < 4000 ? 0.03 : 0;
     /* çizgiden uzaklaşmak puanı doğrudan düşürür: kapsama × isabet */
     finishMini(Math.min(1, cov * Math.pow(prec, 1.5) + fast - 0.02));
